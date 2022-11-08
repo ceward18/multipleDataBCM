@@ -45,8 +45,8 @@ N <- dat$Population[1]
 # used to initialize I0 and R0
 lengthI <- 3
 
-# batches by alarmFit (56 batches total)
-batchSize <- 4
+# batches by alarmFit (3 batches total)
+batchSize <- 5
 batchIdx <- batchSize * (idx - 1) + 1:batchSize
 
 
