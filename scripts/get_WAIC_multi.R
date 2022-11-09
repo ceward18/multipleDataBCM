@@ -5,24 +5,14 @@
 # called from summarize post after samples have been combined across chains
 ################################################################################
 
-getWAIC <- function(samples, incData, smoothC, smoothH, smoothD,
-                    N, I0, R0, Rstar0, lengthI, infPeriod, alarmFit) {
-    
-    source('./scripts/modelCodes.R')
-
-    # get appropriate model code
-    modelCode <- get(paste0('SIR_', alarmFit, '_fixed'))
+getWAIC <- function(samples, incData, smoothC, smoothH, smoothD, N, I0, R0) {
     
     # model-specific constants, data, and inits
-    modelInputs <- getModelInput(alarmFit = alarmFit, incData = incData,
-                                 smoothC = smoothC, smoothH = smoothH,
-                                 smoothD = smoothD, infPeriod = infPeriod, 
-                                 N = N, I0 = I0, R0 = R0, Rstar0 = Rstar0, 
-                                 lengthI = lengthI)
+    modelInputs <- getModelInput(incData, smoothC, smoothH, smoothD, N, I0, R0)
 
 
     ### create nimble model
-    myModel <- nimbleModel(modelCode, 
+    myModel <- nimbleModel(SIR_spline_multi, 
                            data = modelInputs$dataList, 
                            constants = modelInputs$constantsList,
                            inits = modelInputs$initsList)

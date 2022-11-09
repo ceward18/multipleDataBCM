@@ -11,22 +11,18 @@ library(coda)
 library(nimble)
 
 # source relevant scripts
-source('./scripts/model_codes.R')
-source('./scripts/get_model_inputs_uni.R')
-source('./scripts/post_pred_fit_uni.R')
-source('./scripts/get_WAIC_uni.R')
+source('./scripts/get_model_inputs_multi.R')
+source('./scripts/get_WAIC_multi.R')
 
-summarizePost <- function(resThree, incData, alarmBase, N, I0, R0) {
+summarizePost <- function(resThree, incData, smoothC, smoothH, smoothD, N, I0, R0) {
     
-    paramSamples1 <- resThree[[1]][,-grep('alarm|yAlarm|Rstar|R0|SIR_init\\[3\\]',
-                                          colnames(resThree[[1]]))]
-    paramSamples2 <- resThree[[2]][,-grep('alarm|yAlarm|Rstar|R0|SIR_init\\[3\\]', 
-                                          colnames(resThree[[2]]))]
-    paramSamples3 <- resThree[[3]][,-grep('alarm|yAlarm|Rstar|R0|SIR_init\\[3\\]', 
-                                          colnames(resThree[[3]]))]
+    paramSamples1 <- resThree[[1]][,-grep('alarm|R0|yAlarm', colnames(resThree[[1]]))]
+    paramSamples2 <- resThree[[2]][,-grep('alarm|R0|yAlarm', colnames(resThree[[2]]))]
+    paramSamples3 <- resThree[[3]][,-grep('alarm|R0|yAlarm', colnames(resThree[[3]]))]
     
     ##############################################################################
     ### gelman-rubin
+    
     res_mcmc <- mcmc.list(mcmc(paramSamples1),
                           mcmc(paramSamples2),
                           mcmc(paramSamples3))
@@ -37,6 +33,7 @@ summarizePost <- function(resThree, incData, alarmBase, N, I0, R0) {
     
     ##############################################################################
     ### posterior mean and 95% CI for parameters
+    
     paramsPost <- rbind(paramSamples1, paramSamples2, paramSamples3)
     postMeans <- colMeans(paramsPost)
     postCI <- apply(paramsPost, 2, quantile, probs = c(0.025, 0.975))
@@ -47,7 +44,7 @@ summarizePost <- function(resThree, incData, alarmBase, N, I0, R0) {
     rownames(postParams) <- NULL
     
     ##############################################################################
-    ### posterior distribution of alarm function 
+    ### posterior distribution of alarm function over epidemic time 
     
     alarmSamples1 <- t(resThree[[1]][,grep('yAlarm', colnames(resThree[[1]]))])
     alarmSamples2 <- t(resThree[[2]][,grep('yAlarm', colnames(resThree[[2]]))])
@@ -58,18 +55,19 @@ summarizePost <- function(resThree, incData, alarmBase, N, I0, R0) {
     postCI <- apply(alarmSamples, 1, quantile, probs = c(0.025, 0.975))
     
     # get xAlarm
-    modelInputs <- getModelInput(incData, alarmBase, N, I0, R0)
+    modelInputs <- getModelInput(incData, smoothC, smoothH, smoothD, N, I0, R0)
     
-    postAlarm <- data.frame(xAlarm = modelInputs$xAlarm, 
+    postAlarm <- data.frame(xC = modelInputs$grid$xC, 
+                            xH = modelInputs$grid$xH, 
+                            xD = modelInputs$grid$xD, 
                             mean = postMeans,
                             lower = postCI[1,],
                             upper = postCI[2,])
     
     rownames(postAlarm) <- NULL
     
-  
     ##############################################################################
-    ### Posterior distribution of reproductive number
+    ### Posterior distribution of reproductive number over epidemic time
     
     R0Samples1 <-  resThree[[1]][,grep('R0', colnames(resThree[[1]]))]
     R0Samples2 <-  resThree[[2]][,grep('R0', colnames(resThree[[2]]))]
@@ -89,21 +87,28 @@ summarizePost <- function(resThree, incData, alarmBase, N, I0, R0) {
     ##############################################################################
     ### WAIC values
     
+    # samples to use for WAIC calculation differ by model
     samples <- rbind(resThree[[1]], resThree[[2]], resThree[[3]])
-    # need yAlarm on the logit scale
-    yAlarmCols <- grep('yAlarm', colnames(samples))
-    samples[,yAlarmCols] <- logit(samples[,yAlarmCols])
-    colnames(samples)[yAlarmCols] <- paste0('logit_yAlarm[', 1:length(yAlarmCols), ']')
+    # 
+    # if (alarmFit == 'gp') {
+    #     # need yAlarm on the logit scale
+    #     yAlarmCols <- grep('y', colnames(samples))
+    #     samples[,yAlarmCols] <- logit(samples[,yAlarmCols])
+    #     colnames(samples)[yAlarmCols] <- paste0('logit_',  colnames(samples)[yAlarmCols])
+    # }
     
-    waic <- getWAIC(samples = samples, incData = incData, alarmBase = alarmBase, 
+    waic <- getWAIC(samples = samples, incData = incData, 
+                    smoothC = smoothC, smoothH = smoothH, smoothD = smoothD, 
                     N = N, I0 = I0, R0 = R0)
+    
+    
     
     ### output
     list(gdiag = gdiag,
          postParams = postParams,
          postAlarm = postAlarm,
          postR0 = postR0,
-         waic = waic)
+         waic= waic)
     
     
     

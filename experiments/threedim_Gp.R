@@ -1,14 +1,16 @@
+
+library(nimble)
 # linear interpolation function to get alarm values for each observed incidence value
-nim_approx <- nimbleFunction(     
+nim_approx_tri <- nimbleFunction(     
     run = function(x = double(1), y = double(1), z = double(1),
-                   c = double(1), 
+                   grid = double(2), c = double(1), 
                    xout = double(0), yout = double(0), zout = double(0)) {
         returnType(double(0))
         
         # if xout is > max(x), return the closest value
-        if (xout >= max(x)) xout <- max(x) 
-        if (yout >= max(y)) yout <- max(y)
-        if (zout >= max(z)) zout <- max(z)
+        if (xout >= max(x)) xout <- max(x) - 1e-5
+        if (yout >= max(y)) yout <- max(y) - 1e-5
+        if (zout >= max(z)) zout <- max(z) - 1e-5
         
         # x values on either side of xout
         xPlacement <- 1 * (xout < x)
@@ -29,7 +31,14 @@ nim_approx <- nimbleFunction(
         zd <- (zout - z0) / (z1 - z0)
         
         # function values across cube
-        c000 <- c[]
+        c000 <- c[grid[,1] == x0 & grid[,2] == y0 & grid[,3] == z0]
+        c100 <- c[grid[,1] == x1 & grid[,2] == y0 & grid[,3] == z0]
+        c001 <- c[grid[,1] == x0 & grid[,2] == y0 & grid[,3] == z1]
+        c101 <- c[grid[,1] == x1 & grid[,2] == y0 & grid[,3] == z1]
+        c010 <- c[grid[,1] == x0 & grid[,2] == y1 & grid[,3] == z0]
+        c110 <- c[grid[,1] == x1 & grid[,2] == y1 & grid[,3] == z0]
+        c011 <- c[grid[,1] == x0 & grid[,2] == y1 & grid[,3] == z1]
+        c111 <- c[grid[,1] == x1 & grid[,2] == y1 & grid[,3] == z1]
         
         # interpolate along x
         c00 <- c000 * (1 - xd) + c100 * xd
@@ -44,15 +53,23 @@ nim_approx <- nimbleFunction(
         # interpolate along z
         c <- c0 * (1 - zd) + c1 * zd
         
-        return(out)
+        return(c)
     })
 
 
-x <- seq(1, 20, length.out = 10)
-y <- seq(1, 50, length.out = 10)
-z <- seq(1, 10, length.out = 10)
+x <- seq(1, 20, length.out = 50)
+y <- seq(1, 50, length.out = 50)
+z <- seq(1, 10, length.out = 50)
 
 grid <- expand.grid(x, y, z)
+
+grid$c <- grid$Var1 + 
+    0.2 * grid$Var2 + 0.1 * (grid$Var2 - 25)^2 - 0.5 * (grid$Var2 - 25)^3 + 
+    010*cos(grid$Var3 * 4)
+
+plot_ly() %>% add_surface(x = ~x, y = ~y, z = ~matrix(grid$c, 10, 10))
+plot_ly() %>% add_surface(x = ~x, y = ~z, z = ~matrix(grid$c, 10, 10))
+plot_ly() %>% add_surface(x = ~y, y = ~z, z = ~matrix(grid$c, 10, 10))
 
 xout <- 12
 
@@ -62,8 +79,9 @@ xPlacement <- 1 * (xout < x)
 x0 <- x[max(which(xPlacement == 0))]
 x1 <- x[min(which(xPlacement == 1))]
 
-
-
+nim_approx(x, y, z, grid, grid$c, 18, 50, 6)
+oce::approx3d(x, y, z, f = array(grid$c, dim=c(length(x), length(y), length(z))), 
+              18, 51, 6)
 
 SIR_gp <-  nimbleCode({
     

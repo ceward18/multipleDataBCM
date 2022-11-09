@@ -13,7 +13,7 @@ library(parallel)
 library(nimble)
 
 ### source scripts (for movingAverage function)
-source('./scripts/modelCodes.R')
+source('./scripts/model_codes.R')
 
 ### read data
 dat <- read.csv('./data/nycClean.csv')

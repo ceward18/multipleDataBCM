@@ -2,16 +2,16 @@
 # function to fit models 
 ################################################################################
 
-fitAlarmModel <- function(incData, alarmBase, N, I0, R0, seed) {
+fitAlarmModel <- function(incData, smoothC, smoothH, smoothD, N, I0, R0, seed) {
     
     source('./scripts/model_codes.R')
-    source('./scripts/get_model_inputs_uni.R')
+    source('./scripts/get_model_inputs_multi.R')
     
     # for reproducibility so inits are always the same
     set.seed(seed + 3)
     
     # model-specific constants, data, and inits
-    modelInputs <- getModelInput(incData, alarmBase, N, I0, R0)
+    modelInputs <- getModelInput(incData, smoothC, smoothH, smoothD, N, I0, R0)
     
     ### MCMC specifications
     niter <- modelInputs$niter
@@ -19,7 +19,7 @@ fitAlarmModel <- function(incData, alarmBase, N, I0, R0, seed) {
     nthin <- modelInputs$nthin
     
     ### create nimble model
-    myModel <- nimbleModel(SIR_gp_uni, 
+    myModel <- nimbleModel(SIR_spline_multi, 
                            data = modelInputs$dataList, 
                            constants = modelInputs$constantsList,
                            inits = modelInputs$initsList)
@@ -28,16 +28,17 @@ fitAlarmModel <- function(incData, alarmBase, N, I0, R0, seed) {
     # need to ensure all stochastic nodes are monitored for WAIC calculation
     myConfig$addMonitors(c('yAlarm', 'alarm', 'R0'))
     
-    # use slice sampling for GP parameters
-    paramsForSlice <- c('l', 'sigma')
-    myConfig$removeSampler(paramsForSlice)
-    for (j in 1:length(paramsForSlice)) {
-        myConfig$addSampler(target = paramsForSlice[j], type = "slice")
-    }
+    # # if gaussian process model, use slice sampling
+    # paramsForSlice <- c('sigma', 'lC', 'lH', 'lD')
+    # myConfig$removeSampler(paramsForSlice)
+    # for (j in 1:length(paramsForSlice)) {
+    #     myConfig$addSampler(target = paramsForSlice[j], type = "slice")
+    # }
     
     # joint sampler for beta and w0
     myConfig$removeSampler(c('beta', 'w0'))
     myConfig$addSampler(target = c('beta', 'w0'), type = "AF_slice")
+    
     
     myMCMC <- buildMCMC(myConfig)
     compiled <- compileNimble(myModel, myMCMC) 
@@ -49,7 +50,5 @@ fitAlarmModel <- function(incData, alarmBase, N, I0, R0, seed) {
             setSeed  = seed)
     
 }
-
-
 
 

@@ -90,6 +90,25 @@ sqExpCov <- nimbleFunction(
     })
 assign('sqExpCov', sqExpCov, envir = .GlobalEnv)
 
+# spline alarm define first as an R function
+splineAlarmR <- function(xC, xH, xD, b, knotsC, knotsH, knotsD) {
+    xBasis <- cbind(splines::ns(xC, knots = knotsC),
+                    splines::ns(xH, knots = knotsH),
+                    splines::ns(xD, knots = knotsD))
+    c(xBasis %*% b)
+    
+}
+
+# then convert to something that can be compiled in nimble
+splineAlarm <- nimbleRcall(function(xC = double(1), xH = double(1), xD = double(1),
+                                    b = double(1), 
+                                    knotsC = double(1), knotsH = double(1), knotsD = double(1)){}, 
+                           Rfun = 'splineAlarmR',
+                           returnType = double(1)
+)
+assign('splineAlarm', splineAlarm, envir = .GlobalEnv)
+
+
 # linear interpolation function to get alarm values for each observed incidence value
 nim_approx <- nimbleFunction(     
     run = function(x = double(1), y = double(1), xout = double(0)) {
@@ -118,6 +137,62 @@ nim_approx <- nimbleFunction(
         return(out)
     })
 assign('nim_approx', nim_approx, envir = .GlobalEnv)
+
+nim_approx_tri <- nimbleFunction(     
+    run = function(x = double(1), y = double(1), z = double(1),
+                   grid = double(2), f = double(1), 
+                   xout = double(0), yout = double(0), zout = double(0)) {
+        returnType(double(0))
+        
+        # if xout is > max(x), return the closest value
+        if (xout >= max(x)) xout <- max(x) - 1e-5
+        if (yout >= max(y)) yout <- max(y) - 1e-5
+        if (zout >= max(z)) zout <- max(z) - 1e-5
+        
+        # x values on either side of xout
+        xPlacement <- 1 * (xout < x)
+        yPlacement <- 1 * (yout < y)
+        zPlacement <- 1 * (zout < z)
+        
+        x0 <- x[max(which(xPlacement == 0))]
+        x1 <- x[min(which(xPlacement == 1))]
+        
+        y0 <- y[max(which(yPlacement == 0))]
+        y1 <- y[min(which(yPlacement == 1))]
+        
+        z0 <- z[max(which(zPlacement == 0))]
+        z1 <- z[min(which(zPlacement == 1))]
+        
+        xd <- (xout - x0) / (x1 - x0)
+        yd <- (yout - y0) / (y1 - y0)
+        zd <- (zout - z0) / (z1 - z0)
+        
+        # function values across cube
+        c000 <- f[which(grid[,1] == x0 & grid[,2] == y0 & grid[,3] == z0)]
+        c100 <- f[which(grid[,1] == x1 & grid[,2] == y0 & grid[,3] == z0)]
+        c001 <- f[which(grid[,1] == x0 & grid[,2] == y0 & grid[,3] == z1)]
+        c101 <- f[which(grid[,1] == x1 & grid[,2] == y0 & grid[,3] == z1)]
+        c010 <- f[which(grid[,1] == x0 & grid[,2] == y1 & grid[,3] == z0)]
+        c110 <- f[which(grid[,1] == x1 & grid[,2] == y1 & grid[,3] == z0)]
+        c011 <- f[which(grid[,1] == x0 & grid[,2] == y1 & grid[,3] == z1)]
+        c111 <- f[which(grid[,1] == x1 & grid[,2] == y1 & grid[,3] == z1)]
+        
+        # interpolate along x
+        c00 <- c000 * (1 - xd) + c100 * xd
+        c01 <- c001 * (1 - xd) + c101 * xd
+        c10 <- c010 * (1 - xd) + c110 * xd
+        c11 <- c011 * (1 - xd) + c111 * xd
+        
+        # interpolate along y
+        c0 <- c00 * (1 - yd) + c10 * yd
+        c1 <- c01 * (1 - yd) + c11 * yd
+        
+        # interpolate along z
+        out <- c0 * (1 - zd) + c1 * zd
+        
+        return(out[1])
+    })
+assign('nim_approx_tri', nim_approx_tri, envir = .GlobalEnv)
 
 
 # function to simulate from myModel
@@ -331,12 +406,12 @@ SIR_gp_multi <-  nimbleCode({
     for(t in 1:tau) { 
         
         # compute alarm- each piece is between 0 and 1
-        fCases[t] <- nim_approx(xC[1:n], yC[1:n], smoothC[t])
-        fHosp[t] <- nim_approx(xH[1:n], yH[1:n], smoothH[t])
-        fDeath[t] <- nim_approx(xD[1:n], yD[1:n], smoothD[t])
+        alarmC[t] <- nim_approx(xC[1:n], yC[1:n], smoothC[t])
+        alarmH[t] <- nim_approx(xH[1:n], yH[1:n], smoothH[t])
+        alarmD[t] <- nim_approx(xD[1:n], yD[1:n], smoothD[t])
         
         # indicators for each component
-        alarm[t] <- z[1] * fCases[t] + z[2] * fHosp[t] + z[3] * fDeath[t]
+        alarm[t] <- z[1] * alarmC[t] + z[2] * alarmH[t] + z[3] * alarmD[t]
         
         probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * 
                                  sum(idd_curve[1:maxInf] * I[t, 1:maxInf]) / N)
@@ -354,7 +429,6 @@ SIR_gp_multi <-  nimbleCode({
     R0[1:(tau-maxInf)] <- get_R0(betat = beta * (1 - alarm[1:tau]), 
                                  N = N, S = S[1:tau], maxInf = maxInf,
                                  iddCurve = idd_curve[1:maxInf])
-    
     
     yC[1] <- 0
     yH[1] <- 0
@@ -381,10 +455,81 @@ SIR_gp_multi <-  nimbleCode({
     lD ~ dinvgamma(cd, dd)
     
     # indicator variable for model to be used (cases, hosp, deaths)
-    z[1:3] ~ dmulti(size = 1, prob = zProb[1:3])
+    z[1:3] ~ dmulti(prob = zProb[1:3], size = 1)
     
     # IDD Curve
     w0 ~ dnorm(2, sd = 0.1)
     k ~ dgamma(100, 100)
 })
+
+
+
+
+SIR_spline_multi <-  nimbleCode({
+    
+    SIR_init[1:3] ~ dmulti(prob = initProb[1:3], size = N)
+    S[1] <- SIR_init[1] - 1
+    I[1,1] <- SIR_init[2] + 1 # add 1 to ensure I0 > 0
+    I[1,2:maxInf] <- 0
+    
+    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
+    
+    ### rest of time points
+    for(t in 1:tau) { 
+        
+        # tri-linear interpolation
+        alarm[t] <- nim_approx_tri(x = xC[1:n], y = xH[1:n], z = xD[1:n],
+                                   grid = grid[1:nn, 1:3], 
+                                   f = yAlarm[1:nn],
+                                   xout = smoothC[t], yout = smoothH[t], zout = smoothD[t])
+        
+        probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * 
+                                 sum(idd_curve[1:maxInf] * I[t, 1:maxInf]) / N)
+        
+        Istar[t] ~ dbin(probSI[t], S[t])
+        
+        # update S and I
+        S[t + 1] <- S[t] - Istar[t]
+        I[t + 1, 2:maxInf] <- I[t, 1:(maxInf - 1)]  # shift current I by one day
+        I[t + 1, 1] <- Istar[t]                     # add newly infectious
+        
+    }
+    
+    # estimated effective R0
+    R0[1:(tau-maxInf)] <- get_R0(betat = beta * (1 - alarm[1:tau]), 
+                                 N = N, S = S[1:tau], maxInf = maxInf,
+                                 iddCurve = idd_curve[1:maxInf])
+    
+    yAlarm[1:nn] <- splineAlarm(xC_grid[1:nn], 
+                                xH_grid[1:nn], 
+                                xD_grid[1:nn],
+                                b[1:nb], 
+                                knotsC[1:2], 
+                                knotsH[1:2], 
+                                knotsD[1:2])
+    
+    # constrain yAlarm to be between 0 and 1
+    minYAlarm <- min(yAlarm[1:nn])
+    maxYAlarm <- max(yAlarm[1:nn])
+    constrain_min ~ dconstraint(minYAlarm >= 0)
+    constrain_max ~ dconstraint(maxYAlarm <= 1)
+    
+    # priors
+    beta ~ dgamma(0.1, 0.1)
+    
+    for (i in 1:nb) {
+        b[i] ~ dnorm(0, sd = 100)
+    }
+    for (i in 1:2) {
+        knotsC[i] ~ dunif(min = minC, max = maxC)
+        knotsH[i] ~ dunif(min = minH, max = maxH)
+        knotsD[i] ~ dunif(min = minD, max = maxD)
+    }
+    
+    
+    # IDD Curve
+    w0 ~ dnorm(2, sd = 0.1)
+    k ~ dgamma(100, 100)
+})
+
 
