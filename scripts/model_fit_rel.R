@@ -26,7 +26,7 @@ fitAlarmModel <- function(incData, smoothC, smoothH, smoothD, N, I0, R0, seed) {
     myConfig <- configureMCMC(myModel)
     
     # need to ensure all stochastic nodes are monitored for WAIC calculation
-    myConfig$addMonitors(c('yAlarmC', 'yAlarmH', 'yAlarmD', 'alarm', 'R0'))
+    myConfig$addMonitors(c('yC', 'yH', 'yD', 'alarm', 'R0'))
     
     # if gaussian process model, use slice sampling
     paramsForSlice <- c('sigma', 'lC', 'lH', 'lD')

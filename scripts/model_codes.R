@@ -345,15 +345,15 @@ SIR_gp_rel <-  nimbleCode({
     mu[1:n] <- mu0 * ones[1:n]
     
     # cases
-    covC[2:n, 2:n] <- sqExpCov(distC[2:n, 2:n], sigmaC, lC)
+    covC[2:n, 2:n] <- sqExpCov(distC[2:n, 2:n], sigma, lC)
     logit(yC[2:n]) ~ dmnorm(mu[2:n], cov = covC[2:n, 2:n])
     
     # hospitalizations
-    covH[2:n, 2:n] <- sqExpCov(distH[2:n, 2:n], sigmaH, lH)
+    covH[2:n, 2:n] <- sqExpCov(distH[2:n, 2:n], sigma, lH)
     logit(yH[2:n]) ~ dmnorm(mu[2:n], cov = covH[2:n, 2:n])
     
     # deaths
-    covD[2:n, 2:n] <- sqExpCov(distD[2:n, 2:n], sigmaD, lD)
+    covD[2:n, 2:n] <- sqExpCov(distD[2:n, 2:n], sigma, lD)
     logit(yD[2:n]) ~ dmnorm(mu[2:n], cov = covD[2:n, 2:n])
     
     # priors

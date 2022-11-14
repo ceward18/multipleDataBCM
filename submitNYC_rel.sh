@@ -1,10 +1,10 @@
 #!/bin/bash
 ####### Reserve computing resources #############
-#SBATCH --job-name=BCM_NYC_multi
+#SBATCH --job-name=BCM_NYC_rel
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=6
-#SBATCH --time=120:00:00
+#SBATCH --time=24:00:00
 #SBATCH --mem 64000M
 #SBATCH --partition=cpu2019,cpu2021
 #SBATCH --array=1-5
@@ -20,4 +20,4 @@ export PATH=/home/caitlin.ward/R/bin:$PATH
 export R_LIBS=/home/caitlin.ward/R/lib64:$R_LIBS
 
 ####### Run your script #########################
-Rscript run_models_multi.R $SLURM_ARRAY_TASK_ID
+Rscript run_models_rel.R $SLURM_ARRAY_TASK_ID
