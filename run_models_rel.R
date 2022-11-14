@@ -91,7 +91,7 @@ resThree <- parLapplyLB(cl, 1:3, function(x) {
     # source relevant scripts
     source('./scripts/model_fit_multi.R')
     
-    # debugonce(fitAlarmModel)
+    debugonce(fitAlarmModel)
     samples <- fitAlarmModel(incData = incData, smoothC = smoothC, smoothH = smoothH,
                              smoothD = smoothD, N = N, I0 = I0, R0 = R0, seed = x)
     

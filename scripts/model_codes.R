@@ -245,7 +245,6 @@ myF <- function(x, mid) {
 ################################################################################
 ### Univariate GP Model (alarm based only on one thing)
 
-
 SIR_gp_uni <-  nimbleCode({
     
     SIR_init[1:3] ~ dmulti(prob = initProb[1:3], size = N)
@@ -294,6 +293,82 @@ SIR_gp_uni <-  nimbleCode({
     # IDD Curve
     w0 ~ dnorm(2, sd = 0.1)
     k ~ dgamma(100, 100)
+})
+
+################################################################################
+### Relative GP Model (alarm based only on convex combo of three things)
+# correlation accounted for by model?
+
+SIR_gp_rel <-  nimbleCode({
+    
+    SIR_init[1:3] ~ dmulti(prob = initProb[1:3], size = N)
+    S[1] <- SIR_init[1] - 1
+    I[1,1] <- SIR_init[2] + 1 # add 1 to ensure I0 > 0
+    I[1,2:maxInf] <- 0
+    
+    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
+    
+    ### rest of time points
+    for(t in 1:tau) {
+        
+        # compute alarm- each piece is between 0 and 1
+        yAlarmC[t] <- nim_approx(xC[1:n], yC[1:n], smoothC[t])
+        yAlarmH[t] <- nim_approx(xH[1:n], yH[1:n], smoothH[t])
+        yAlarmD[t] <- nim_approx(xD[1:n], yD[1:n], smoothD[t])
+        
+        # weighted sum of each component
+        alarm[t] <- alpha[1] * yAlarmC[t] +
+            alpha[2] * yAlarmH[t] + 
+            alpha[3] * yAlarmD[t]
+        
+        probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * 
+                                 sum(idd_curve[1:maxInf] * I[t, 1:maxInf]) / N)
+        
+        Istar[t] ~ dbin(probSI[t], S[t])
+        
+        # update S and I
+        S[t + 1] <- S[t] - Istar[t]
+        I[t + 1, 2:maxInf] <- I[t, 1:(maxInf - 1)]  # shift current I by one day
+        I[t + 1, 1] <- Istar[t]                     # add newly infectious
+        
+    }
+    
+    # estimated effective R0
+    R0[1:(tau-maxInf)] <- get_R0(betat = beta * (1 - alarm[1:tau]), 
+                                 N = N, S = S[1:tau], maxInf = maxInf,
+                                 iddCurve = idd_curve[1:maxInf])
+    
+    
+    yC[1] <- 0
+    yH[1] <- 0
+    yD[1] <- 0
+    mu[1:n] <- mu0 * ones[1:n]
+    
+    # cases
+    covC[2:n, 2:n] <- sqExpCov(distC[2:n, 2:n], sigmaC, lC)
+    logit(yC[2:n]) ~ dmnorm(mu[2:n], cov = covC[2:n, 2:n])
+    
+    # hospitalizations
+    covH[2:n, 2:n] <- sqExpCov(distH[2:n, 2:n], sigmaH, lH)
+    logit(yH[2:n]) ~ dmnorm(mu[2:n], cov = covH[2:n, 2:n])
+    
+    # deaths
+    covD[2:n, 2:n] <- sqExpCov(distD[2:n, 2:n], sigmaD, lD)
+    logit(yD[2:n]) ~ dmnorm(mu[2:n], cov = covD[2:n, 2:n])
+    
+    # priors
+    beta ~ dgamma(0.1, 0.1)
+    sigma ~ dgamma(100, 50)
+    lC ~ dinvgamma(lCShape, lCScale)
+    lH ~ dinvgamma(lHShape, lHScale)
+    lD ~ dinvgamma(lDShape, lDScale)
+    
+    # IDD Curve
+    w0 ~ dnorm(2, sd = 0.1)
+    k ~ dgamma(100, 100)
+    
+    # relative importance
+    alpha[1:3] ~ ddirch(priorWeights[1:3])
 })
 
 ################################################################################
@@ -393,7 +468,7 @@ zUpdate <- nimbleFunction(
 
 assign('zUpdate', zUpdate, envir = .GlobalEnv)
 
-SIR_gp_multi <-  nimbleCode({
+SIR_gp_model_switch <-  nimbleCode({
     
     SIR_init[1:3] ~ dmulti(prob = initProb[1:3], size = N)
     S[1] <- SIR_init[1] - 1
@@ -464,6 +539,8 @@ SIR_gp_multi <-  nimbleCode({
 
 
 
+################################################################################
+### Multivariate GP Model (alarm non-linear function of all three)
 
 SIR_spline_multi <-  nimbleCode({
     
