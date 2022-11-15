@@ -33,6 +33,9 @@ allModels <- allModels[order(allModels$smoothWindow,
                              allModels$peak),]
 rownames(allModels) <- NULL
 
+# list of batches
+tmp <- allModels[seq(1, nrow(allModels), 5),]
+rownames(tmp) <- NULL
 
 # constants for all models
 N <- dat$Population[1]
@@ -86,19 +89,18 @@ resThree <- parLapplyLB(cl, 1:3, function(x) {
     library(nimble)
     
     # source relevant scripts
-    source('./scripts/model_fit_multi.R')
+    source('./scripts/model_fit_model_switch.R')
     
-    # debugonce(fitAlarmModel)
+    debugonce(fitAlarmModel)
     samples <- fitAlarmModel(incData = incData, smoothC = smoothC, smoothH = smoothH,
-                             smoothD = smoothD, N = N, I0 = I0, R0 = R0, seed = x)
+                             smoothD = smoothD, N = N, I0 = I0, R0 = R0, seed = 1)
     
 })
 stopCluster(cl)
 
 
-source('./scripts/summarize_post_multi.R')
+source('./scripts/summarize_post_rel.R')
 # debugonce(summarizePost)
-# debugonce(postPredFit)
 postSummaries <- summarizePost(resThree = resThree, incData = incData,
                                smoothC = smoothC, smoothH = smoothH,
                                smoothD = smoothD, N = N, I0 = I0, R0 = R0)
@@ -112,31 +114,45 @@ if (!all(postSummaries$gdiag$gr < 1.1)) {
     resThree[[3]] <- resThree[[3]][seq(1,nrow(resThree[[3]]), 10),]
     
     saveRDS(resThree, 
-            paste0('./output/chains_multi_peak', 
+            paste0('./output/chains_rel_peak', 
                    peak_i, '_', smoothWindow_i, '.rds'))
 }
 
 
 # save results in separate files
-modelInfo <- data.frame(alarmBase = 'multi',
+modelInfo <- data.frame(alarmBase = 'rel',
                         peak = peak_i,
                         smoothWindow = smoothWindow_i)
 
-gr <- cbind.data.frame(postSummaries$gdiag, modelInfo)
-paramsPost <- cbind.data.frame(postSummaries$postParams, modelInfo)
-alarmPost <- cbind.data.frame(postSummaries$postAlarm, modelInfo)
-R0Post <- cbind.data.frame(postSummaries$postR0, modelInfo)
-waicPost <- cbind.data.frame(postSummaries$waic, modelInfo)
+if (i == batchIdx[1]) {
+    gr <- cbind.data.frame(postSummaries$gdiag, modelInfo)
+    paramsPost <- cbind.data.frame(postSummaries$postParams, modelInfo)
+    alarmPost <- cbind.data.frame(postSummaries$postAlarm, modelInfo)
+    R0Post <- cbind.data.frame(postSummaries$postR0, modelInfo)
+    waicPost <- cbind.data.frame(postSummaries$waic, modelInfo)
+    
+} else {
+    gr <- rbind.data.frame(gr, 
+                           cbind.data.frame(postSummaries$gdiag, modelInfo))
+    paramsPost <- rbind.data.frame(paramsPost, 
+                                   cbind.data.frame(postSummaries$postParams, modelInfo))
+    alarmPost <- rbind.data.frame(alarmPost, 
+                                  cbind.data.frame(postSummaries$postAlarm, modelInfo))
+    R0Post <- rbind.data.frame(R0Post, 
+                               cbind.data.frame(postSummaries$postR0, modelInfo))
+    waicPost <- rbind.data.frame(waicPost, 
+                                 cbind.data.frame(postSummaries$waic, modelInfo))
+}
 
 
 
 idxPrint <- sprintf("%02d",idx)
 
 # save output in RDS form
-saveRDS(gr, paste0('./output/gr_multiBatch', idxPrint, '.rds'))
-saveRDS(paramsPost, paste0('./output/paramsPost_multiBatch', idxPrint, '.rds'))
-saveRDS(alarmPost, paste0('./output/alarmPost_multiBatch', idxPrint, '.rds'))
-saveRDS(R0Post, paste0('./output/R0Post_multiBatch', idxPrint, '.rds'))
-saveRDS(waicPost, paste0('./output/waicPost_multiBatch', idxPrint, '.rds'))
+saveRDS(gr, paste0('./output/gr_relBatch', idxPrint, '.rds'))
+saveRDS(paramsPost, paste0('./output/paramsPost_relBatch', idxPrint, '.rds'))
+saveRDS(alarmPost, paste0('./output/alarmPost_relBatch', idxPrint, '.rds'))
+saveRDS(R0Post, paste0('./output/R0Post_relBatch', idxPrint, '.rds'))
+saveRDS(waicPost, paste0('./output/waicPost_relBatch', idxPrint, '.rds'))
 
 

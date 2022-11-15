@@ -5,7 +5,7 @@
 fitAlarmModel <- function(incData, smoothC, smoothH, smoothD, N, I0, R0, seed) {
     
     source('./scripts/model_codes.R')
-    source('./scripts/get_model_inputs_rel.R')
+    source('./scripts/get_model_inputs_model_switch.R')
     
     # for reproducibility so inits are always the same
     set.seed(seed + 3)
@@ -19,14 +19,15 @@ fitAlarmModel <- function(incData, smoothC, smoothH, smoothD, N, I0, R0, seed) {
     nthin <- modelInputs$nthin
     
     ### create nimble model
-    myModel <- nimbleModel(SIR_gp_rel, 
+    myModel <- nimbleModel(SIR_gp_model_switch, 
                            data = modelInputs$dataList, 
                            constants = modelInputs$constantsList,
                            inits = modelInputs$initsList)
     myConfig <- configureMCMC(myModel)
     
+    
     # need to ensure all stochastic nodes are monitored for WAIC calculation
-    myConfig$addMonitors(c('yC', 'yH', 'yD', 'alarm', 'R0'))
+    myConfig$addMonitors(c('alarmC', 'alarmH', 'alarmD', 'alarm', 'R0'))
     
     # if gaussian process model, use slice sampling
     paramsForSlice <- c('sigma', 'lC', 'lH', 'lD')
@@ -38,6 +39,10 @@ fitAlarmModel <- function(incData, smoothC, smoothH, smoothD, N, I0, R0, seed) {
     # joint sampler for beta and w0
     myConfig$removeSampler(c('beta', 'w0'))
     myConfig$addSampler(target = c('beta', 'w0'), type = "AF_slice")
+    
+    # joint sampler for beta and w0
+    myConfig$removeSampler('z')
+    myConfig$addSampler(target = 'z', type = "zUpdate")
     
     myMCMC <- buildMCMC(myConfig)
     compiled <- compileNimble(myModel, myMCMC) 

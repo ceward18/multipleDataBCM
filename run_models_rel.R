@@ -33,10 +33,6 @@ allModels <- allModels[order(allModels$smoothWindow,
                              allModels$peak),]
 rownames(allModels) <- NULL
 
-# list of batches
-tmp <- allModels[seq(1, nrow(allModels), 5),]
-rownames(tmp) <- NULL
-
 # constants for all models
 N <- dat$Population[1]
 
@@ -124,26 +120,11 @@ modelInfo <- data.frame(alarmBase = 'rel',
                         peak = peak_i,
                         smoothWindow = smoothWindow_i)
 
-if (i == batchIdx[1]) {
-    gr <- cbind.data.frame(postSummaries$gdiag, modelInfo)
-    paramsPost <- cbind.data.frame(postSummaries$postParams, modelInfo)
-    alarmPost <- cbind.data.frame(postSummaries$postAlarm, modelInfo)
-    R0Post <- cbind.data.frame(postSummaries$postR0, modelInfo)
-    waicPost <- cbind.data.frame(postSummaries$waic, modelInfo)
-    
-} else {
-    gr <- rbind.data.frame(gr, 
-                           cbind.data.frame(postSummaries$gdiag, modelInfo))
-    paramsPost <- rbind.data.frame(paramsPost, 
-                                   cbind.data.frame(postSummaries$postParams, modelInfo))
-    alarmPost <- rbind.data.frame(alarmPost, 
-                                  cbind.data.frame(postSummaries$postAlarm, modelInfo))
-    R0Post <- rbind.data.frame(R0Post, 
-                               cbind.data.frame(postSummaries$postR0, modelInfo))
-    waicPost <- rbind.data.frame(waicPost, 
-                                 cbind.data.frame(postSummaries$waic, modelInfo))
-}
-
+gr <- cbind.data.frame(postSummaries$gdiag, modelInfo)
+paramsPost <- cbind.data.frame(postSummaries$postParams, modelInfo)
+alarmPost <- cbind.data.frame(postSummaries$postAlarm, modelInfo)
+R0Post <- cbind.data.frame(postSummaries$postR0, modelInfo)
+waicPost <- cbind.data.frame(postSummaries$waic, modelInfo)
 
 
 idxPrint <- sprintf("%02d",idx)

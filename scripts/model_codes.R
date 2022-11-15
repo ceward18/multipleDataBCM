@@ -376,90 +376,32 @@ SIR_gp_rel <-  nimbleCode({
 
 # RJ MCMC proposal for z[1:3]
 zUpdate <- nimbleFunction(
-    name = 'z',                              
+    name = 'zUpdate',                              
     contains = sampler_BASE,                     
     setup = function(model, mvSaved, target, control) {                 # REQUIRED setup arguments
         calcNodes <- model$getDependencies(target) 
         
-        # number of update attempts is some % of the final epidemic size (total # of removals)
-        nUpdates <- 200
     },                                                                  # setup can't return anything
     run = function() {
         currentValue <- model[[target]]                                   
-        currentLogProb <- model$getLogProb(calcNodes)                    
+        currentLogProb <- model$getLogProb(calcNodes)    
         
-        # repeat proposal many times 
-        for (it in 1:nUpdates) {
-            
-            # three possible moves:
-            moveType <- ceiling(runif(1, 0, 3))
-            
-            proposalValue <- currentValue
-            
-            nTimePoints <- length(currentValue)
-            
-            if (moveType == 1) {
-                # add a removal time
-                addIdx <- runif(1, 1, nTimePoints + 1)
-                proposalValue[addIdx] <- proposalValue[addIdx] + 1
-                
-                # g(old|new) - g(new|old)
-                # subtract from new - add to old
-                possibleSubtract <- which(proposalValue > 0)
-                g <- -log(length(possibleSubtract)) + log(nTimePoints)
-                
-                
-            } else if (moveType == 2) {
-                # move a removal time
-                possibleSubtract <- which(currentValue > 0)
-                subtractIdx <- possibleSubtract[runif(1, 1, length(possibleSubtract) + 1)]
-                addIdx <- runif(1, 1, nTimePoints + 1)
-                
-                proposalValue[subtractIdx] <- proposalValue[subtractIdx] - 1
-                proposalValue[addIdx] <- proposalValue[addIdx] + 1
-                
-                # g(old|new) - g(new|old)
-                # possibly have different number of values to subtract from 
-                newPossibleSubtract <- which(proposalValue > 0)
-                g <- -log(length(newPossibleSubtract)) +log(length(possibleSubtract))
-                
-            } else if (moveType == 3) {
-                # subtract a removal time
-                possibleSubtract <- which(currentValue > 0)
-                subtractIdx <- possibleSubtract[runif(1, 1, length(possibleSubtract) + 1)]
-                proposalValue[subtractIdx] <- proposalValue[subtractIdx] - 1
-                
-                # g(old|new) - g(new|old)
-                # add to new - subtract from old
-                g <- -log(nTimePoints) + log(length(possibleSubtract)) 
-                
-            }
-            
-            # put proposal value in model
-            model[[target]] <<- proposalValue                                
-            proposalLogProb <- model$calculate(calcNodes)                     
-            logAcceptanceRatio <- proposalLogProb - currentLogProb + g            
-            
-            accept <- decide(logAcceptanceRatio)                              
-            
-            if (accept) {
-                # no changes to model object needed
-                currentLogProb <- proposalLogProb
-                currentValue <- proposalValue
-                
-            } else {
-                # reject proposal and revert model to current state
-                model[[target]] <<- currentValue
-                
-                # current full conditional (calculate overwrites the stored value)
-                currentLogProb <- model$calculate(calcNodes) 
-            }
-            
-        } # end loop
+        # independent proposal
+        proposalValue <- rmulti(n = 1, size = 1, prob = rep(1, 3))
         
-        # synchronize model -> mvSaved after nUpdates
-        copy(from = model, to = mvSaved, row = 1, nodes = calcNodes, logProb = TRUE)
+        # put proposal value in model
+        model[[target]] <<- proposalValue                                
+        proposalLogProb <- model$calculate(calcNodes)                     
+        logAcceptanceRatio <- proposalLogProb - currentLogProb     
         
+        accept <- decide(logAcceptanceRatio)       
+        
+        if(accept)   {
+            copy(from = model, to = mvSaved, row = 1, nodes = calcNodes, logProb = TRUE)
+        } else {
+            copy(from = mvSaved, to = model, row = 1, nodes = calcNodes, logProb = TRUE)
+        }                                                            
+           
     },
     methods = list(   # required method for sampler_BASE base class
         reset = function() {}
@@ -525,9 +467,9 @@ SIR_gp_model_switch <-  nimbleCode({
     # priors
     beta ~ dgamma(0.1, 0.1)
     sigma ~ dgamma(100, 50)
-    lC ~ dinvgamma(cc, dc)
-    lH ~ dinvgamma(ch, dh)
-    lD ~ dinvgamma(cd, dd)
+    lC ~ dinvgamma(lCShape, lCScale)
+    lH ~ dinvgamma(lHShape, lHScale)
+    lD ~ dinvgamma(lDShape, lDScale)
     
     # indicator variable for model to be used (cases, hosp, deaths)
     z[1:3] ~ dmulti(prob = zProb[1:3], size = 1)
