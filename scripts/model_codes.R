@@ -18,6 +18,35 @@ logitDecay <- nimbleFunction(
     })
 assign('logitDecay', logitDecay, envir = .GlobalEnv)
 
+
+# multivariate threshold alarm function
+multiThresholdAlarm <- nimbleFunction(     
+    run = function(x1 = double(0), x2 = double(0), x3 = double(0), N = double(0), 
+                   delta1 = double(0), delta2 = double(0), delta3 = double(0), 
+                   H1 = double(0), H2 = double(0), H3 = double(0)) {
+        returnType(double(0))
+        
+        result <- delta1 * (x1 / N > H1) +
+            delta2 * (x2 / N > H2) + 
+            delta3 * (x3 / N > H3)
+        
+        return(result)
+    })
+assign('multiThresholdAlarm', multiThresholdAlarm, envir = .GlobalEnv)
+
+# Hill-Langmuir alarm function
+hillAlarm <- nimbleFunction(     
+    run = function(x = double(0), nu = double(0), x0 = double(0), 
+                   delta = double(0)) {
+        returnType(double(0))
+        
+        result <- delta / (1 + (x0 / x) ^ nu)
+        
+        return(result)
+    })
+assign('hillAlarm', hillAlarm, envir = .GlobalEnv)
+
+
 # calculate moving average for smoothing
 movingAverage <- nimbleFunction(     
     run = function(x = double(1), bw = double(0)) {
@@ -296,6 +325,70 @@ SIR_gp_uni <-  nimbleCode({
 })
 
 ################################################################################
+### Multivariate Threshold Alarm
+
+SIR_thresh_multi <-  nimbleCode({
+    
+    SIR_init[1:3] ~ dmulti(prob = initProb[1:3], size = N)
+    S[1] <- SIR_init[1] - 1
+    I[1,1] <- SIR_init[2] + 1 # add 1 to ensure I0 > 0
+    I[1,2:maxInf] <- 0
+    
+    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
+    
+    ### rest of time points
+    for(t in 1:tau) {
+        
+        #  sum of each component
+        alarm[t] <- multiThresholdAlarm(smoothC[t], smoothH[t], smoothD[t], N,
+                                        delta1, delta2, delta3,
+                                        H1, H2, H3)
+        
+        probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * 
+                                 sum(idd_curve[1:maxInf] * I[t, 1:maxInf]) / N)
+        
+        Istar[t] ~ dbin(probSI[t], S[t])
+        
+        # update S and I
+        S[t + 1] <- S[t] - Istar[t]
+        I[t + 1, 2:maxInf] <- I[t, 1:(maxInf - 1)]  # shift current I by one day
+        I[t + 1, 1] <- Istar[t]                     # add newly infectious
+        
+    }
+    
+    # estimated effective R0
+    R0[1:(tau-maxInf)] <- get_R0(betat = beta * (1 - alarm[1:tau]), 
+                                 N = N, S = S[1:tau], maxInf = maxInf,
+                                 iddCurve = idd_curve[1:maxInf])
+    
+    # compute alarm over input grid
+    for (i in 1:nn) {
+        yAlarm[i] <- multiThresholdAlarm(xC_grid[i], xH_grid[i], xD_grid[i], N,
+                                         delta1, delta2, delta3,
+                                         H1, H2, H3)
+    }
+    
+    # priors
+    beta ~ dgamma(0.1, 0.1)
+    delta1 ~ dbeta(1, 1)
+    delta2 ~ dbeta(1, 1)
+    delta3 ~ dbeta(1, 1)
+    H1 ~ dunif(minC/N, maxC/N)
+    H2 ~ dunif(minH/N, maxH/N)
+    H3 ~ dunif(minD/N, maxD/N)
+    
+    # IDD Curve
+    w0 ~ dnorm(2, sd = 0.1)
+    k ~ dgamma(100, 100)
+    
+    # constrain deltas to sum to 1
+    constrain_deltas ~ dconstraint(delta1 + delta2 + delta3 <= 1)
+    
+})
+
+
+
+################################################################################
 ### Relative GP Model (alarm based only on convex combo of three things)
 # correlation accounted for by model?
 
@@ -372,6 +465,82 @@ SIR_gp_rel <-  nimbleCode({
 })
 
 ################################################################################
+### Hierarchical Hill Model 
+
+SIR_gp_hier <-  nimbleCode({
+    
+    SIR_init[1:3] ~ dmulti(prob = initProb[1:3], size = N)
+    S[1] <- SIR_init[1] - 1
+    I[1,1] <- SIR_init[2] + 1 # add 1 to ensure I0 > 0
+    I[1,2:maxInf] <- 0
+    
+    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
+    
+    ### rest of time points
+    for(t in 1:tau) {
+        
+        # compute alarm- each piece is between 0 and 1
+        yAlarmC[t] <- nim_approx(xC[1:n], yC[1:n], smoothC[t])
+        yAlarmH[t] <- nim_approx(xH[1:n], yH[1:n], smoothH[t])
+        yAlarmD[t] <- nim_approx(xD[1:n], yD[1:n], smoothD[t])
+        
+        # weighted sum of each component
+        alarm[t] <- alpha[1] * yAlarmC[t] +
+            alpha[2] * yAlarmH[t] + 
+            alpha[3] * yAlarmD[t]
+        
+        probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * 
+                                 sum(idd_curve[1:maxInf] * I[t, 1:maxInf]) / N)
+        
+        Istar[t] ~ dbin(probSI[t], S[t])
+        
+        # update S and I
+        S[t + 1] <- S[t] - Istar[t]
+        I[t + 1, 2:maxInf] <- I[t, 1:(maxInf - 1)]  # shift current I by one day
+        I[t + 1, 1] <- Istar[t]                     # add newly infectious
+        
+    }
+    
+    # estimated effective R0
+    R0[1:(tau-maxInf)] <- get_R0(betat = beta * (1 - alarm[1:tau]), 
+                                 N = N, S = S[1:tau], maxInf = maxInf,
+                                 iddCurve = idd_curve[1:maxInf])
+    
+    
+    yC[1] <- 0
+    yH[1] <- 0
+    yD[1] <- 0
+    mu[1:n] <- mu0 * ones[1:n]
+    
+    # cases
+    covC[2:n, 2:n] <- sqExpCov(distC[2:n, 2:n], sigma, lC)
+    logit(yC[2:n]) ~ dmnorm(mu[2:n], cov = covC[2:n, 2:n])
+    
+    # hospitalizations
+    covH[2:n, 2:n] <- sqExpCov(distH[2:n, 2:n], sigma, lH)
+    logit(yH[2:n]) ~ dmnorm(mu[2:n], cov = covH[2:n, 2:n])
+    
+    # deaths
+    covD[2:n, 2:n] <- sqExpCov(distD[2:n, 2:n], sigma, lD)
+    logit(yD[2:n]) ~ dmnorm(mu[2:n], cov = covD[2:n, 2:n])
+    
+    # priors
+    beta ~ dgamma(0.1, 0.1)
+    sigma ~ dgamma(100, 50)
+    lC ~ dinvgamma(lCShape, lCScale)
+    lH ~ dinvgamma(lHShape, lHScale)
+    lD ~ dinvgamma(lDShape, lDScale)
+    
+    # IDD Curve
+    w0 ~ dnorm(2, sd = 0.1)
+    k ~ dgamma(100, 100)
+    
+    # relative importance
+    alpha[1:3] ~ ddirch(priorWeights[1:3])
+})
+
+
+################################################################################
 ### Multivariate GP Model (alarm based only on one of three things)
 
 # RJ MCMC proposal for z[1:3]
@@ -401,7 +570,7 @@ zUpdate <- nimbleFunction(
         } else {
             copy(from = mvSaved, to = model, row = 1, nodes = calcNodes, logProb = TRUE)
         }                                                            
-           
+        
     },
     methods = list(   # required method for sampler_BASE base class
         reset = function() {}

@@ -24,9 +24,9 @@ for (i in 2:length(grFiles)) {
 saveRDS(grAll, paste0('./', resultsFolder, '/grAll.rds'))
 
 ################################################################################
-# posterior alarms - for models that estimate the alarm function
+# posterior alarms - for models that estimate the alarm function separately
 
-alarmFiles <- outputFiles[grep('alarmPost', outputFiles)]
+alarmFiles <- outputFiles[grep('alarmPostBatch', outputFiles)]
 
 alarmAll <- readRDS(paste0('./', outputFolder, '/', alarmFiles[1]))
 
@@ -40,6 +40,25 @@ alarmAll <- alarmAll[!is.na(alarmAll$mean),]
 rownames(alarmAll) <- NULL
 
 saveRDS(alarmAll, paste0('./', resultsFolder, '/alarmPostAll.rds'))
+
+
+################################################################################
+# posterior alarms - for models that estimate all alarm functions
+
+alarmFiles <- outputFiles[grep('alarmPost_', outputFiles)]
+
+alarmAll <- readRDS(paste0('./', outputFolder, '/', alarmFiles[1]))
+
+for (i in 2:length(alarmFiles)) {
+    alarm_i <- readRDS(paste0('./', outputFolder, '/', alarmFiles[i]))
+    alarmAll <-rbind.data.frame(alarmAll, alarm_i)
+}
+
+# remove models that didn't estimate an alarm (betat and basic)
+alarmAll <- alarmAll[!is.na(alarmAll$mean),]
+rownames(alarmAll) <- NULL
+
+saveRDS(alarmAll, paste0('./', resultsFolder, '/alarmPostTogetherAll.rds'))
 
 ################################################################################
 # posterior parameters 
