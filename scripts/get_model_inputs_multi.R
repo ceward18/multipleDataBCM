@@ -34,43 +34,6 @@ getModelInput <- function(incData, smoothC, smoothH, smoothD, N, I0, R0) {
     grid <- expand.grid(xC = xC, xH = xH, xD = xD)
     nn <- nrow(grid)
     
-    # distC <- as.matrix(dist(matrix(xC)))
-    # distH <- as.matrix(dist(matrix(xH)))
-    # distD <- as.matrix(dist(matrix(xD)))
-    # 
-    # midDist <- getl(max(distC[lower.tri(distC)]))
-    # valsC <- round(optim(c(3, 2), myF, lower = c(2.001, 1.001), method = 'L-BFGS-B',
-    #                      mid = midDist)$par, 2)
-    # 
-    # midDist <- getl(max(distH[lower.tri(distH)]))
-    # valsH <- round(optim(c(3, 2), myF, lower = c(2.001, 1.001), method = 'L-BFGS-B',
-    #                      mid = midDist)$par, 2)
-    # 
-    # midDist <- getl(max(distD[lower.tri(distD)]))
-    # valsD <- round(optim(c(3, 2), myF, lower = c(2.001, 1.001), method = 'L-BFGS-B',
-    #                      mid = midDist)$par, 2)
-    # constantsList <- list(tau = tau,
-    #                       N = N,
-    #                       initProb = initProb,
-    #                       n = n,
-    #                       distC = distC,
-    #                       distH = distH,
-    #                       distD = distD,
-    #                       mu0 = 1,
-    #                       ones = logit(seq(0.0001, 0.9999, length.out= n)),
-    #                       xC = xC,
-    #                       xH = xH,
-    #                       xD = xD,
-    #                       maxInf = 10,
-    #                       priorWeights = rep(1, 3),
-    #                       cc = valsC[1],
-    #                       dc = valsC[2],
-    #                       ch = valsH[1],
-    #                       dh = valsH[2],
-    #                       cd = valsD[1],
-    #                       dd = valsD[2],
-    #                       zProb = c(1, 1, 1))
-    
     constantsList <- list(tau = tau,
                           N = N,
                           initProb = initProb,

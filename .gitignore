@@ -2,3 +2,4 @@
 *.Rhistory
 *.qmd
 ./output/chains*
+./old/output/chains*
