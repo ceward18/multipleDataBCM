@@ -1,5 +1,5 @@
 *.html
 *.Rhistory
 *.qmd
-./output/chains*
-./new/output/chains*
+output/chains*
+new/output/chains*
