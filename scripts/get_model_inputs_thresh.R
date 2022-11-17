@@ -71,8 +71,8 @@ getModelInput <- function(incData, smoothC, smoothH, smoothD, N, I0, R0) {
     
     
     ### MCMC specifications
-    niter <- 1e6
-    nburn <- 5e5
+    niter <- 5e5
+    nburn <- 2e5
     nthin <- 10
     
     list(constantsList = constantsList,
