@@ -413,7 +413,7 @@ SIR_spline_multi <-  nimbleCode({
         
         # tri-linear interpolation
         alarm[t] <- nim_approx_tri(x = xC[1:n], y = xH[1:n], z = xD[1:n],
-                                   grid = grid[1:nn, 1:3], 
+                                   grid = grid[1:nn, 1:3],
                                    f = yAlarm[1:nn],
                                    xout = smoothC[t], yout = smoothH[t], zout = smoothD[t])
         
@@ -434,12 +434,12 @@ SIR_spline_multi <-  nimbleCode({
                                  N = N, S = S[1:tau], maxInf = maxInf,
                                  iddCurve = idd_curve[1:maxInf])
     
-    yAlarm[1:nn] <- splineAlarm(xC_grid[1:nn], 
-                                xH_grid[1:nn], 
+    yAlarm[1:nn] <- splineAlarm(xC_grid[1:nn],
+                                xH_grid[1:nn],
                                 xD_grid[1:nn],
-                                b[1:nb], 
-                                knotsC[1:2], 
-                                knotsH[1:2], 
+                                b[1:nb],
+                                knotsC[1:2],
+                                knotsH[1:2],
                                 knotsD[1:2])
     
     # constrain yAlarm to be between 0 and 1

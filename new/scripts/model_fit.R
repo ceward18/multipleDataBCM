@@ -33,8 +33,18 @@ fitAlarmModel <- function(incData, modelType, alarmFit, alarmBase,
     # need to ensure all stochastic nodes are monitored for WAIC calculation
     myConfig$addMonitors(c('yAlarm', 'alarm', 'R0'))
     
+    
     if (modelType == 'multi' & alarmFit == 'hill') {
         myConfig$addMonitors(c('alarmC', 'alarmH', 'alarmD'))
+        
+        # use slice sampling for hill parameters
+        paramsForSlice <- c('gamma1', 'gamma2', 'gamma3',
+                            'nu1', 'nu2', 'nu3',
+                            'delta1', 'delta2', 'delta3')
+        myConfig$removeSampler(paramsForSlice)
+        for (j in 1:length(paramsForSlice)) {
+            myConfig$addSampler(target = paramsForSlice[j], type = "slice")
+        }
     }
  
     if (alarmFit == 'gp') {
@@ -46,6 +56,7 @@ fitAlarmModel <- function(incData, modelType, alarmFit, alarmBase,
             myConfig$addSampler(target = paramsForSlice[j], type = "slice")
         }
     }
+    
     
     # joint sampler for beta and w0
     myConfig$removeSampler(c('beta', 'w0'))

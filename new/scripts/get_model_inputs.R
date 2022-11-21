@@ -71,7 +71,7 @@ getModelInput <- function(incData, modelType, alarmFit, alarmBase,
         if (alarmFit == 'hill') {
             
             ### constants
-            n <- 20
+            n <- 10
             
             minC <- floor(min(smoothC))
             minH <- floor(min(smoothH))
@@ -129,7 +129,7 @@ getModelInput <- function(incData, modelType, alarmFit, alarmBase,
         } else if (alarmFit == 'spline') {
             
             ### constants
-            n <- 20
+            n <- 10
             
             minC <- floor(min(smoothC))
             minH <- floor(min(smoothH))

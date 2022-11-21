@@ -53,7 +53,6 @@ allModels <- allModels[order(allModels$alarmFit,
 rownames(allModels) <- NULL
 
 
-
 # used to initialize I0 and R0
 lengthI <- 3
 
@@ -140,6 +139,8 @@ for (i in batchIdx) {
                       smoothC = smoothC, smoothH = smoothH,
                       smoothD = smoothD, N = N, I0 = I0, R0 = R0, seed = x)
         
+        
+        
     })
     stopCluster(cl)
     
@@ -190,13 +191,13 @@ for (i in batchIdx) {
         alarmPost <- rbind.data.frame(alarmPost, 
                                       cbind.data.frame(postSummaries$postAlarm, modelInfo))
         alarmIndPost <- rbind.data.frame(alarmIndPost, 
-                                      cbind.data.frame(postSummaries$postAlarmInd, modelInfo))
+                                         cbind.data.frame(postSummaries$postAlarmInd, modelInfo))
         R0Post <- rbind.data.frame(R0Post, 
                                    cbind.data.frame(postSummaries$postR0, modelInfo))
         waicPost <- rbind.data.frame(waicPost, 
                                      cbind.data.frame(postSummaries$waic, modelInfo))
     }
- 
+    
 } # end loop
 
 
