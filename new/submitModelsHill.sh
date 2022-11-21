@@ -1,13 +1,13 @@
 #!/bin/bash
 ####### Reserve computing resources #############
-#SBATCH --job-name=BCM_multi_spline
+#SBATCH --job-name=BCM_multi
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=6
-#SBATCH --time=168:00:00
+#SBATCH --time=24:00:00
 #SBATCH --mem 128000M
 #SBATCH --partition=cpu2019,cpu2021
-#SBATCH --array=49-108
+#SBATCH --array=37-48
 #SBATCH --output=./out/Array.%A_%a.out
 #SBATCH --error=./err/Array.%A_%a.error
 

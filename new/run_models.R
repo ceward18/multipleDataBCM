@@ -18,7 +18,7 @@ library(nimble)
 ### source scripts (for movingAverage function)
 source('./scripts/model_codes.R')
 
-cities <- c('nyc', 'london')
+cities <- c('nyc', 'london', 'montreal')
 peak <- c('1', '2', '3', '4', '5')
 smoothWindow <- c(1, 14, 30, 60)
 
@@ -43,7 +43,7 @@ allModelsMulti <- expand.grid(city = cities,
 allModels <- rbind.data.frame(allModelsUni,
                               allModelsMulti)
 
-# 120 total
+# 300 total
 allModels <- allModels[order(allModels$alarmFit,
                              allModels$city, 
                              allModels$modelType, 
@@ -58,15 +58,17 @@ lengthI <- 3
 
 # batches by model (5 in each batch)
 # spline models should run in their own batch
-if (idx <= 32) {
+if (idx <= 48) {
     
     batchSize <- 5
     batchIdx <- batchSize * (idx - 1) + 1:batchSize
     
 } else {
+    # 49-108 (20 per peak = 60 total)
     
     batchSize <- 1
-    batchIdx <- 160 - 32 + batchSize * (idx - 1) + 1:batchSize
+    batchIdx <- (length(cities) * 80) - (length(cities) * 16) + 
+        batchSize * (idx - 1) + 1:batchSize
     
 }
 
