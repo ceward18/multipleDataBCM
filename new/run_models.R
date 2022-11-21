@@ -1,8 +1,10 @@
 ################################################################################
-# Run multivariate alarm models (BMA)
+# Run multivariate alarm models 
+# London and NYC
 # Peaks 1-5
 # Cases, hosps, deaths
-# all based on GP alarm
+# Univariate based on GP alarm
+# Multivariate based on hill alarms
 ################################################################################
 
 
