@@ -60,3 +60,7 @@ Compiling
   [Note] This may take a minute.
   [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.
 Calculating WAIC.
+Error in quantile.default(newX[, i], ...) : 
+  missing values and NaN's not allowed if 'na.rm' is FALSE
+Calls: summarizePost -> apply -> FUN -> quantile.default
+Execution halted
