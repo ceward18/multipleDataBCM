@@ -51,8 +51,8 @@ fitAlarmModel <- function(incData, modelType, alarmBase,
     if (modelType == 'simple') {
         
         # joint sampler for beta and w0
-        myConfig$removeSampler(c('beta', 'w0'))(target = c('beta', 'w0'), type = "AF_slice")
-        myConfig$addSampler
+        myConfig$removeSampler(c('beta', 'w0'))
+        myConfig$addSampler(target = c('beta', 'w0'), type = "AF_slice")
     }
     
     if (modelType == 'full') {

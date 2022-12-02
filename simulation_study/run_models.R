@@ -57,9 +57,6 @@ for (i in batchIdx) {
     smoothH <- head(movingAverage(c(0, hospData), 30), -1)
     smoothD <- head(movingAverage(c(0, deathData), 30), -1)
     
-    
-    system.time({
-        
     # run three chains in parallel
     cl <- makeCluster(3)
     clusterExport(cl, list('incData', 'modelType_i', 'smoothC', 'smoothH', 'smoothD',
@@ -71,12 +68,13 @@ for (i in batchIdx) {
         
         # source relevant scripts
         source('./scripts/fit_models.R')
+        
         fitAlarmModel(incData = incData, modelType = modelType_i, 
                       smoothC = smoothC,  smoothH = smoothH, smoothD = smoothD,
                       hospData = hospData, deathData = deathData, seed = x)
     })
     stopCluster(cl)
-    })
+
     source('./scripts/summarize_post.R')
     
     # debugonce(summarizePost)
