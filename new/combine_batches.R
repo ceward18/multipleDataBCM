@@ -29,9 +29,23 @@ saveRDS(grAll, paste0('./', resultsFolder, '/grAll.rds'))
 alarmFiles <- outputFiles[grep('alarmPost', outputFiles)]
 
 alarmAll <- readRDS(paste0('./', outputFolder, '/', alarmFiles[1]))
+if('xAlarm' %in% colnames(alarmAll)) {
+    alarmAll$xC <- NA
+    alarmAll$xH <- NA
+    alarmAll$xD <- NA
+} else {
+    alarmAll$xAlarm <- NA
+}
 
 for (i in 2:length(alarmFiles)) {
     alarm_i <- readRDS(paste0('./', outputFolder, '/', alarmFiles[i]))
+    if('xAlarm' %in% colnames(alarm_i)) {
+        alarm_i$xC <- NA
+        alarm_i$xH <- NA
+        alarm_i$xD <- NA
+    } else {
+        alarm_i$xAlarm <- NA
+    }
     alarmAll <-rbind.data.frame(alarmAll, alarm_i)
 }
 
@@ -48,9 +62,15 @@ saveRDS(alarmAll, paste0('./', resultsFolder, '/alarmPostAll.rds'))
 alarmFiles <- outputFiles[grep('alarmIndPost', outputFiles)]
 
 alarmAll <- readRDS(paste0('./', outputFolder, '/', alarmFiles[1]))
+if('xAlarm' %in% colnames(alarmAll)) {
+    colnames(alarmAll)[which(colnames(alarmAll) == 'xAlarm')] <- 'time'
+}
 
 for (i in 2:length(alarmFiles)) {
     alarm_i <- readRDS(paste0('./', outputFolder, '/', alarmFiles[i]))
+    if('xAlarm' %in% colnames(alarm_i)) {
+        colnames(alarm_i)[which(colnames(alarm_i) == 'xAlarm')] <- 'time'
+    }
     alarmAll <-rbind.data.frame(alarmAll, alarm_i)
 }
 

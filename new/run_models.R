@@ -64,7 +64,7 @@ if (idx <= 48) {
     batchIdx <- batchSize * (idx - 1) + 1:batchSize
     
 } else {
-    # 49-108 (20 per peak = 60 total)
+    # 49-108 (20 per peak = 60 total (4 smoothWindows * 5 peaks))
     
     batchSize <- 1
     batchIdx <- (length(cities) * 80) - (length(cities) * 16) + 

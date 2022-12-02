@@ -111,7 +111,7 @@ summarizePost <- function(resThree, incData, modelType, alarmFit, alarmBase,
         
     } else {
         
-        postAlarmInd <- data.frame(xAlarm = NA, 
+        postAlarmInd <- data.frame(time = NA, 
                                    marg = NA,
                                    mean = NA,
                                    lower = NA,
