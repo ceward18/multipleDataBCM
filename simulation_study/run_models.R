@@ -86,14 +86,17 @@ for (i in batchIdx) {
     # if the model did not converge save the chains so these can be examined later
     if (!all(postSummaries$gdiag$gr < 1.1)) {
         
-        # create thinned version
+        # # create thinned version
         resThree[[1]] <- resThree[[1]][seq(1,nrow(resThree[[1]]), 10),]
         resThree[[2]] <- resThree[[2]][seq(1,nrow(resThree[[2]]), 10),]
         resThree[[3]] <- resThree[[3]][seq(1,nrow(resThree[[3]]), 10),]
+        # 
+        # saveRDS(resThree, 
+        #         paste0('./output/chains_', dataType_i, '_', modelType_i,
+        #                '_', simNumber_i, '.rds'))
         
-        saveRDS(resThree, 
-                paste0('./output/chains_', dataType_i, '_', modelType_i,
-                       '_', simNumber_i, '.rds'))
+        print(paste0('./output/chains_', dataType_i, '_', modelType_i,
+                                    '_', simNumber_i, '.rds'))
     }
     
     
@@ -129,6 +132,7 @@ for (i in batchIdx) {
     
 } # end loop
 
+idxPrint <- sprintf("%02d",idx)
 
 
 # save output in RDS form

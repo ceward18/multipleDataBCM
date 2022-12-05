@@ -76,23 +76,36 @@ getModelInput <- function(incData, modelType, smoothC, smoothH, smoothD,
         dataList$Hstar <- hospData
         dataList$Dstar <- deathData
         
-        ### inits 
-        initsList <- list(beta = runif(1, 1/7, 1),
-                          gamma1 = runif(1), # IR
-                          gamma2 = runif(1), # HR
-                          lambda = runif(1), # IH
-                          phi = runif(1) ,   # HD
-                          nuC = runif(1, 1, 5),
-                          nuH = runif(1, 1, 5),
-                          nuD = runif(1, 1, 5),
-                          x0C = runif(1, 0, maxC/3),
-                          x0H = runif(1, 0, maxH/3),
-                          x0D = runif(1, 0, maxD/3),
-                          deltaC = runif(1, 0, 0.3),
-                          deltaH = runif(1, 0, 0.3),
-                          deltaD = runif(1, 0, 0.3),
-                          RstarI = round(0.3 * c(rep(0, 3), I0, dataList$Istar[1:(tau-4)])),
-                          RstarH = round(0.3 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
+        repeat {
+            
+            ### inits 
+            initsList <- list(beta = runif(1, 1/7, 1),
+                              gamma1 = runif(1), # IR
+                              gamma2 = runif(1), # HR
+                              lambda = runif(1), # IH
+                              phi = runif(1) ,   # HD
+                              nuC = runif(1, 1, 5),
+                              nuH = runif(1, 1, 5),
+                              nuD = runif(1, 1, 5),
+                              x0C = runif(1, 0, maxC/3),
+                              x0H = runif(1, 0, maxH/3),
+                              x0D = runif(1, 0, maxD/3),
+                              deltaC = runif(1, 0, 0.3),
+                              deltaH = runif(1, 0, 0.3),
+                              deltaD = runif(1, 0, 0.3),
+                              RstarI = round(0.3 * c(rep(0, 3), I0, dataList$Istar[1:(tau-4)])),
+                              RstarH = round(0.3 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
+            
+            probIH <- 1 - exp(-initsList$lambda)
+            probIR <- 1 - exp(-initsList$gamma1)
+            
+            probHR <- 1 - exp(-initsList$gamma2)
+            probHD <- 1 - exp(-initsList$phi)
+            
+            if ((probIH + probIR < 1) & (probHR + probHD < 1)) break
+            
+        }
+       
         
         names(initsList$RstarI) <- paste0('RstarI[', 1:tau, ']')
         names(initsList$RstarH) <- paste0('RstarH[', 1:tau, ']')
@@ -103,7 +116,6 @@ getModelInput <- function(incData, modelType, smoothC, smoothH, smoothD,
     niter <- 6e5
     nburn <- 3e5
     nthin <- 10
-    
     
     list(constantsList = constantsList,
          dataList = dataList,

@@ -30,6 +30,7 @@ getWAIC <- function(samples, modelType, incData, smoothC, smoothH, smoothD,
     samplesIstar <- cbind(samples, incDataSamples)
     
     if (modelType == 'full') {
+        
         hospDataSamples <- matrix(rep(hospData), NROW(samples),
                                  ncol = length(hospData), byrow = T)
         colnames(hospDataSamples) <- paste0('Hstar[', 1:ncol(hospDataSamples), ']')
@@ -40,10 +41,14 @@ getWAIC <- function(samples, modelType, incData, smoothC, smoothH, smoothD,
         colnames(deathDataSamples) <- paste0('Dstar[', 1:ncol(deathDataSamples), ']')
         samplesDstar <- cbind(samplesHstar, deathDataSamples)
         
+        waicList <- calculateWAIC(samplesDstar, compiled)
+        
+    } else {
+        
+        waicList <- calculateWAIC(samplesIstar, compiled)
     }
     
     
-    waicList <- calculateWAIC(samplesDstar, compiled)
     
     data.frame(waic = waicList$WAIC,
                lppd = waicList$lppd,
