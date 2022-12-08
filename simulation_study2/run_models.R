@@ -14,10 +14,10 @@ source('./scripts/model_code.R')
 
 # set up grid of models to fit
 nSim <- 50
-dataType <- c('inc', 'hosp', 'death', 'equal')
+dataType <- c('inc', 'death', 'equal')
 modelType <- c('simple', 'full')
 
-# 400
+# 300
 allFits <- expand.grid(simNumber = 1:nSim,
                        dataType = dataType,
                        modelType = modelType,
@@ -54,12 +54,11 @@ for (i in batchIdx) {
     # smoothed incidence/hosp/deaths to inform alarm function 
     # (shifted so alarm is informed only by data up to time t-1)
     smoothC <- head(movingAverage(c(0, incData), 30), -1)
-    smoothH <- head(movingAverage(c(0, hospData), 30), -1)
     smoothD <- head(movingAverage(c(0, deathData), 30), -1)
     
     # run three chains in parallel
     cl <- makeCluster(3)
-    clusterExport(cl, list('incData', 'modelType_i', 'smoothC', 'smoothH', 'smoothD',
+    clusterExport(cl, list('incData', 'modelType_i', 'smoothC', 'smoothD',
                            'hospData', 'deathData'))
     
     resThree <- parLapplyLB(cl, 1:3, function(x) {
@@ -70,7 +69,7 @@ for (i in batchIdx) {
         source('./scripts/fit_models.R')
         
         fitAlarmModel(incData = incData, modelType = modelType_i, 
-                      smoothC = smoothC,  smoothH = smoothH, smoothD = smoothD,
+                      smoothC = smoothC,  smoothD = smoothD,
                       hospData = hospData, deathData = deathData, seed = x)
     })
     stopCluster(cl)
@@ -80,7 +79,7 @@ for (i in batchIdx) {
     # debugonce(summarizePost)
     postSummaries <- summarizePost(resThree = resThree, incData = incData,
                                    modelType = modelType_i, 
-                                   smoothC = smoothC, smoothH = smoothH, smoothD = smoothD,
+                                   smoothC = smoothC, smoothD = smoothD,
                                    hospData = hospData, deathData = deathData)
     
     # if the model did not converge save the chains so these can be examined later
@@ -94,9 +93,6 @@ for (i in batchIdx) {
         saveRDS(resThree,
                 paste0('./output/chains_', dataType_i, '_', modelType_i,
                        '_', simNumber_i, '.rds'))
-        
-        print(paste0('./output/chains_', dataType_i, '_', modelType_i,
-                                    '_', simNumber_i, '.rds'))
     }
     
     
@@ -112,7 +108,6 @@ for (i in batchIdx) {
         paramsPost <- cbind.data.frame(postSummaries$postParams, modelInfo)
         alarmPost <- cbind.data.frame(postSummaries$postAlarm, modelInfo)
         alarmTimePost <- cbind.data.frame(postSummaries$postAlarmTime, modelInfo)
-        R0Post <- cbind.data.frame(postSummaries$postR0, modelInfo)
         waicPost <- cbind.data.frame(postSummaries$waic, modelInfo)
         
     } else {
@@ -124,8 +119,6 @@ for (i in batchIdx) {
                                       cbind.data.frame(postSummaries$postAlarm, modelInfo))
         alarmTimePost <- rbind.data.frame(alarmTimePost, 
                                           cbind.data.frame(postSummaries$postAlarmTime, modelInfo))
-        R0Post <- rbind.data.frame(R0Post, 
-                                   cbind.data.frame(postSummaries$postR0, modelInfo))
         waicPost <- rbind.data.frame(waicPost, 
                                      cbind.data.frame(postSummaries$waic, modelInfo))
     }
@@ -140,7 +133,6 @@ saveRDS(gr, paste0('./output/gr_Batch', idxPrint, '.rds'))
 saveRDS(paramsPost, paste0('./output/paramsPost_Batch', idxPrint, '.rds'))
 saveRDS(alarmPost, paste0('./output/alarmPost_Batch', idxPrint, '.rds'))
 saveRDS(alarmTimePost, paste0('./output/alarmTimePost_Batch', idxPrint, '.rds'))
-saveRDS(R0Post, paste0('./output/R0Post_Batch', idxPrint, '.rds'))
 saveRDS(waicPost, paste0('./output/waicPost_Batch', idxPrint, '.rds'))
 
 
