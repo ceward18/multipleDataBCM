@@ -83,3 +83,20 @@ for (i in 2:length(waicFiles)) {
 }
 
 saveRDS(waicAll,  paste0('./', resultsFolder, '/waicAll.rds'))
+
+################################################################################
+# R0 posterior over time
+
+
+r0PostFiles <- outputFiles[grep('R0Post', outputFiles)]
+
+r0PostAll <- readRDS(paste0('./', outputFolder, '/', r0PostFiles[1]))
+
+for (i in 2:length(r0PostFiles)) {
+    r0Post_i <- readRDS(paste0('./', outputFolder, '/', r0PostFiles[i]))
+    r0PostAll <-rbind.data.frame(r0PostAll, r0Post_i)
+}
+
+rownames(r0PostAll) <- NULL
+
+saveRDS(r0PostAll,  paste0('./', resultsFolder, '/r0PostAll.rds'))
