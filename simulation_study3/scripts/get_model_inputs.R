@@ -57,9 +57,9 @@ getModelInput <- function(incData, modelType, smoothC, smoothH, smoothD,
         
         ### inits 
         initsList <- list(beta = runif(1, 1/7, 1),
-                          HC = runif(1, 0, maxC/3),
-                          HH = runif(1, 0, maxH/3),
-                          HD = runif(1, 0, maxD/3),
+                          HC = runif(1, 0, maxC/3)/N,
+                          HH = runif(1, 0, maxH/3)/N,
+                          HD = runif(1, 0, maxD/3)/N,
                           deltaC = runif(1, 0, 0.3),
                           deltaH = runif(1, 0, 0.3),
                           deltaD = runif(1, 0, 0.3),
@@ -81,9 +81,9 @@ getModelInput <- function(incData, modelType, smoothC, smoothH, smoothD,
                               gamma2 = runif(1), # HR
                               lambda = runif(1), # IH
                               phi = runif(1) ,   # HD
-                              HC = runif(1, 0, maxC/3),
-                              HH = runif(1, 0, maxH/3),
-                              HD = runif(1, 0, maxD/3),
+                              HC = runif(1, 0, maxC/3)/N,
+                              HH = runif(1, 0, maxH/3)/N,
+                              HD = runif(1, 0, maxD/3)/N,
                               deltaC = runif(1, 0, 0.3),
                               deltaH = runif(1, 0, 0.3),
                               deltaD = runif(1, 0, 0.3),

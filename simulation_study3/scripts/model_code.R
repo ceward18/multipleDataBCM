@@ -313,9 +313,9 @@ SIHRD_full <-  nimbleCode({
     deltaC ~ dbeta(1, 1)
     deltaH ~ dbeta(1, 1)
     deltaD ~ dbeta(1, 1)
-    HC ~ dunif(minC, maxC)
-    HH ~ dunif(minH, maxH)
-    HD ~ dunif(minD, maxD)
+    HC ~ dunif(minC/N, maxC/N)
+    HH ~ dunif(minH/N, maxH/N)
+    HD ~ dunif(minD/N, maxD/N)
     
     # constrain deltas to sum to 1
     constrain_deltas ~ dconstraint(deltaC + deltaH + deltaD <= 1)
@@ -383,9 +383,9 @@ SIHRD_simple <-  nimbleCode({
     deltaC ~ dbeta(1, 1)
     deltaH ~ dbeta(1, 1)
     deltaD ~ dbeta(1, 1)
-    HC ~ dunif(minC, maxC)
-    HH ~ dunif(minH, maxH)
-    HD ~ dunif(minD, maxD)
+    HC ~ dunif(minC/N, maxC/N)
+    HH ~ dunif(minH/N, maxH/N)
+    HD ~ dunif(minD/N, maxD/N)
     
     # IDD Curve
     w0 ~ dnorm(3, sd = 0.5)
@@ -397,96 +397,6 @@ SIHRD_simple <-  nimbleCode({
 })
 
 
-
-################################################################################
-
-SIHRD_fixed <-  nimbleCode({
-    
-    S[1] <- S0
-    I[1, 1] <- I0
-    I[1, 2:maxInf] <- 0
-    H[1, 1] <- 0
-    H[1, 2:maxHosp] <- 0
-    R[1] <- 0
-    D[1] <- 0
-    
-    probIH <- 1 - exp(-lambda)
-    probHD <- 1 - exp(-phi)
-    
-    ### loop over time
-    for(t in 1:tau) {
-        
-        # compute alarms for each component
-        alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, deltaC)
-        alarmH[t] <- hillAlarm(smoothH[t], nuH, x0H, deltaH)
-        alarmD[t] <- hillAlarm(smoothD[t], nuD, x0D, deltaD)
-        
-        # weighted sum of each component
-        alarm[t] <- alarmC[t] + alarmH[t] + alarmD[t]
-        
-        probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * I[t] / N)
-        
-        # SIHRD model
-        # S -> I
-        Istar[t] ~ dbin(probSI[t], S[t])
-        # I -> H or R using sequential binomial
-        Hstar[t] ~ dbin(probIH, I[t])
-        RstarI[t] ~ dbin(probIR / (1 - probIH), I[t] - Hstar[t])
-        # H -> R or D using sequential binomial
-        Dstar[t] ~ dbin(probHD, H[t])
-        RstarH[t] ~ dbin(probHR / (1 - probHD), H[t] - Dstar[t])
-        
-        # update S, I, H, R, D
-        S[t + 1] <- S[t] - Istar[t]
-        I[t + 1] <- I[t] + Istar[t] - Hstar[t] - RstarI[t]
-        H[t + 1] <- H[t] + Hstar[t] - RstarH[t] - Dstar[t] 
-        R[t + 1] <- R[t] + RstarI[t] + RstarH[t]
-        D[t + 1] <- D[t] + Dstar[t] 
-        
-    }
-    
-    # estimated effective R0
-    R0[1:(tau-maxInf-1)] <- get_R0_full(betat = beta * (1 - alarm[1:tau]), 
-                                        N = N, gamma1 = gamma1, lambda = lambda,
-                                        S = S[1:tau], maxInf = maxInf)
-    
-    ### compute alarms for summaries
-    for (i in 1:n) {
-        
-        # compute alarms for each component
-        yAlarmC[i] <- hillAlarm(xC[i], nuC, x0C, deltaC)
-        yAlarmH[i] <- hillAlarm(xH[i], nuH, x0H, deltaH)
-        yAlarmD[i] <- hillAlarm(xD[i], nuD, x0D, deltaD)
-        
-    }
-    
-    ### Priors
-    
-    # transmission
-    beta ~ dgamma(0.1, 0.1)
-    
-    # transitions
-    gamma1 ~ dgamma(0.1, 0.1) # IR
-    gamma2 ~ dgamma(0.1, 0.1) # HR
-    lambda ~ dgamma(0.1, 0.1) # IH
-    phi ~ dgamma(0.1, 0.1)    # HD
-    
-    # alarm functions
-    deltaC ~ dbeta(1, 1)
-    deltaH ~ dbeta(1, 1)
-    deltaD ~ dbeta(1, 1)
-    nuC ~ dgamma(1, 1)
-    nuH ~ dgamma(1, 1)
-    nuD ~ dgamma(1, 1)
-    x0C ~ dunif(minC, maxC)
-    x0H ~ dunif(minH, maxH)
-    x0D ~ dunif(minD, maxD)
-    
-    # constrain deltas to sum to 1
-    constrain_deltas ~ dconstraint(deltaC + deltaH + deltaD <= 1)
-    
-    
-})
 
 
 ################################################################################
