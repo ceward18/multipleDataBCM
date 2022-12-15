@@ -120,7 +120,7 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
     niter <- 6e5
     nburn <- 3e5
     nthin <- 10
-
+    
     
     list(constantsList = constantsList,
          dataList = dataList,
