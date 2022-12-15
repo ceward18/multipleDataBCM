@@ -6,7 +6,7 @@
 ################################################################################
 
 
-getModelInput <- function(incData, modelType, smoothC, smoothD,
+getModelInput <- function(incData, modelType, smoothC, smoothH, smoothD,
                           hospData, deathData) {
     
     # constants that are the same for all models
@@ -20,16 +20,21 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
     n <- 50
     
     minC <- floor(min(smoothC))
+    minH <- floor(min(smoothH))
     minD <- floor(min(smoothD))
     maxC <- ceiling(max(smoothC))
+    maxH <- ceiling(max(smoothH))
     maxD <- ceiling(max(smoothD))
     
     xC <- seq(0, maxC, length.out = n)
+    xH <- seq(0, maxH, length.out = n)
     xD <- seq(0, maxD, length.out = n)
     
-    corMat <- matrix(c(1, -0.5, 
-                       -0.5, 1), ncol = 2, byrow = T)
-    sds <- c(0.5, 0.5)
+    # C, H, D
+    corMat <- matrix(c(1, -0.5, -0.1,
+                       -0.5, 1, -0.3,
+                       -0.1, -0.3, 1), ncol = 3, byrow = T)
+    sds <- c(0.5, 0.5, 0.5)
     Sigma <- diag(sds) %*% corMat %*% diag(sds)
     
     constantsList <- list(tau = tau,
@@ -37,19 +42,23 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
                           S0 = S0,
                           I0 = I0,
                           minC = minC,
+                          minH = minH,
                           minD = minD,
                           maxC = maxC,
+                          maxH = maxH,
                           maxD = maxD,
                           n = n,
                           xC = xC,
+                          xH = xH,
                           xD = xD,
                           maxInf = 10,
-                          zeros = rep(0, 2),
+                          zeros = rep(0, 3),
                           Sigma = Sigma)
     
     ### data
     dataList <- list(Istar = incData,
                      smoothC = smoothC,
+                     smoothH = smoothH,
                      smoothD = smoothD,
                      constrain_deltas = 1)
     
@@ -59,13 +68,14 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
             ### inits 
             initsList <- list(beta = runif(1, 1/7, 1),
                               nuC = runif(1, 1, 10),
+                              nuH = runif(1, 1, 10),
                               nuD = runif(1, 1, 10),
                               x0C = runif(1, 0, maxC/3),
+                              x0H = runif(1, 0, maxH/3),
                               x0D = runif(1, 0, maxD/3),
-                              Z = rmnorm_chol(1, rep(0, 2),  chol(Sigma), prec_param = FALSE),
+                              Z = rmnorm_chol(1, rep(0, 3),  chol(Sigma), prec_param = FALSE),
                               w0 = rnorm(1, 3, 0.5),
                               k = rgamma(1, 100, 100))
-            
             
             delta <- multiBeta(initsList$Z, constantsList$Sigma)
             
@@ -90,10 +100,12 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
                               lambda = runif(1), # IH
                               phi = runif(1) ,   # HD
                               nuC = runif(1, 1, 5),
+                              nuH = runif(1, 1, 5),
                               nuD = runif(1, 1, 5),
                               x0C = runif(1, 0, maxC/3),
+                              x0H = runif(1, 0, maxH/3),
                               x0D = runif(1, 0, maxD/3),
-                              Z = rmnorm_chol(1, rep(0, 2),  chol(Sigma), prec_param = FALSE),
+                              Z = rmnorm_chol(1, rep(0, 3),  chol(Sigma), prec_param = FALSE),
                               RstarI = round(0.3 * c(rep(0, 3), I0, dataList$Istar[1:(tau-4)])),
                               RstarH = round(0.3 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
             
@@ -102,7 +114,6 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
             
             probHR <- 1 - exp(-initsList$gamma2)
             probHD <- 1 - exp(-initsList$phi)
-            
             
             delta <- multiBeta(initsList$Z, constantsList$Sigma)
             
@@ -120,7 +131,11 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
     niter <- 6e5
     nburn <- 3e5
     nthin <- 10
-
+    
+    ### MCMC specifications
+    niter <- 2000
+    nburn <- 1000
+    nthin <- 1
     
     list(constantsList = constantsList,
          dataList = dataList,
@@ -129,6 +144,7 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
          nburn = nburn,
          nthin = nthin,
          xC = xC,
+         xH = xH,
          xD = xD)
     
 }

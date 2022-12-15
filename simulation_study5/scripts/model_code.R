@@ -1,6 +1,5 @@
 ################################################################################
 # Nimble model codes for simulation study
-# alarm based on only incidence and deaths
 ################################################################################
 
 
@@ -27,6 +26,7 @@ hillAlarm <- nimbleFunction(
     })
 assign('hillAlarm', hillAlarm, envir = .GlobalEnv)
 
+
 # nimbleFunction for Gaussian copula with beta distribution
 multiBeta <- nimbleFunction(     
     run = function(Z = double(1), Sigma = double(2)) {
@@ -38,6 +38,7 @@ multiBeta <- nimbleFunction(
         return(result)
     })
 assign('multiBeta', multiBeta, envir = .GlobalEnv)
+
 
 # calculate moving average for smoothing
 movingAverage <- nimbleFunction(     
@@ -147,6 +148,9 @@ assign('simulator', simulator, envir = .GlobalEnv)
 
 ################################################################################
 # SIHRD Model
+# Recoveries are fixed length
+# if you are infectious for maxInf days, you recover
+# If you are hospitalized for maxHosp = 40 days, you recover?
 
 SIHRD_sim <-  nimbleCode({
     
@@ -191,14 +195,16 @@ SIHRD_sim <-  nimbleCode({
     for(t in 2:tau) {
         
         smoothC[t] <- movingAverage(Istar[1:(t-1)], bw)[t-1]
+        smoothH[t] <- movingAverage(Hstar[1:(t-1)], bw)[t-1]
         smoothD[t] <- movingAverage(Dstar[1:(t-1)], bw)[t-1]
         
         # compute alarms for each component
         alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, deltaC)
+        alarmH[t] <- hillAlarm(smoothH[t], nuH, x0H, deltaH)
         alarmD[t] <- hillAlarm(smoothD[t], nuD, x0D, deltaD)
         
         # weighted sum of each component
-        alarm[t] <- alarmC[t] + alarmD[t]
+        alarm[t] <- alarmC[t] + alarmH[t] + alarmD[t]
         
         probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * I[t] / N)
         
@@ -238,6 +244,9 @@ SIHRD_sim <-  nimbleCode({
     deltaC ~ dbeta(1, 1)
     nuC ~ dunif(0, 50)
     x0C ~ dunif(0, 20000)
+    deltaH ~ dbeta(1, 1)
+    nuH ~ dunif(0, 50)
+    x0H ~ dunif(0, 20000)
     deltaD ~ dbeta(1, 1)
     nuD ~ dunif(0, 50)
     x0D ~ dunif(0, 20000)
@@ -265,10 +274,11 @@ SIHRD_full <-  nimbleCode({
         
         # compute alarms for each component
         alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, delta[1])
-        alarmD[t] <- hillAlarm(smoothD[t], nuD, x0D, delta[2])
+        alarmH[t] <- hillAlarm(smoothH[t], nuH, x0H, delta[2])
+        alarmD[t] <- hillAlarm(smoothD[t], nuD, x0D, delta[3])
         
         # weighted sum of each component
-        alarm[t] <- alarmC[t] + alarmD[t]
+        alarm[t] <- alarmC[t] + alarmH[t] + alarmD[t]
         
         probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * I[t] / N)
         
@@ -301,7 +311,8 @@ SIHRD_full <-  nimbleCode({
         
         # compute alarms for each component
         yAlarmC[i] <- hillAlarm(xC[i], nuC, x0C, delta[1])
-        yAlarmD[i] <- hillAlarm(xD[i], nuD, x0D, delta[2])
+        yAlarmH[i] <- hillAlarm(xH[i], nuH, x0H, delta[2])
+        yAlarmD[i] <- hillAlarm(xD[i], nuD, x0D, delta[3])
         
     }
     
@@ -317,18 +328,97 @@ SIHRD_full <-  nimbleCode({
     phi ~ dgamma(0.1, 0.1)    # HD
     
     # alarm functions
-    
     # delta prior using Gaussian copula
-    Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
-    delta[1:2] <- multiBeta(Z[1:2], Sigma[1:2, 1:2])
+    Z[1:3] ~ dmnorm(zeros[1:3], cov = Sigma[1:3, 1:3])
+    delta[1:3] <- multiBeta(Z[1:3], Sigma[1:3, 1:3])
     
     nuC ~ dgamma(1, 1)
+    nuH ~ dgamma(1, 1)
     nuD ~ dgamma(1, 1)
     x0C ~ dunif(minC, maxC)
+    x0H ~ dunif(minH, maxH)
     x0D ~ dunif(minD, maxD)
     
     # constrain deltas to sum to 1
-    constrain_deltas ~ dconstraint(delta[1] + delta[2] <= 1)
+    constrain_deltas ~ dconstraint(delta[1] + delta[2] + delta[3] <= 1)
+    
+})
+
+
+################################################################################
+
+
+SIHRD_simple <-  nimbleCode({
+    
+    S[1] <- S0
+    I[1, 1] <- I0
+    I[1, 2:maxInf] <- 0
+    
+    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
+    
+    ### rest of time points
+    for(t in 1:tau) {
+        
+        # compute alarms for each component
+        alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, delta[1])
+        alarmH[t] <- hillAlarm(smoothH[t], nuH, x0H, delta[2])
+        alarmD[t] <- hillAlarm(smoothD[t], nuD, x0D, delta[3])
+        
+        # weighted sum of each component
+        alarm[t] <- alarmC[t] + alarmH[t] + alarmD[t]
+        
+        probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * 
+                                 sum(idd_curve[1:maxInf] * I[t, 1:maxInf]) / N)
+        
+        # SIR model
+        Istar[t] ~ dbin(probSI[t], S[t])
+        
+        # update S and I
+        S[t + 1] <- S[t] - Istar[t]
+        I[t + 1, 2:maxInf] <- I[t, 1:(maxInf - 1)]  # shift current I by one day
+        I[t + 1, 1] <- Istar[t]                     # add newly infectious
+        
+    }
+    
+    # estimated effective R0
+    R0[1:(tau-maxInf)] <- get_R0(betat = beta * (1 - alarm[1:tau]), 
+                                 N = N, S = S[1:tau], maxInf = maxInf,
+                                 iddCurve = idd_curve[1:maxInf])
+    
+    
+    ### compute alarms for summaries
+    for (i in 1:n) {
+        
+        # compute alarms for each component
+        yAlarmC[i] <- hillAlarm(xC[i], nuC, x0C, delta[1])
+        yAlarmH[i] <- hillAlarm(xH[i], nuH, x0H, delta[2])
+        yAlarmD[i] <- hillAlarm(xD[i], nuD, x0D, delta[3])
+        
+    }
+    
+    ### Priors
+    
+    # transmission
+    beta ~ dgamma(0.1, 0.1)
+    
+    # alarm functions
+    # delta prior using Gaussian copula
+    Z[1:3] ~ dmnorm(zeros[1:3], cov = Sigma[1:3, 1:3])
+    delta[1:3] <- multiBeta(Z[1:3], Sigma[1:3, 1:3])
+    
+    nuC ~ dgamma(1, 1)
+    nuH ~ dgamma(1, 1)
+    nuD ~ dgamma(1, 1)
+    x0C ~ dunif(minC, maxC)
+    x0H ~ dunif(minH, maxH)
+    x0D ~ dunif(minD, maxD)
+    
+    # IDD Curve
+    w0 ~ dnorm(3, sd = 0.5)
+    k ~ dgamma(100, 100)
+    
+    # constrain deltas to sum to 1
+    constrain_deltas ~ dconstraint(delta[1] + delta[2] + delta[3] <= 1)
     
 })
 
@@ -372,19 +462,21 @@ SIHRD_full_sim <-  nimbleCode({
     D[2] <- D[1] + Dstar[1] 
     
     
-    ### loop over rest of time points
+    ### loop over time
     for(t in 2:tau) {
         
         # compute moving average up to t-1
         smoothC[t] <- movingAverage(Istar[1:(t-1)], bw)[t-1]
+        smoothH[t] <- movingAverage(Hstar[1:(t-1)], bw)[t-1]
         smoothD[t] <- movingAverage(Dstar[1:(t-1)], bw)[t-1]
         
         # compute alarms for each component
         alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, delta[1])
-        alarmD[t] <- hillAlarm(smoothD[t], nuD, x0D, delta[2])
+        alarmH[t] <- hillAlarm(smoothH[t], nuH, x0H, delta[2])
+        alarmD[t] <- hillAlarm(smoothD[t], nuD, x0D, delta[3])
         
         # weighted sum of each component
-        alarm[t] <- alarmC[t] + alarmD[t]
+        alarm[t] <- alarmC[t] + alarmH[t] + alarmD[t]
         
         probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * I[t] / N)
         
@@ -419,94 +511,23 @@ SIHRD_full_sim <-  nimbleCode({
     phi ~ dgamma(0.1, 0.1)    # HD
     
     # alarm functions
-    
     # delta prior using Gaussian copula
-    Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
-    delta[1:2] <- multiBeta(Z[1:2], Sigma[1:2, 1:2])
+    Z[1:3] ~ dmnorm(zeros[1:3], cov = Sigma[1:3, 1:3])
+    delta[1:3] <- multiBeta(Z[1:3], Sigma[1:3, 1:3])
     
     nuC ~ dgamma(1, 1)
+    nuH ~ dgamma(1, 1)
     nuD ~ dgamma(1, 1)
     x0C ~ dunif(minC, maxC)
+    x0H ~ dunif(minH, maxH)
     x0D ~ dunif(minD, maxD)
     
     # constrain deltas to sum to 1
-    constrain_deltas ~ dconstraint(delta[1] + delta[2] <= 1)
+    constrain_deltas ~ dconstraint(delta[1] + delta[2] + delta[3] <= 1)
     
 })
 
 
-################################################################################
-
-
-SIHRD_simple <-  nimbleCode({
-    
-    S[1] <- S0
-    I[1, 1] <- I0
-    I[1, 2:maxInf] <- 0
-    
-    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
-    
-    ### rest of time points
-    for(t in 1:tau) {
-        
-        # compute alarms for each component
-        alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, delta[1])
-        alarmD[t] <- hillAlarm(smoothD[t], nuD, x0D, delta[2])
-        
-        # weighted sum of each component
-        alarm[t] <- alarmC[t] + alarmD[t]
-        
-        probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * 
-                                 sum(idd_curve[1:maxInf] * I[t, 1:maxInf]) / N)
-        
-        # SIR model
-        Istar[t] ~ dbin(probSI[t], S[t])
-        
-        # update S and I
-        S[t + 1] <- S[t] - Istar[t]
-        I[t + 1, 2:maxInf] <- I[t, 1:(maxInf - 1)]  # shift current I by one day
-        I[t + 1, 1] <- Istar[t]                     # add newly infectious
-        
-    }
-    
-    # estimated effective R0
-    R0[1:(tau-maxInf)] <- get_R0(betat = beta * (1 - alarm[1:tau]), 
-                                 N = N, S = S[1:tau], maxInf = maxInf,
-                                 iddCurve = idd_curve[1:maxInf])
-    
-    
-    ### compute alarms for summaries
-    for (i in 1:n) {
-        
-        # compute alarms for each component
-        yAlarmC[i] <- hillAlarm(xC[i], nuC, x0C, delta[1])
-        yAlarmD[i] <- hillAlarm(xD[i], nuD, x0D, delta[2])
-        
-    }
-    
-    ### Priors
-    
-    # transmission
-    beta ~ dgamma(0.1, 0.1)
-    
-    # alarm functions
-    # delta prior using Gaussian copula
-    Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
-    delta[1:2] <- multiBeta(Z[1:2], Sigma[1:2, 1:2])
-    
-    nuC ~ dgamma(1, 1)
-    nuD ~ dgamma(1, 1)
-    x0C ~ dunif(minC, maxC)
-    x0D ~ dunif(minD, maxD)
-    
-    # IDD Curve
-    w0 ~ dnorm(3, sd = 0.5)
-    k ~ dgamma(100, 100)
-    
-    # constrain deltas to sum to 1
-    constrain_deltas ~ dconstraint(delta[1] + delta[2] <= 1)
-    
-})
 
 
 ################################################################################
