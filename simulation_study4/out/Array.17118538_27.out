@@ -1,0 +1,21 @@
+[1] "Data Gen: equal, model fit: full, simulation: 11"
+Stochastic parents of data are:  beta gamma1 gamma2 lambda phi nuC nuD x0C x0D Z[1] Z[2] .
+[1] "Data Gen: equal, model fit: full, simulation: 12"
+Stochastic parents of data are:  beta gamma1 gamma2 lambda phi nuC nuD x0C x0D Z[1] Z[2] .
+[1] "Data Gen: equal, model fit: full, simulation: 13"
+Stochastic parents of data are:  beta gamma1 gamma2 lambda phi nuC nuD x0C x0D Z[1] Z[2] .
+[1] "Data Gen: equal, model fit: full, simulation: 14"
+Stochastic parents of data are:  beta gamma1 gamma2 lambda phi nuC nuD x0C x0D Z[1] Z[2] .
+[1] "Data Gen: equal, model fit: full, simulation: 15"
+Stochastic parents of data are:  beta gamma1 gamma2 lambda phi nuC nuD x0C x0D Z[1] Z[2] .
+[1] "Data Gen: equal, model fit: full, simulation: 16"
+Stochastic parents of data are:  beta gamma1 gamma2 lambda phi nuC nuD x0C x0D Z[1] Z[2] .
+[1] "Data Gen: equal, model fit: full, simulation: 17"
+Stochastic parents of data are:  beta gamma1 gamma2 lambda phi nuC nuD x0C x0D Z[1] Z[2] .
+[1] "Data Gen: equal, model fit: full, simulation: 18"
+Stochastic parents of data are:  beta gamma1 gamma2 lambda phi nuC nuD x0C x0D Z[1] Z[2] .
+[1] "Data Gen: equal, model fit: full, simulation: 19"
+Stochastic parents of data are:  beta gamma1 gamma2 lambda phi nuC nuD x0C x0D Z[1] Z[2] .
+[1] "Data Gen: equal, model fit: full, simulation: 20"
+WAIC was calculated as NaN.  You may need to add monitors to model latent states, in order for a valid WAIC calculation.
+Stochastic parents of data are:  beta gamma1 gamma2 lambda phi nuC nuD x0C x0D Z[1] Z[2] .
