@@ -4,6 +4,7 @@
 ### deltaC = 0.6, deltaH = 0.1, deltaD = 0.1
 ### deltaC = 0.1, deltaH = 0.6, deltaD = 0.1
 ### deltaC = 0.1, deltaH = 0.1, deltaD = 0.6
+### deltaC = 0.25, deltaH = 0.25, deltaD = 0.25
 ################################################################################
 
 ### load libraries
