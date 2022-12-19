@@ -27,8 +27,9 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
     xC <- seq(0, maxC, length.out = n)
     xD <- seq(0, maxD, length.out = n)
     
-    corMat <- matrix(c(1, -0.5, 
-                       -0.5, 1), ncol = 2, byrow = T)
+    rho <- -0.5
+    corMat <- matrix(c(1, rho, 
+                       rho, 1), ncol = 2, byrow = T)
     sds <- c(0.5, 0.5)
     Sigma <- diag(sds) %*% corMat %*% diag(sds)
     
@@ -67,7 +68,7 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
                               k = rgamma(1, 100, 100))
             
             
-            delta <- multiBeta(initsList$Z, constantsList$Sigma)
+            delta <- multiBeta(initsList$Z)
             
             if (sum(delta) <= 1) break
         }
@@ -104,7 +105,7 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
             probHD <- 1 - exp(-initsList$phi)
             
             
-            delta <- multiBeta(initsList$Z, constantsList$Sigma)
+            delta <- multiBeta(initsList$Z)
             
             if ((probIH + probIR < 1) & (probHR + probHD < 1) & sum(delta) <= 1) break
             

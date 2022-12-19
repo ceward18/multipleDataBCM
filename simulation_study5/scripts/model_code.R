@@ -29,10 +29,10 @@ assign('hillAlarm', hillAlarm, envir = .GlobalEnv)
 
 # nimbleFunction for Gaussian copula with beta distribution
 multiBeta <- nimbleFunction(     
-    run = function(Z = double(1), Sigma = double(2)) {
+    run = function(Z = double(1)) {
         returnType(double(1))
         
-        fInv <- pnorm(Z, 0, sqrt(diag(Sigma)))
+        fInv <- pnorm(Z)
         result <- qbeta(fInv, 1, 1)
         
         return(result)
@@ -330,7 +330,7 @@ SIHRD_full <-  nimbleCode({
     # alarm functions
     # delta prior using Gaussian copula
     Z[1:3] ~ dmnorm(zeros[1:3], cov = Sigma[1:3, 1:3])
-    delta[1:3] <- multiBeta(Z[1:3], Sigma[1:3, 1:3])
+    delta[1:3] <- multiBeta(Z[1:3])
     
     nuC ~ dgamma(1, 1)
     nuH ~ dgamma(1, 1)
@@ -404,7 +404,7 @@ SIHRD_simple <-  nimbleCode({
     # alarm functions
     # delta prior using Gaussian copula
     Z[1:3] ~ dmnorm(zeros[1:3], cov = Sigma[1:3, 1:3])
-    delta[1:3] <- multiBeta(Z[1:3], Sigma[1:3, 1:3])
+    delta[1:3] <- multiBeta(Z[1:3])
     
     nuC ~ dgamma(1, 1)
     nuH ~ dgamma(1, 1)
@@ -513,7 +513,7 @@ SIHRD_full_sim <-  nimbleCode({
     # alarm functions
     # delta prior using Gaussian copula
     Z[1:3] ~ dmnorm(zeros[1:3], cov = Sigma[1:3, 1:3])
-    delta[1:3] <- multiBeta(Z[1:3], Sigma[1:3, 1:3])
+    delta[1:3] <- multiBeta(Z[1:3])
     
     nuC ~ dgamma(1, 1)
     nuH ~ dgamma(1, 1)

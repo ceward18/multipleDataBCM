@@ -1,6 +1,7 @@
 *.html
 *.Rhistory
 *.qmd
+*.docx
 output/chains*
 new/output/chains*
 old/output/chains*

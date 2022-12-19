@@ -77,7 +77,7 @@ getModelInput <- function(incData, modelType, smoothC, smoothH, smoothD,
                               w0 = rnorm(1, 3, 0.5),
                               k = rgamma(1, 100, 100))
             
-            delta <- multiBeta(initsList$Z, constantsList$Sigma)
+            delta <- multiBeta(initsList$Z)
             
             if (sum(delta) <= 1) break
         }
@@ -115,7 +115,7 @@ getModelInput <- function(incData, modelType, smoothC, smoothH, smoothD,
             probHR <- 1 - exp(-initsList$gamma2)
             probHD <- 1 - exp(-initsList$phi)
             
-            delta <- multiBeta(initsList$Z, constantsList$Sigma)
+            delta <- multiBeta(initsList$Z)
             
             if ((probIH + probIR < 1) & (probHR + probHD < 1) & sum(delta) <= 1) break
             

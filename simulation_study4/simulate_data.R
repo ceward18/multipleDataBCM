@@ -61,10 +61,10 @@ trueVals <- c(beta = 0.85,
               lambda = lambda,
               phi = phi,
               deltaC = deltaC,
-              nuC = 2,
+              nuC = 3,
               x0C = 100,
               deltaD = deltaD,
-              nuD = 2,
+              nuD = 3,
               x0D = 10)
 
 set.seed(1)
@@ -107,10 +107,10 @@ trueVals <- c(beta = 0.85,
               lambda = lambda,
               phi = phi,
               deltaC = deltaC,
-              nuC = 2,
+              nuC = 3,
               x0C = 100,
               deltaD = deltaD,
-              nuD = 2,
+              nuD = 3,
               x0D = 10)
 
 set.seed(1)
@@ -151,10 +151,10 @@ trueVals <- c(beta = 0.85,
               lambda = lambda,
               phi = phi,
               deltaC = deltaC,
-              nuC = 2,
+              nuC = 3,
               x0C = 100,
               deltaD = deltaD,
-              nuD = 2,
+              nuD = 3,
               x0D = 10)
 
 set.seed(1)
