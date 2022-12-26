@@ -61,8 +61,8 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
             initsList <- list(beta = runif(1, 1/7, 1),
                               nuC = runif(1, 1, 10),
                               nuD = runif(1, 1, 10),
-                              x0C = runif(1, 0, maxC/3),
-                              x0D = runif(1, 0, maxD/3),
+                              x0C = runif(1, 0, maxC/10),
+                              x0D = runif(1, 0, maxD/10),
                               Z = rmnorm_chol(1, rep(0, 2),  chol(Sigma), prec_param = FALSE),
                               w0 = rnorm(1, 3, 0.5),
                               k = rgamma(1, 100, 100))
@@ -90,10 +90,10 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
                               gamma2 = runif(1), # HR
                               lambda = runif(1), # IH
                               phi = runif(1) ,   # HD
-                              nuC = runif(1, 1, 5),
-                              nuD = runif(1, 1, 5),
-                              x0C = runif(1, 0, maxC/3),
-                              x0D = runif(1, 0, maxD/3),
+                              nuC = runif(1, 1, 10),
+                              nuD = runif(1, 1, 10),
+                              x0C = runif(1, 0, maxC/10),
+                              x0D = runif(1, 0, maxD/10),
                               Z = rmnorm_chol(1, rep(0, 2),  chol(Sigma), prec_param = FALSE),
                               RstarI = round(0.3 * c(rep(0, 3), I0, dataList$Istar[1:(tau-4)])),
                               RstarH = round(0.3 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
