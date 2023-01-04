@@ -36,11 +36,9 @@ fitAlarmModel <- function(incData, modelType, alarmBase,
                            'R0', 'delta'))
     
     # # use slice sampling for hill parameters
-    # paramsForSlice <- c('x0C', 'x0D', 'nuC', 'nuD')
-    # myConfig$removeSampler(paramsForSlice)
-    # for (j in 1:length(paramsForSlice)) {
-    #     myConfig$addSampler(target = paramsForSlice[j], type = "slice")
-    # }
+    paramsForSlice <- c('Z', 'x0C', 'x0D', 'nuC', 'nuD')
+    myConfig$removeSampler(paramsForSlice)
+    myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
     
     # joint slice sampler for Z
     # myConfig$removeSampler(c('Z'))
