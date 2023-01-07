@@ -32,19 +32,28 @@ fitAlarmModel <- function(incData, modelType, alarmBase,
     myConfig <- configureMCMC(myModel)
     
     # need to ensure all stochastic nodes are monitored for WAIC calculation
-    myConfig$addMonitors(c('yAlarmC', 'yAlarmD', 'alarmC', 'alarmD', 
-                           'R0', 'delta'))
+    if (modelType != 'inc') {
+        
+        myConfig$addMonitors(c('yAlarmC', 'yAlarmD', 'alarmC', 'alarmD', 
+                               'R0', 'delta'))
+        
+        # # use slice sampling for hill parameters
+        paramsForSlice <- c('Z', 'x0C', 'x0D', 'nuC', 'nuD')
+        myConfig$removeSampler(paramsForSlice)
+        myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
+        
+    } else {
+        
+        myConfig$addMonitors(c('yAlarmC','alarmC', 'R0', 'deltaC'))
+        
+        # # use slice sampling for hill parameters
+        paramsForSlice <- c('deltaC', 'x0C', 'nuC')
+        myConfig$removeSampler(paramsForSlice)
+        myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
+    }
     
-    # # use slice sampling for hill parameters
-    paramsForSlice <- c('Z', 'x0C', 'x0D', 'nuC', 'nuD')
-    myConfig$removeSampler(paramsForSlice)
-    myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
     
-    # joint slice sampler for Z
-    # myConfig$removeSampler(c('Z'))
-    # myConfig$addSampler(target = c('Z'), type = "AF_slice")
-    
-    if (modelType == 'simple') {
+    if (modelType %in% c('simple', 'inc')) {
         
         # joint sampler for beta and w0
         myConfig$removeSampler(c('beta', 'w0'))

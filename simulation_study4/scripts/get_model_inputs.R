@@ -109,17 +109,55 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
             
             if ((probIH + probIR < 1) & (probHR + probHD < 1) & sum(delta) <= 1) break
             
-        }
-       
+        } 
+        
         names(initsList$RstarI) <- paste0('RstarI[', 1:tau, ']')
         names(initsList$RstarH) <- paste0('RstarH[', 1:tau, ']')
-    }
-    
+        
+        # end modeltype == 'full'
+        
+    } else if (modelType == 'inc') {
+        
+        ### constants
+        constantsList <- list(tau = tau,
+                              N = N,
+                              S0 = S0,
+                              I0 = I0,
+                              minC = minC,
+                              maxC = maxC,
+                              n = n,
+                              xC = xC,
+                              maxInf = 10,
+                              zeros = rep(0, 2),
+                              Sigma = Sigma)
+        
+        ### data
+        dataList <- list(Istar = incData,
+                         smoothC = smoothC)
+        
+        ### inits 
+        initsList <- list(beta = runif(1, 1/7, 1),
+                          nuC = runif(1, 1, 10),
+                          x0C = runif(1, maxC/20, maxC/5),
+                          deltaC = runif(1, 0, 1),
+                          w0 = rnorm(1, 3, 0.5),
+                          k = rgamma(1, 100, 100))
+        
+        
+        
+        # end modeltype == 'inc'
+        
+    } 
     
     ### MCMC specifications
     niter <- 8e5
     nburn <- 6e5
     nthin <- 10
+    
+    ### MCMC specifications
+    niter <- 100
+    nburn <- 0
+    nthin <- 1
     
     
     list(constantsList = constantsList,

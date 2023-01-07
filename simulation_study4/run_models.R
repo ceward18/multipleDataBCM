@@ -15,9 +15,9 @@ source('./scripts/model_code.R')
 # set up grid of models to fit
 nSim <- 50
 dataType <- c('inc', 'death', 'equal')
-modelType <- c('simple', 'full')
+modelType <- c('simple', 'full', 'inc')
 
-# 300
+# 450
 allFits <- expand.grid(simNumber = 1:nSim,
                        dataType = dataType,
                        modelType = modelType,

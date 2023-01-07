@@ -508,6 +508,129 @@ SIHRD_simple <-  nimbleCode({
     
 })
 
+################################################################################
+
+
+SIHRD_inc <-  nimbleCode({
+    
+    S[1] <- S0
+    I[1, 1] <- I0
+    I[1, 2:maxInf] <- 0
+    
+    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
+    
+    ### rest of time points
+    for(t in 1:tau) {
+        
+        # alarm is function of incidence only
+        alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, deltaC)
+        
+        probSI[t] <- 1 - exp(- beta * (1 - alarmC[t]) * 
+                                 sum(idd_curve[1:maxInf] * I[t, 1:maxInf]) / N)
+        
+        # SIR model
+        Istar[t] ~ dbin(probSI[t], S[t])
+        
+        # update S and I
+        S[t + 1] <- S[t] - Istar[t]
+        I[t + 1, 2:maxInf] <- I[t, 1:(maxInf - 1)]  # shift current I by one day
+        I[t + 1, 1] <- Istar[t]                     # add newly infectious
+        
+    }
+    
+    # estimated effective R0
+    R0[1:(tau-maxInf)] <- get_R0(betat = beta * (1 - alarmC[1:tau]), 
+                                 N = N, S = S[1:tau], maxInf = maxInf,
+                                 iddCurve = idd_curve[1:maxInf])
+    
+    
+    ### compute alarms for summaries
+    for (i in 1:n) {
+        
+        # compute alarms for each component
+        yAlarmC[i] <- hillAlarm(xC[i], nuC, x0C, deltaC)
+        
+    }
+    
+    ### Priors
+    
+    # transmission
+    beta ~ dgamma(0.1, 0.1)
+    
+    # alarm functions
+    deltaC ~ dunif(0, 1)
+    nuC ~ dinvgamma(2, 4)
+    x0C ~ dunif(minC, maxC)
+    
+    # IDD Curve
+    w0 ~ dnorm(3, sd = 0.5)
+    k ~ dgamma(100, 100)
+    
+})
+
+################################################################################
+
+
+SIHRD_inc_sim <-  nimbleCode({
+    
+    S[1] <- S0
+    I[1, 1] <- I0
+    I[1, 2:maxInf] <- 0
+    
+    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
+    
+    # time 1
+    alarmC[1] <- 0
+    
+    probSI[1] <- 1 - exp(- beta * (1 - alarmC[1]) * 
+                             sum(idd_curve[1:maxInf] * I[1, 1:maxInf]) / N)
+    
+    # SIR model
+    Istar[1] ~ dbin(probSI[1], S[1])
+    
+    # update S and I
+    S[2] <- S[1] - Istar[1]
+    I[2, 2:maxInf] <- I[1, 1:(maxInf - 1)]  # shift current I by one day
+    I[2, 1] <- Istar[1]                     # add newly infectious
+    
+    ### rest of time points
+    for(t in 2:tau) {
+        
+        # moving average incidence
+        smoothC[t] <- movingAverage(Istar[1:(t-1)], bw)[t-1]
+        
+        # alarm is function of incidence only
+        alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, deltaC)
+        
+        probSI[t] <- 1 - exp(- beta * (1 - alarmC[t]) * 
+                                 sum(idd_curve[1:maxInf] * I[t, 1:maxInf]) / N)
+        
+        # SIR model
+        Istar[t] ~ dbin(probSI[t], S[t])
+        
+        # update S and I
+        S[t + 1] <- S[t] - Istar[t]
+        I[t + 1, 2:maxInf] <- I[t, 1:(maxInf - 1)]  # shift current I by one day
+        I[t + 1, 1] <- Istar[t]                     # add newly infectious
+        
+    }
+    
+    ### Priors
+    
+    # transmission
+    beta ~ dgamma(0.1, 0.1)
+    
+    # alarm functions
+    deltaC ~ dunif(0, 1)
+    nuC ~ dinvgamma(2, 4)
+    x0C ~ dunif(minC, maxC)
+    
+    # IDD Curve
+    w0 ~ dnorm(3, sd = 0.5)
+    k ~ dgamma(100, 100)
+    
+})
+
 
 ################################################################################
 ### Special proposal function for removal times in exponential model

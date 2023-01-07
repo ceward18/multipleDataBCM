@@ -48,7 +48,7 @@ summarizePost <- function(resThree, incData, modelType,
     ##############################################################################
     ### posterior distribution of alarm function over range observed
     
-    # get xC, xH, xD (range of observed incidence/hosp/deaths)
+    # get xC and xD (range of observed incidence/deaths)
     modelInputs <- getModelInput(incData, modelType, smoothC, smoothD,
                                  hospData, deathData)
     n <- length(modelInputs$xC)
@@ -57,17 +57,28 @@ summarizePost <- function(resThree, incData, modelType,
     alarmSamples2 <- resThree[[2]][,grep('yAlarm', colnames(resThree[[2]]))]
     alarmSamples3 <- resThree[[3]][,grep('yAlarm', colnames(resThree[[3]]))]
     alarmSamples <- rbind(alarmSamples1, alarmSamples2, alarmSamples3)
-    alarmSamples <- alarmSamples[,c(paste0('yAlarmC[', 1:n, ']'),
-                                    paste0('yAlarmD[', 1:n, ']'))]
+    if (modelType %in% c('simple', 'full')) {
+        alarmSamples <- alarmSamples[,c(paste0('yAlarmC[', 1:n, ']'),
+                                        paste0('yAlarmD[', 1:n, ']'))]
+    }
     
     postMeans <- colMeans(alarmSamples)
     postCI <- apply(alarmSamples, 2, quantile, probs = c(0.025, 0.975))
     
-    postAlarm <- data.frame(xAlarm = c(modelInputs$xC,  modelInputs$xD),
-                            marg = rep(c('inc', 'death'), each = n),
-                            mean = postMeans,
-                            lower = postCI[1,],
-                            upper = postCI[2,])
+    if (modelType %in% c('simple', 'full')) {
+        postAlarm <- data.frame(xAlarm = c(modelInputs$xC,  modelInputs$xD),
+                                marg = rep(c('inc', 'death'), each = n),
+                                mean = postMeans,
+                                lower = postCI[1,],
+                                upper = postCI[2,])
+    }  else if (modelType == 'inc') {
+        postAlarm <- data.frame(xAlarm = modelInputs$xC,
+                                marg = rep('inc', n),
+                                mean = postMeans,
+                                lower = postCI[1,],
+                                upper = postCI[2,])
+    }
+    
     
     rownames(postAlarm) <- NULL
     
@@ -80,17 +91,28 @@ summarizePost <- function(resThree, incData, modelType,
     alarmSamples2 <- resThree[[2]][,grep('alarm[[:upper:]]', colnames(resThree[[2]]))]
     alarmSamples3 <- resThree[[3]][,grep('alarm[[:upper:]]', colnames(resThree[[3]]))]
     alarmSamples <- rbind(alarmSamples1, alarmSamples2, alarmSamples3)
-    alarmSamples <- alarmSamples[,c(paste0('alarmC[', 1:tau, ']'),
-                                    paste0('alarmD[', 1:tau, ']'))]
+    if (modelType %in% c('simple', 'full')) {
+        alarmSamples <- alarmSamples[,c(paste0('alarmC[', 1:tau, ']'),
+                                        paste0('alarmD[', 1:tau, ']'))]
+    }
     
     postMeans <- colMeans(alarmSamples)
     postCI <- apply(alarmSamples, 2, quantile, probs = c(0.025, 0.975))
     
-    postAlarmTime <- data.frame(time = rep(1:tau, 2),
-                                marg = rep(c('inc', 'death'), each = tau),
-                                mean = postMeans,
-                                lower = postCI[1,],
-                                upper = postCI[2,])
+    if (modelType %in% c('simple', 'full')) {
+        postAlarmTime <- data.frame(time = rep(1:tau, 2),
+                                    marg = rep(c('inc', 'death'), each = tau),
+                                    mean = postMeans,
+                                    lower = postCI[1,],
+                                    upper = postCI[2,])
+    } else if (modelType == 'inc') {
+        postAlarmTime <- data.frame(time = 1:tau,
+                                    marg = rep('inc', tau),
+                                    mean = postMeans,
+                                    lower = postCI[1,],
+                                    upper = postCI[2,])
+    }
+    
     
     rownames(postAlarmTime) <- NULL
     
@@ -108,20 +130,35 @@ summarizePost <- function(resThree, incData, modelType,
     ##############################################################################
     ### Posterior predictive fit for full model
     
-    if (modelType == 'full') {
-        postPred <- postPredFit(incData = incData, smoothC = smoothC,
-                                smoothD = smoothD, hospData = hospData, 
-                                deathData = deathData, 
+    if (modelType %in% c('full', 'inc')) {
+        postPred <- postPredFit(incData = incData, modelType = modelType,
+                                smoothC = smoothC, smoothD = smoothD, 
+                                hospData = hospData, deathData = deathData, 
                                 paramsSamples = samples)
-
+        
+        
+        # remove NA rows (inc model only)
+        postPred <- postPred[!is.na(postPred[,1]),]
+        
         postMeans <- rowMeans(postPred)
         postCI <- apply(postPred, 1, quantile, probs = c(0.025, 0.975))
         
-        postPredictFit <- data.frame(time = rep(1:tau, 3),
-                                     marg = rep(c('inc', 'hosp', 'death'), each = tau),
-                                     mean = postMeans,
-                                     lower = postCI[1,],
-                                     upper = postCI[2,])
+        if (modelType == 'full') {
+            postPredictFit <- data.frame(time = rep(1:tau, 3),
+                                         marg = rep(c('inc', 'hosp', 'death'), each = tau),
+                                         mean = postMeans,
+                                         lower = postCI[1,],
+                                         upper = postCI[2,])
+        } else {
+            postPredictFit <- data.frame(time = 1:tau,
+                                         marg = rep('inc', tau),
+                                         mean = postMeans,
+                                         lower = postCI[1,],
+                                         upper = postCI[2,])
+        }
+        
+        
+        
     } else {
         postPredictFit <- data.frame(time = NA, 
                                      marg = NA,

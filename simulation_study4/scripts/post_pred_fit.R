@@ -2,12 +2,11 @@
 # function to do posterior predictive distribution of observed epidemic curve 
 ################################################################################
 
-# can only run if modelType == 'full'
+# can only run if modelType == 'full' or 'inc'
 
-postPredFit <- function(incData, smoothC, smoothD, hospData, deathData, 
+postPredFit <- function(incData, modelType, 
+                        smoothC, smoothD, hospData, deathData, 
                         paramsSamples) {
-    
-    modelType <- 'full'
     
     # model-specific constants, data, and inits
     modelInputs <- getModelInput(incData, modelType, smoothC, smoothD,
@@ -15,14 +14,22 @@ postPredFit <- function(incData, smoothC, smoothD, hospData, deathData,
     
     modelInputs$constantsList$bw <- 30
     
+    # get model code
+    modelCode <- get(paste0('SIHRD_', modelType, '_sim'))
+    
     # compile model and simulator
-    myModelPred <- nimbleModel(SIHRD_full_sim, 
+    myModelPred <- nimbleModel(modelCode, 
                                constants = modelInputs$constantsList)
     
     compiledPred  <- compileNimble(myModelPred) 
     
     tau <- modelInputs$constantsList$tau
-    dataNodes <- c('Istar', 'Hstar', 'Dstar', 'RstarH', 'RstarI')
+    
+    if (modelType == 'full') {
+        dataNodes <- c('Istar', 'Hstar', 'Dstar', 'RstarH', 'RstarI')
+    } else {
+        dataNodes <- 'Istar'
+    }
     dataNodes <- myModelPred$expandNodeNames(dataNodes)
     
     sim_R <- simulator(myModelPred, dataNodes)
@@ -41,17 +48,20 @@ postPredFit <- function(incData, smoothC, smoothD, hospData, deathData,
     for (j in 1:nPost) {
         
         postIdx <- sample(1:nrow(paramsSamples), 1)
-    
+        
         trueVals <- paramsSamples[postIdx, parentNodes]
         
         postPredAll <- apply(sim_C$run(trueVals, 10), 2, median)
         
         
         postPredInc[,j] <- postPredAll[grep('Istar', dataNodes)]
-        postPredHosp[,j] <- postPredAll[grep('Hstar', dataNodes)]
-        postPredDeath[,j] <- postPredAll[grep('Dstar', dataNodes)]
+        
+        if (modelType == 'full') {
+            postPredHosp[,j] <- postPredAll[grep('Hstar', dataNodes)]
+            postPredDeath[,j] <- postPredAll[grep('Dstar', dataNodes)]
+        }
     }
     
     rbind(postPredInc, postPredHosp, postPredDeath)
-
+    
 }
