@@ -11,12 +11,12 @@
 #SBATCH --error=./err/Array.%A_%a.error
 
 ####### Set environment variables ###############
-module load gcc/7.3.0
-module load lib/openblas/0.3.5-gnu
+module load gcc/8.2.0
+module load openblas/0.3.5_gcc8.2.0_multiarch
 module load java/9.0.4
 module load lib/hdf5/1.10.0.1
-export PATH=/home/caitlin.ward/R/bin:$PATH
-export R_LIBS=/home/caitlin.ward/R/lib64:$R_LIBS
+export PATH=/home/ward-c/R/bin:$PATH
+export R_LIBS=/home/ward-c/R/lib64:$R_LIBS
 
 ####### Run your script #########################
 Rscript run_models.R $SLURM_ARRAY_TASK_ID
