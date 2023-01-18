@@ -2,7 +2,7 @@
 # function to do posterior predictive distribution of observed epidemic curve 
 ################################################################################
 
-# can only run if modelType == 'full' or 'inc'
+# can only run if modelType == 'full' or 'fullThresh' or 'inc'
 
 postPredFit <- function(incData, modelType, 
                         smoothC, smoothD, hospData, deathData, 
@@ -25,7 +25,7 @@ postPredFit <- function(incData, modelType,
     
     tau <- modelInputs$constantsList$tau
     
-    if (modelType == 'full') {
+    if (modelType %in% c('full', 'fullThresh')) {
         dataNodes <- c('Istar', 'Hstar', 'Dstar', 'RstarH', 'RstarI')
     } else {
         dataNodes <- 'Istar'
@@ -56,7 +56,7 @@ postPredFit <- function(incData, modelType,
         
         postPredInc[,j] <- postPredAll[grep('Istar', dataNodes)]
         
-        if (modelType == 'full') {
+        if (modelType %in% c('full', 'fullThresh')) {
             postPredHosp[,j] <- postPredAll[grep('Hstar', dataNodes)]
             postPredDeath[,j] <- postPredAll[grep('Dstar', dataNodes)]
         }

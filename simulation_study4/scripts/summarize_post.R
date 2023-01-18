@@ -65,7 +65,7 @@ summarizePost <- function(resThree, incData, modelType,
     postMeans <- colMeans(alarmSamples)
     postCI <- apply(alarmSamples, 2, quantile, probs = c(0.025, 0.975))
     
-    if (modelType %in% c('simple', 'full')) {
+    if (modelType %in% c('simple', 'full', 'simpleThresh', 'fullThresh')) {
         postAlarm <- data.frame(xAlarm = c(modelInputs$xC,  modelInputs$xD),
                                 marg = rep(c('inc', 'death'), each = n),
                                 mean = postMeans,
@@ -91,7 +91,7 @@ summarizePost <- function(resThree, incData, modelType,
     alarmSamples2 <- resThree[[2]][,grep('alarm[[:upper:]]', colnames(resThree[[2]]))]
     alarmSamples3 <- resThree[[3]][,grep('alarm[[:upper:]]', colnames(resThree[[3]]))]
     alarmSamples <- rbind(alarmSamples1, alarmSamples2, alarmSamples3)
-    if (modelType %in% c('simple', 'full')) {
+    if (modelType %in% c('simple', 'full', 'simpleThresh', 'fullThresh')) {
         alarmSamples <- alarmSamples[,c(paste0('alarmC[', 1:tau, ']'),
                                         paste0('alarmD[', 1:tau, ']'))]
     }
@@ -99,7 +99,7 @@ summarizePost <- function(resThree, incData, modelType,
     postMeans <- colMeans(alarmSamples)
     postCI <- apply(alarmSamples, 2, quantile, probs = c(0.025, 0.975))
     
-    if (modelType %in% c('simple', 'full')) {
+    if (modelType %in% c('simple', 'full', 'simpleThresh', 'fullThresh')) {
         postAlarmTime <- data.frame(time = rep(1:tau, 2),
                                     marg = rep(c('inc', 'death'), each = tau),
                                     mean = postMeans,
@@ -130,7 +130,7 @@ summarizePost <- function(resThree, incData, modelType,
     ##############################################################################
     ### Posterior predictive fit for full model
     
-    if (modelType %in% c('full', 'inc')) {
+    if (modelType %in% c('full', 'fullThresh', 'inc')) {
         postPred <- postPredFit(incData = incData, modelType = modelType,
                                 smoothC = smoothC, smoothD = smoothD, 
                                 hospData = hospData, deathData = deathData, 
@@ -143,7 +143,7 @@ summarizePost <- function(resThree, incData, modelType,
         postMeans <- rowMeans(postPred)
         postCI <- apply(postPred, 1, quantile, probs = c(0.025, 0.975))
         
-        if (modelType == 'full') {
+        if (modelType %in% c('full', 'fullThresh')) {
             postPredictFit <- data.frame(time = rep(1:tau, 3),
                                          marg = rep(c('inc', 'hosp', 'death'), each = tau),
                                          mean = postMeans,

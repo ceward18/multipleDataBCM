@@ -29,7 +29,7 @@ getWAIC <- function(samples, modelType, incData, smoothC, smoothD,
     colnames(incDataSamples) <- paste0('Istar[', 1:ncol(incDataSamples), ']')
     samplesIstar <- cbind(samples, incDataSamples)
     
-    if (modelType == 'full') {
+    if (modelType %in% c('full', 'fullThresh')) {
         
         hospDataSamples <- matrix(rep(hospData), NROW(samples),
                                  ncol = length(hospData), byrow = T)

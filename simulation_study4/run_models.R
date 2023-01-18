@@ -17,7 +17,7 @@ nSim <- 50
 dataType <- c('inc', 'death', 'equal')
 modelType <- c('simple', 'full', 'inc')
 
-# 450
+# 750
 allFits <- expand.grid(simNumber = 1:nSim,
                        dataType = dataType,
                        modelType = modelType,
