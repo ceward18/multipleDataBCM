@@ -824,8 +824,8 @@ SIHRD_inc <-  nimbleCode({
     
     # alarm functions
     deltaC ~ dunif(0, 1)
-    nuC ~ dinvgamma(2, 4)
-    x0C ~ dunif(minC, maxC)
+    nuC ~ dinvgamma(7, 26)
+    x0C ~ dunif(minC + 1, maxC - 1)
     
     # IDD Curve
     w0 ~ dnorm(5, sd = 0.5)
@@ -887,8 +887,8 @@ SIHRD_inc_sim <-  nimbleCode({
     
     # alarm functions
     deltaC ~ dunif(0, 1)
-    nuC ~ dinvgamma(2, 4)
-    x0C ~ dunif(minC, maxC)
+    nuC ~ dinvgamma(7, 26)
+    x0C ~ dunif(minC + 1, maxC - 1)
     
     # IDD Curve
     w0 ~ dnorm(5, sd = 0.5)
