@@ -44,9 +44,9 @@ fitAlarmModel <- function(incData, modelType, alarmBase,
       myConfig$removeSampler(paramsForSlice)
       myConfig$addSampler(target = paramsForSlice, 
                           type = "RW_block",
-                          control = list(propCov = diag(c(0.5, 0.5, 
-                                                          100, 10, 
-                                                          2, 2))))
+                          control = list(propCov = diag(c(0.7, 0.7, 
+                                                          30, 10, 
+                                                          3, 3))))
       
     } else if (modelType %in% c('simpleThresh', 'fullThresh')) {
 
@@ -57,7 +57,7 @@ fitAlarmModel <- function(incData, modelType, alarmBase,
                           type = "RW_block",
                           control = list(propCov = diag(c(0.5, 0.5, 
                                                           50/modelInputs$constantsList$N,
-                                                          15/modelInputs$constantsList$N))))
+                                                          10/modelInputs$constantsList$N))))
       
     }
     

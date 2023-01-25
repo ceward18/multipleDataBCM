@@ -322,10 +322,10 @@ SIHRD_full <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(0.1, 0.1) # IR
-    gamma2 ~ dgamma(0.1, 0.1) # HR
-    lambda ~ dgamma(0.1, 0.1) # IH
-    phi ~ dgamma(0.1, 0.1)    # HD
+    gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
+    gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
+    lambda ~ dgamma(1, 10) # IH (mean 0.1)
+    phi ~ dgamma(1, 10)    # HD (mean 0.1)
     
     # alarm functions
     
@@ -424,10 +424,10 @@ SIHRD_full_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(0.1, 0.1) # IR
-    gamma2 ~ dgamma(0.1, 0.1) # HR
-    lambda ~ dgamma(0.1, 0.1) # IH
-    phi ~ dgamma(0.1, 0.1)    # HD
+    gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
+    gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
+    lambda ~ dgamma(1, 10) # IH (mean 0.1)
+    phi ~ dgamma(1, 10)    # HD (mean 0.1)
     
     # alarm functions
     
@@ -512,10 +512,10 @@ SIHRD_fullThresh <-  nimbleCode({
   beta ~ dgamma(0.1, 0.1)
   
   # transitions
-  gamma1 ~ dgamma(0.1, 0.1) # IR
-  gamma2 ~ dgamma(0.1, 0.1) # HR
-  lambda ~ dgamma(0.1, 0.1) # IH
-  phi ~ dgamma(0.1, 0.1)    # HD
+  gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
+  gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
+  lambda ~ dgamma(1, 10) # IH (mean 0.1)
+  phi ~ dgamma(1, 10)    # HD (mean 0.1)
   
   # alarm functions
   
@@ -611,10 +611,10 @@ SIHRD_fullThresh_sim <-  nimbleCode({
   beta ~ dgamma(0.1, 0.1)
   
   # transitions
-  gamma1 ~ dgamma(0.1, 0.1) # IR
-  gamma2 ~ dgamma(0.1, 0.1) # HR
-  lambda ~ dgamma(0.1, 0.1) # IH
-  phi ~ dgamma(0.1, 0.1)    # HD
+  gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
+  gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
+  lambda ~ dgamma(1, 10) # IH (mean 0.1)
+  phi ~ dgamma(1, 10)    # HD (mean 0.1)
   
   # alarm functions
   
