@@ -27,16 +27,7 @@ hillAlarm <- nimbleFunction(
     })
 assign('hillAlarm', hillAlarm, envir = .GlobalEnv)
 
-# threshold alarm function
-thresholdAlarm <- nimbleFunction(     
-  run = function(x = double(0), N = double(0), delta = double(0), H = double(0)) {
-    returnType(double(0))
-    
-    result <- delta * (x / N > H)
-    
-    return(result)
-  })
-assign('thresholdAlarm', thresholdAlarm, envir = .GlobalEnv)
+
 
 # nimbleFunction for Gaussian copula with beta distribution
 multiBeta <- nimbleFunction(     
@@ -74,6 +65,26 @@ movingAverage <- nimbleFunction(
         return(out)
     })
 assign('movingAverage', movingAverage, envir = .GlobalEnv)
+
+
+# get smoothC or smoothD at time t when doing posterior prediction
+get_smooth <- nimbleFunction(     
+    run = function(Xstar = double(1), t = double(0), Xstar0 = double(1), 
+                   Xstar0Length = double(0),  bw = double(0)) {
+        returnType(double(0))
+        
+        if (t < bw) {
+            
+            # incorporate previously observed incidence
+            result <- movingAverage(c(Xstar0, Xstar), bw)[Xstar0Length + t - 1]
+            
+        } else {
+            result <- movingAverage(Xstar, bw)[t - 1]
+        }
+        
+        return(result)
+    })
+assign('get_smooth', get_smooth, envir = .GlobalEnv)
 
 # get effective reproductive number at time t using a forward sum
 get_R0 <- nimbleFunction(     
@@ -155,115 +166,17 @@ simulator <- nimbleFunction(
     })
 assign('simulator', simulator, envir = .GlobalEnv)
 
-
-################################################################################
-# SIHRD Model
-
-SIHRD_sim <-  nimbleCode({
-    
-    S[1] <- S0
-    I[1] <- I0
-    H[1] <- 0
-    R[1] <- 0
-    D[1] <- 0
-    
-    probIH <- 1 - exp(-lambda)
-    probIR <- 1 - exp(-gamma1)
-    fromIProb[1:3] <- c(probIH, probIR, 1 - probIH - probIR)
-    
-    probHR <- 1 - exp(-gamma2)
-    probHD <- 1 - exp(-phi)
-    fromHProb[1:3] <- c(probHR, probHD, 1 - probHR - probHD)
-    
-    ### first time point
-    
-    # weighted sum of each component
-    alarm[1] <- 0
-    
-    probSI[1] <- 1 - exp(- beta * (1 - alarm[1]) * I[1] / N)
-    
-    # SIHRD model
-    Istar[1] ~ dbin(probSI[1], S[1])
-    fromI[1, 1:3] ~ dmulti(prob = fromIProb[1:3], size = I[1])
-    Hstar[1] <- fromI[1, 1]
-    RstarI[1] <- fromI[1, 2]
-    fromH[1, 1:3] ~ dmulti(prob = fromHProb[1:3], size = H[1])
-    RstarH[1] <- fromH[1, 1]
-    Dstar[1] <- fromH[1, 2]
-    
-    # update S, I, H, R, D
-    S[2] <- S[1] - Istar[1]
-    I[2] <- I[1] + Istar[1] - Hstar[1] - RstarI[1]
-    H[2] <- H[1] + Hstar[1] - RstarH[1] - Dstar[1] 
-    R[2] <- R[1] + RstarI[1] + RstarH[1]
-    D[2] <- D[1] + Dstar[1] 
-    
-    ### rest of time points
-    for(t in 2:tau) {
-        
-        smoothC[t] <- movingAverage(Istar[1:(t-1)], bw)[t-1]
-        smoothD[t] <- movingAverage(Dstar[1:(t-1)], bw)[t-1]
-        
-        # compute alarms for each component
-        alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, deltaC)
-        alarmD[t] <- hillAlarm(smoothD[t], nuD, x0D, deltaD)
-        
-        # weighted sum of each component
-        alarm[t] <- alarmC[t] + alarmD[t]
-        
-        probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * I[t] / N)
-        
-        # SIHRD model
-        # S -> I
-        Istar[t] ~ dbin(probSI[t], S[t])
-        # I -> H or R
-        fromI[t, 1:3] ~ dmulti(prob = fromIProb[1:3], size = I[t])
-        Hstar[t] <- fromI[t, 1]
-        RstarI[t] <- fromI[t, 2]
-        # H -> R or D
-        fromH[t, 1:3] ~ dmulti(prob = fromHProb[1:3], size = H[t])
-        RstarH[t] <- fromH[t, 1]
-        Dstar[t] <- fromH[t, 2]
-        
-        # update S, I, H, R, D
-        S[t + 1] <- S[t] - Istar[t]
-        I[t + 1] <- I[t] + Istar[t] - Hstar[t] - RstarI[t]
-        H[t + 1] <- H[t] + Hstar[t] - RstarH[t] - Dstar[t] 
-        R[t + 1] <- R[t] + RstarI[t] + RstarH[t]
-        D[t + 1] <- D[t] + Dstar[t] 
-        
-    }
-    
-    ### Priors
-    
-    # transmission
-    beta ~ dgamma(0.1, 0.1)
-    
-    # transitions
-    gamma1 ~ dgamma(0.1, 0.1) # IR
-    gamma2 ~ dgamma(0.1, 0.1) # HR
-    lambda ~ dgamma(0.1, 0.1) # IH
-    phi ~ dgamma(0.1, 0.1)    # HD
-    
-    # alarm functions - priors don't matter as this is used for simulation only
-    deltaC ~ dbeta(1, 1)
-    nuC ~ dunif(0, 50)
-    x0C ~ dunif(0, 20000)
-    deltaD ~ dbeta(1, 1)
-    nuD ~ dunif(0, 50)
-    x0D ~ dunif(0, 20000)
-    
-})
-
 ################################################################################
 
 SIHRD_full <-  nimbleCode({
     
-    S[1] <- S0
-    I[1] <- I0
-    H[1] <- 0
-    R[1] <- 0
-    D[1] <- 0
+    # compartment initial values
+    comp_init[1:5] ~ dmulti(prob = initProb[1:5], size = N)
+    S[1] <- comp_init[1] - 1
+    I[1] <- comp_init[2] + 1 # add 1 to ensure I0 > 0
+    H[1] <- comp_init[3]
+    R[1] <- comp_init[4]
+    D[1] <- comp_init[5]
     
     probIH <- 1 - exp(-lambda)
     probIR <- 1 - exp(-gamma1)
@@ -286,6 +199,8 @@ SIHRD_full <-  nimbleCode({
         # SIHRD model
         # S -> I
         Istar[t] ~ dbin(probSI[t], S[t])
+        # Istar[t] <- detectIstar[t] + undetectIstar[t]
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         # I -> H or R using sequential binomial
         Hstar[t] ~ dbin(probIH, I[t])
         RstarI[t] ~ dbin(probIR / (1 - probIH), I[t] - Hstar[t])
@@ -316,7 +231,10 @@ SIHRD_full <-  nimbleCode({
         
     }
     
-    ### Priors
+    ### Priors 
+    
+    # detection probability (1/4 reported)
+    probDetect ~ dbeta(2.5, 7.5)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -348,11 +266,13 @@ SIHRD_full <-  nimbleCode({
 
 SIHRD_full_sim <-  nimbleCode({
     
-    S[1] <- S0
-    I[1] <- I0
-    H[1] <- 0
-    R[1] <- 0
-    D[1] <- 0
+    # compartment initial values
+    comp_init[1:5] ~ dmulti(prob = initProb[1:5], size = N)
+    S[1] <- comp_init[1] - 1
+    I[1] <- comp_init[2] + 1 # add 1 to ensure I0 > 0
+    H[1] <- comp_init[3]
+    R[1] <- comp_init[4]
+    D[1] <- comp_init[5]
     
     probIH <- 1 - exp(-lambda)
     probIR <- 1 - exp(-gamma1)
@@ -361,13 +281,22 @@ SIHRD_full_sim <-  nimbleCode({
     probHD <- 1 - exp(-phi)
     
     ### first time point
-    alarm[1] <- 0
+    smoothC[1] <- smoothC0
+    smoothD[1] <- smoothD0
+    
+    # compute alarms for each component
+    alarmC[1] <- hillAlarm(smoothC[1], nuC, x0C, delta[1])
+    alarmD[1] <- hillAlarm(smoothD[1], nuD, x0D, delta[2])
+    
+    alarm[1] <- alarmC[1] + alarmD[1]
     
     probSI[1] <- 1 - exp(- beta * (1 - alarm[1]) * I[1] / N)
     
     # SIHRD model
     # S -> I
     Istar[1] ~ dbin(probSI[1], S[1])
+    # Istar[t] <- detectIstar[t] + undetectIstar[t]
+    detectIstar[1] ~ dbin(probDetect, Istar[1]) # e.g. 25% of cases are detected
     # I -> H or R using sequential binomial
     Hstar[1] ~ dbin(probIH, I[1])
     RstarI[1] ~ dbin(probIR / (1 - probIH), I[1] - Hstar[1])
@@ -387,8 +316,8 @@ SIHRD_full_sim <-  nimbleCode({
     for(t in 2:tau) {
         
         # compute moving average up to t-1
-        smoothC[t] <- movingAverage(Istar[1:(t-1)], bw)[t-1]
-        smoothD[t] <- movingAverage(Dstar[1:(t-1)], bw)[t-1]
+        smoothC[t] <- get_smooth(detectIstar[1:(t-1)], t, Istar0[1:Istar0Length], Istar0Length, bw)
+        smoothD[t] <- get_smooth(Dstar[1:(t-1)], t, Dstar0[1:Dstar0Length], Dstar0Length, bw)
         
         # compute alarms for each component
         alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, delta[1])
@@ -402,6 +331,8 @@ SIHRD_full_sim <-  nimbleCode({
         # SIHRD model
         # S -> I
         Istar[t] ~ dbin(probSI[t], S[t])
+        # Istar[t] <- detectIstar[t] + undetectIstar[t]
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         # I -> H or R using sequential binomial
         Hstar[t] ~ dbin(probIH, I[t])
         RstarI[t] ~ dbin(probIR / (1 - probIH), I[t] - Hstar[t])
@@ -419,6 +350,9 @@ SIHRD_full_sim <-  nimbleCode({
     }
     
     ### Priors
+    
+    # detection probability (1/4 reported = 3/4 unreported)
+    probDetect ~ dbeta(2.5, 7.5)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -445,198 +379,17 @@ SIHRD_full_sim <-  nimbleCode({
     
 })
 
-################################################################################
-
-SIHRD_fullThresh <-  nimbleCode({
-  
-  S[1] <- S0
-  I[1] <- I0
-  H[1] <- 0
-  R[1] <- 0
-  D[1] <- 0
-  
-  probIH <- 1 - exp(-lambda)
-  probIR <- 1 - exp(-gamma1)
-  
-  probHR <- 1 - exp(-gamma2)
-  probHD <- 1 - exp(-phi)
-  
-  ### loop over time
-  for(t in 1:tau) {
-    
-    # compute alarms for each component
-    alarmC[t] <- thresholdAlarm(smoothC[t], N, delta[1], HC)
-    alarmD[t] <- thresholdAlarm(smoothD[t], N, delta[2], HD)
-    
-    # weighted sum of each component
-    alarm[t] <- alarmC[t] + alarmD[t]
-    
-    probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * I[t] / N)
-    
-    # SIHRD model
-    # S -> I
-    Istar[t] ~ dbin(probSI[t], S[t])
-    # I -> H or R using sequential binomial
-    Hstar[t] ~ dbin(probIH, I[t])
-    RstarI[t] ~ dbin(probIR / (1 - probIH), I[t] - Hstar[t])
-    # H -> R or D using sequential binomial
-    Dstar[t] ~ dbin(probHD, H[t])
-    RstarH[t] ~ dbin(probHR / (1 - probHD), H[t] - Dstar[t])
-    
-    # update S, I, H, R, D
-    S[t + 1] <- S[t] - Istar[t]
-    I[t + 1] <- I[t] + Istar[t] - Hstar[t] - RstarI[t]
-    H[t + 1] <- H[t] + Hstar[t] - RstarH[t] - Dstar[t] 
-    R[t + 1] <- R[t] + RstarI[t] + RstarH[t]
-    D[t + 1] <- D[t] + Dstar[t] 
-    
-  }
-  
-  # estimated effective R0
-  R0[1:(tau-maxInf-1)] <- get_R0_full(betat = beta * (1 - alarm[1:tau]), 
-                                      N = N, gamma1 = gamma1, lambda = lambda,
-                                      S = S[1:tau], maxInf = maxInf)
-  
-  ### compute alarms for summaries
-  for (i in 1:n) {
-    
-    # compute alarms for each component
-    yAlarmC[i] <- thresholdAlarm(xC[i], N, delta[1], HC)
-    yAlarmD[i] <- thresholdAlarm(xD[i], N, delta[2], HD)
-    
-  }
-  
-  ### Priors
-  
-  # transmission
-  beta ~ dgamma(0.1, 0.1)
-  
-  # transitions
-  gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
-  gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
-  lambda ~ dgamma(1, 10) # IH (mean 0.1)
-  phi ~ dgamma(1, 10)    # HD (mean 0.1)
-  
-  # alarm functions
-  
-  # delta prior using Gaussian copula
-  Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
-  delta[1:2] <- multiBeta(Z[1:2])
-  
-  HC ~ dunif(minC/N, maxC/N)
-  HD ~ dunif(minD/N, maxD/N)
-  
-  # constrain deltas to sum to 1
-  constrain_deltas ~ dconstraint(delta[1] + delta[2] <= 1)
-  
-})
-
-################################################################################
-
-SIHRD_fullThresh_sim <-  nimbleCode({
-  
-  S[1] <- S0
-  I[1] <- I0
-  H[1] <- 0
-  R[1] <- 0
-  D[1] <- 0
-  
-  probIH <- 1 - exp(-lambda)
-  probIR <- 1 - exp(-gamma1)
-  
-  probHR <- 1 - exp(-gamma2)
-  probHD <- 1 - exp(-phi)
-  
-  ### first time point
-  alarm[1] <- 0
-  
-  probSI[1] <- 1 - exp(- beta * (1 - alarm[1]) * I[1] / N)
-  
-  # SIHRD model
-  # S -> I
-  Istar[1] ~ dbin(probSI[1], S[1])
-  # I -> H or R using sequential binomial
-  Hstar[1] ~ dbin(probIH, I[1])
-  RstarI[1] ~ dbin(probIR / (1 - probIH), I[1] - Hstar[1])
-  # H -> R or D using sequential binomial
-  Dstar[1] ~ dbin(probHD, H[1])
-  RstarH[1] ~ dbin(probHR / (1 - probHD), H[1] - Dstar[1])
-  
-  # update S, I, H, R, D
-  S[2] <- S[1] - Istar[1]
-  I[2] <- I[1] + Istar[1] - Hstar[1] - RstarI[1]
-  H[2] <- H[1] + Hstar[1] - RstarH[1] - Dstar[1] 
-  R[2] <- R[1] + RstarI[1] + RstarH[1]
-  D[2] <- D[1] + Dstar[1] 
-  
-  
-  ### loop over rest of time points
-  for(t in 2:tau) {
-    
-    # compute moving average up to t-1
-    smoothC[t] <- movingAverage(Istar[1:(t-1)], bw)[t-1]
-    smoothD[t] <- movingAverage(Dstar[1:(t-1)], bw)[t-1]
-    
-    # compute alarms for each component
-    alarmC[t] <- thresholdAlarm(smoothC[t], N, delta[1], HC)
-    alarmD[t] <- thresholdAlarm(smoothD[t], N, delta[2], HD)
-    
-    # weighted sum of each component
-    alarm[t] <- alarmC[t] + alarmD[t]
-    
-    probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * I[t] / N)
-    
-    # SIHRD model
-    # S -> I
-    Istar[t] ~ dbin(probSI[t], S[t])
-    # I -> H or R using sequential binomial
-    Hstar[t] ~ dbin(probIH, I[t])
-    RstarI[t] ~ dbin(probIR / (1 - probIH), I[t] - Hstar[t])
-    # H -> R or D using sequential binomial
-    Dstar[t] ~ dbin(probHD, H[t])
-    RstarH[t] ~ dbin(probHR / (1 - probHD), H[t] - Dstar[t])
-    
-    # update S, I, H, R, D
-    S[t + 1] <- S[t] - Istar[t]
-    I[t + 1] <- I[t] + Istar[t] - Hstar[t] - RstarI[t]
-    H[t + 1] <- H[t] + Hstar[t] - RstarH[t] - Dstar[t] 
-    R[t + 1] <- R[t] + RstarI[t] + RstarH[t]
-    D[t + 1] <- D[t] + Dstar[t] 
-    
-  }
-  
-  ### Priors
-  
-  # transmission
-  beta ~ dgamma(0.1, 0.1)
-  
-  # transitions
-  gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
-  gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
-  lambda ~ dgamma(1, 10) # IH (mean 0.1)
-  phi ~ dgamma(1, 10)    # HD (mean 0.1)
-  
-  # alarm functions
-  
-  # delta prior using Gaussian copula
-  Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
-  delta[1:2] <- multiBeta(Z[1:2])
-  
-  HC ~ dunif(minC/N, maxC/N)
-  HD ~ dunif(minD/N, maxD/N)
-  
-  # constrain deltas to sum to 1
-  constrain_deltas ~ dconstraint(delta[1] + delta[2] <= 1)
-  
-})
 
 ################################################################################
 
 SIHRD_simple <-  nimbleCode({
     
-    S[1] <- S0
-    I[1, 1] <- I0
-    I[1, 2:maxInf] <- 0
+    # compartment initial values
+    comp_init[1:3] ~ dmulti(prob = initProb[1:3], size = N)
+    S[1] <- comp_init[1] - 1
+    I0[1:maxInf] ~ dmulti(prob = I0Prob[1:maxInf], 
+                          size = comp_init[2] + 1) 
+    I[1, 1:maxInf] <- I0[1:maxInf]
     
     idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
     
@@ -655,6 +408,8 @@ SIHRD_simple <-  nimbleCode({
         
         # SIR model
         Istar[t] ~ dbin(probSI[t], S[t])
+        # Istar[t] <- detectIstar[t] + undetectIstar[t]
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         
         # update S and I
         S[t + 1] <- S[t] - Istar[t]
@@ -679,6 +434,9 @@ SIHRD_simple <-  nimbleCode({
     }
     
     ### Priors
+    
+    # detection probability (1/4 reported)
+    probDetect ~ dbeta(2.5, 7.5)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -705,82 +463,14 @@ SIHRD_simple <-  nimbleCode({
 ################################################################################
 
 
-SIHRD_simpleThresh <-  nimbleCode({
-  
-  S[1] <- S0
-  I[1, 1] <- I0
-  I[1, 2:maxInf] <- 0
-  
-  idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
-  
-  ### rest of time points
-  for(t in 1:tau) {
-    
-    # compute alarms for each component
-    alarmC[t] <- thresholdAlarm(smoothC[t], N, delta[1], HC)
-    alarmD[t] <- thresholdAlarm(smoothD[t], N, delta[2], HD)
-    
-    # weighted sum of each component
-    alarm[t] <- alarmC[t] + alarmD[t]
-    
-    probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * 
-                           sum(idd_curve[1:maxInf] * I[t, 1:maxInf]) / N)
-    
-    # SIR model
-    Istar[t] ~ dbin(probSI[t], S[t])
-    
-    # update S and I
-    S[t + 1] <- S[t] - Istar[t]
-    I[t + 1, 2:maxInf] <- I[t, 1:(maxInf - 1)]  # shift current I by one day
-    I[t + 1, 1] <- Istar[t]                     # add newly infectious
-    
-  }
-  
-  # estimated effective R0
-  R0[1:(tau-maxInf)] <- get_R0(betat = beta * (1 - alarm[1:tau]), 
-                               N = N, S = S[1:tau], maxInf = maxInf,
-                               iddCurve = idd_curve[1:maxInf])
-  
-  
-  ### compute alarms for summaries
-  for (i in 1:n) {
-    
-    # compute alarms for each component
-    yAlarmC[i] <- thresholdAlarm(xC[i], N, delta[1], HC)
-    yAlarmD[i] <- thresholdAlarm(xD[i], N, delta[2], HD)
-    
-  }
-  
-  ### Priors
-  
-  # transmission
-  beta ~ dgamma(0.1, 0.1)
-  
-  # alarm functions
-  # delta prior using Gaussian copula
-  Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
-  delta[1:2] <- multiBeta(Z[1:2])
-  
-  HC ~ dunif(minC/N, maxC/N)
-  HD ~ dunif(minD/N, maxD/N)
-  
-  # IDD Curve
-  w0 ~ dnorm(5, sd = 0.5)
-  k ~ dgamma(100, 100)
-  
-  # constrain deltas to sum to 1
-  constrain_deltas ~ dconstraint(delta[1] + delta[2] <= 1)
-  
-})
-
-################################################################################
-
-
 SIHRD_inc <-  nimbleCode({
     
-    S[1] <- S0
-    I[1, 1] <- I0
-    I[1, 2:maxInf] <- 0
+    # compartment initial values
+    comp_init[1:3] ~ dmulti(prob = initProb[1:3], size = N)
+    S[1] <- comp_init[1] - 1
+    I0[1:maxInf] ~ dmulti(prob = I0Prob[1:maxInf], 
+                          size = comp_init[2] + 1) 
+    I[1, 1:maxInf] <- I0[1:maxInf]
     
     idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
     
@@ -795,6 +485,8 @@ SIHRD_inc <-  nimbleCode({
         
         # SIR model
         Istar[t] ~ dbin(probSI[t], S[t])
+        # Istar[t] <- detectIstar[t] + undetectIstar[t]
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         
         # update S and I
         S[t + 1] <- S[t] - Istar[t]
@@ -819,6 +511,9 @@ SIHRD_inc <-  nimbleCode({
     
     ### Priors
     
+    # detection probability (1/4 reported)
+    probDetect ~ dbeta(2.5, 7.5)
+    
     # transmission
     beta ~ dgamma(0.1, 0.1)
     
@@ -838,20 +533,26 @@ SIHRD_inc <-  nimbleCode({
 
 SIHRD_inc_sim <-  nimbleCode({
     
-    S[1] <- S0
-    I[1, 1] <- I0
-    I[1, 2:maxInf] <- 0
+    # compartment initial values
+    comp_init[1:3] ~ dmulti(prob = initProb[1:3], size = N)
+    S[1] <- comp_init[1] - 1
+    I0[1:maxInf] ~ dmulti(prob = I0Prob[1:maxInf], 
+                          size = comp_init[2] + 1) 
+    I[1, 1:maxInf] <- I0[1:maxInf]
     
     idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
     
-    # time 1
-    alarmC[1] <- 0
+    ### first time point
+    smoothC[1] <- smoothC0
+    alarmC[1] <- hillAlarm(smoothC[1], nuC, x0C, deltaC)
     
     probSI[1] <- 1 - exp(- beta * (1 - alarmC[1]) * 
                              sum(idd_curve[1:maxInf] * I[1, 1:maxInf]) / N)
     
     # SIR model
     Istar[1] ~ dbin(probSI[1], S[1])
+    # Istar[t] <- detectIstar[t] + undetectIstar[t]
+    detectIstar[1] ~ dbin(probDetect, Istar[1]) # e.g. 25% of cases are detected
     
     # update S and I
     S[2] <- S[1] - Istar[1]
@@ -861,8 +562,8 @@ SIHRD_inc_sim <-  nimbleCode({
     ### rest of time points
     for(t in 2:tau) {
         
-        # moving average incidence
-        smoothC[t] <- movingAverage(Istar[1:(t-1)], bw)[t-1]
+        # moving average observed incidence
+        smoothC[t] <- get_smooth(detectIstar[1:(t-1)], t, Istar0[1:Istar0Length], Istar0Length, bw)
         
         # alarm is function of incidence only
         alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, deltaC)
@@ -872,6 +573,8 @@ SIHRD_inc_sim <-  nimbleCode({
         
         # SIR model
         Istar[t] ~ dbin(probSI[t], S[t])
+        # Istar[t] <- detectIstar[t] + undetectIstar[t]
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         
         # update S and I
         S[t + 1] <- S[t] - Istar[t]
@@ -881,6 +584,9 @@ SIHRD_inc_sim <-  nimbleCode({
     }
     
     ### Priors
+    
+    # detection probability (1/4 reported)
+    probDetect ~ dbeta(2.5, 7.5)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
