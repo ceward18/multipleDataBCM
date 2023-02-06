@@ -1,0 +1,428 @@
+nimble version 0.13.1 is loaded.
+For more information on NIMBLE and a User Manual,
+please visit https://R-nimble.org.
+
+Note for advanced users who have written their own MCMC samplers:
+  As of version 0.13.0, NIMBLE's protocol for handling posterior
+  predictive nodes has changed in a way that could affect user-defined
+  samplers in some situations. Please see Section 15.5.1 of the User Manual.
+
+Attaching package: ‘nimble’
+
+The following object is masked from ‘package:stats’:
+
+    simulate
+
+Defining model
+Building model
+Setting data and initial values
+Running calculate on model
+  [Note] Any error reports that follow may simply reflect missing values in model variables.
+Checking model sizes and dimensions
+Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.
+Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.
+Calculating WAIC.
+Defining model
+  [Note] 'smoothI0' is provided in 'constants' but not used in the model code and is being ignored.
+  [Note] 'xC' is provided in 'constants' but not used in the model code and is being ignored.
+  [Note] 'xD' is provided in 'constants' but not used in the model code and is being ignored.
+  [Note] 'maxInf' is provided in 'constants' but not used in the model code and is being ignored.
+  [Note] 'n' is provided in 'constants' but not used in the model code and is being ignored.
+Building model
+Setting data and initial values
+Running calculate on model
+  [Note] Any error reports that follow may simply reflect missing values in model variables.
+Checking model sizes and dimensions
+  [Note] This model is not fully initialized. This is not an error.
+         To see which variables are not initialized, use model$initializeInfo().
+         For more information on model initialization, see help(modelInitialization).
+Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.
+Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.
+*** Error in `/panfs/roc/msisoft/R/4.0.4/lib64/R/bin/exec/R': double free or corruption (out): 0x0000000024707b40 ***
+======= Backtrace: =========
+/lib64/libc.so.6(+0x81329)[0x7f6d6300f329]
+/tmp/Rtmp8d0SRQ/nimble_generatedCode/P_1_MCMC_02_04_03_43_03.so(_ZN5Rstar3runEv+0x796)[0x7f6d567c4266]
+/tmp/Rtmp8d0SRQ/nimble_generatedCode/P_1_MCMC_02_04_03_43_03.so(_ZN4MCMC3runEibbbbiiib+0x7d3)[0x7f6d567c8693]
+/tmp/Rtmp8d0SRQ/nimble_generatedCode/P_1_MCMC_02_04_03_43_03.so(CALL_MCMC_run+0xf8)[0x7f6d567c8d78]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0xf8e78)[0x7f6d63ac7e78]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0xf9465)[0x7f6d63ac8465]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_eval+0x7d8)[0x7f6d63b133f8]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x148e59)[0x7f6d63b17e59]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_eval+0x59d)[0x7f6d63b131bd]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x1478b4)[0x7f6d63b168b4]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_eval+0x59d)[0x7f6d63b131bd]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x145b2f)[0x7f6d63b14b2f]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_applyClosure+0x1c7)[0x7f6d63b15a67]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x139bf6)[0x7f6d63b08bf6]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7f6d63b12d80]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x145b2f)[0x7f6d63b14b2f]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_applyClosure+0x1c7)[0x7f6d63b15a67]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x139bf6)[0x7f6d63b08bf6]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7f6d63b12d80]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x145b2f)[0x7f6d63b14b2f]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_applyClosure+0x1c7)[0x7f6d63b15a67]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x139bf6)[0x7f6d63b08bf6]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7f6d63b12d80]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x145b2f)[0x7f6d63b14b2f]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_applyClosure+0x1c7)[0x7f6d63b15a67]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(R_forceAndCall+0x16d)[0x7f6d63b183fd]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x80b12)[0x7f6d63a4fb12]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x186776)[0x7f6d63b55776]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x130aff)[0x7f6d63affaff]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7f6d63b12d80]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x145b2f)[0x7f6d63b14b2f]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_applyClosure+0x1c7)[0x7f6d63b15a67]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_eval+0x320)[0x7f6d63b12f40]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0xc6655)[0x7f6d63a95655]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x130d05)[0x7f6d63affd05]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7f6d63b12d80]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x145b2f)[0x7f6d63b14b2f]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_applyClosure+0x1c7)[0x7f6d63b15a67]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x139bf6)[0x7f6d63b08bf6]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7f6d63b12d80]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x144742)[0x7f6d63b13742]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x144bc8)[0x7f6d63b13bc8]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x138479)[0x7f6d63b07479]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7f6d63b12d80]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x144742)[0x7f6d63b13742]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x144bc8)[0x7f6d63b13bc8]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x138479)[0x7f6d63b07479]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7f6d63b12d80]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x144742)[0x7f6d63b13742]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x144bc8)[0x7f6d63b13bc8]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x138479)[0x7f6d63b07479]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7f6d63b12d80]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x144742)[0x7f6d63b13742]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x144bc8)[0x7f6d63b13bc8]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x138479)[0x7f6d63b07479]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7f6d63b12d80]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x145b2f)[0x7f6d63b14b2f]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_applyClosure+0x1c7)[0x7f6d63b15a67]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x139bf6)[0x7f6d63b08bf6]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7f6d63b12d80]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x145b2f)[0x7f6d63b14b2f]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(Rf_applyClosure+0x1c7)[0x7f6d63b15a67]
+/panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so(+0x139bf6)[0x7f6d63b08bf6]
+======= Memory map: ========
+00400000-00401000 r-xp 00000000 00:69 4221567542                         /panfs/roc/msisoft/R/4.0.4/lib64/R/bin/exec/R
+00600000-00601000 r--p 00000000 00:69 4221567542                         /panfs/roc/msisoft/R/4.0.4/lib64/R/bin/exec/R
+00601000-00602000 rw-p 00001000 00:69 4221567542                         /panfs/roc/msisoft/R/4.0.4/lib64/R/bin/exec/R
+0064e000-24710000 rw-p 00000000 00:00 0                                  [heap]
+7f6d4c000000-7f6d4c021000 rw-p 00000000 00:00 0 
+7f6d4c021000-7f6d50000000 ---p 00000000 00:00 0 
+7f6d53dfc000-7f6d567a8000 rw-p 00000000 00:00 0 
+7f6d567a8000-7f6d567f6000 r-xp 00000000 00:70 4451355                    /tmp/Rtmp8d0SRQ/nimble_generatedCode/P_1_MCMC_02_04_03_43_03.so
+7f6d567f6000-7f6d569f5000 ---p 0004e000 00:70 4451355                    /tmp/Rtmp8d0SRQ/nimble_generatedCode/P_1_MCMC_02_04_03_43_03.so
+7f6d569f5000-7f6d569f7000 r--p 0004d000 00:70 4451355                    /tmp/Rtmp8d0SRQ/nimble_generatedCode/P_1_MCMC_02_04_03_43_03.so
+7f6d569f7000-7f6d569f8000 rw-p 0004f000 00:70 4451355                    /tmp/Rtmp8d0SRQ/nimble_generatedCode/P_1_MCMC_02_04_03_43_03.so
+7f6d569f8000-7f6d56a70000 r-xp 00000000 00:70 4262874                    /tmp/Rtmp8d0SRQ/nimble_generatedCode/P_1_modelCode_MID_1_02_04_03_42_33.so
+7f6d56a70000-7f6d56c70000 ---p 00078000 00:70 4262874                    /tmp/Rtmp8d0SRQ/nimble_generatedCode/P_1_modelCode_MID_1_02_04_03_42_33.so
+7f6d56c70000-7f6d56c73000 r--p 00078000 00:70 4262874                    /tmp/Rtmp8d0SRQ/nimble_generatedCode/P_1_modelCode_MID_1_02_04_03_42_33.so
+7f6d56c73000-7f6d56c74000 rw-p 0007b000 00:70 4262874                    /tmp/Rtmp8d0SRQ/nimble_generatedCode/P_1_modelCode_MID_1_02_04_03_42_33.so
+7f6d56c74000-7f6d56d14000 r-xp 00000000 00:67 3344879088                 /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.0/nimble/CppCode/libnimble.so
+7f6d56d14000-7f6d56f13000 ---p 000a0000 00:67 3344879088                 /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.0/nimble/CppCode/libnimble.so
+7f6d56f13000-7f6d56f16000 r--p 0009f000 00:67 3344879088                 /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.0/nimble/CppCode/libnimble.so
+7f6d56f16000-7f6d56f17000 rw-p 000a2000 00:67 3344879088                 /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.0/nimble/CppCode/libnimble.so
+7f6d56f17000-7f6d56f18000 rw-p 00000000 00:00 0 
+7f6d56f18000-7f6d56f1c000 r-xp 00000000 00:70 4323729                    /tmp/Rtmp8d0SRQ/nimble_generatedCode/dynamicRegistrations_02_04_03_42_33.so
+7f6d56f1c000-7f6d5711b000 ---p 00004000 00:70 4323729                    /tmp/Rtmp8d0SRQ/nimble_generatedCode/dynamicRegistrations_02_04_03_42_33.so
+7f6d5711b000-7f6d5711c000 r--p 00003000 00:70 4323729                    /tmp/Rtmp8d0SRQ/nimble_generatedCode/dynamicRegistrations_02_04_03_42_33.so
+7f6d5711c000-7f6d5711d000 rw-p 00004000 00:70 4323729                    /tmp/Rtmp8d0SRQ/nimble_generatedCode/dynamicRegistrations_02_04_03_42_33.so
+7f6d5711d000-7f6d57129000 r-xp 00000000 00:69 2503038436                 /panfs/roc/msisoft/R/4.0.4/lib64/R/modules/lapack.so
+7f6d57129000-7f6d57328000 ---p 0000c000 00:69 2503038436                 /panfs/roc/msisoft/R/4.0.4/lib64/R/modules/lapack.so
+7f6d57328000-7f6d57329000 r--p 0000b000 00:69 2503038436                 /panfs/roc/msisoft/R/4.0.4/lib64/R/modules/lapack.so
+7f6d57329000-7f6d5732a000 rw-p 0000c000 00:69 2503038436                 /panfs/roc/msisoft/R/4.0.4/lib64/R/modules/lapack.so
+7f6d5732a000-7f6d5795e000 rw-p 00000000 00:00 0 
+7f6d5795e000-7f6d579a6000 r-xp 00000000 00:67 527608860                  /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.0/nimble/libs/nimble.so
+7f6d579a6000-7f6d57ba5000 ---p 00048000 00:67 527608860                  /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.0/nimble/libs/nimble.so
+7f6d57ba5000-7f6d57ba6000 r--p 00047000 00:67 527608860                  /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.0/nimble/libs/nimble.so
+7f6d57ba6000-7f6d57ba7000 rw-p 00048000 00:67 527608860                  /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.0/nimble/libs/nimble.so
+7f6d57ba7000-7f6d57ba8000 rw-p 00000000 00:00 0 
+7f6d57ba8000-7f6d57bab000 r-xp 00000000 00:69 2252183284                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/lattice/libs/lattice.so
+7f6d57bab000-7f6d57daa000 ---p 00003000 00:69 2252183284                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/lattice/libs/lattice.so
+7f6d57daa000-7f6d57dab000 r--p 00002000 00:69 2252183284                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/lattice/libs/lattice.so
+7f6d57dab000-7f6d57dac000 rw-p 00003000 00:69 2252183284                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/lattice/libs/lattice.so
+7f6d57dac000-7f6d57dcc000 r-xp 00000000 00:69 3723562616                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/grid/libs/grid.so
+7f6d57dcc000-7f6d57fcc000 ---p 00020000 00:69 3723562616                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/grid/libs/grid.so
+7f6d57fcc000-7f6d57fcd000 r--p 00020000 00:69 3723562616                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/grid/libs/grid.so
+7f6d57fcd000-7f6d57fce000 rw-p 00021000 00:69 3723562616                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/grid/libs/grid.so
+7f6d57fce000-7f6d58042000 r-xp 00000000 00:69 2560559330                 /panfs/roc/msisoft/gmp/6.1.2_gcc8.1.0/lib/libgmp.so.10.3.2
+7f6d58042000-7f6d58241000 ---p 00074000 00:69 2560559330                 /panfs/roc/msisoft/gmp/6.1.2_gcc8.1.0/lib/libgmp.so.10.3.2
+7f6d58241000-7f6d58243000 rw-p 00073000 00:69 2560559330                 /panfs/roc/msisoft/gmp/6.1.2_gcc8.1.0/lib/libgmp.so.10.3.2
+7f6d58243000-7f6d583a1000 r-xp 00000000 fd:01 4346727                    /usr/lib64/libxml2.so.2.9.1
+7f6d583a1000-7f6d585a1000 ---p 0015e000 fd:01 4346727                    /usr/lib64/libxml2.so.2.9.1
+7f6d585a1000-7f6d585a9000 r--p 0015e000 fd:01 4346727                    /usr/lib64/libxml2.so.2.9.1
+7f6d585a9000-7f6d585ab000 rw-p 00166000 fd:01 4346727                    /usr/lib64/libxml2.so.2.9.1
+7f6d585ab000-7f6d585ad000 rw-p 00000000 00:00 0 
+7f6d585ad000-7f6d5885e000 r-xp 00000000 00:67 1633558898                 /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.0/igraph/libs/igraph.so
+7f6d5885e000-7f6d58a5e000 ---p 002b1000 00:67 1633558898                 /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.0/igraph/libs/igraph.so
+7f6d58a5e000-7f6d58a62000 r--p 002b1000 00:67 1633558898                 /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.0/igraph/libs/igraph.so
+7f6d58a62000-7f6d58a63000 rw-p 002b5000 00:67 1633558898                 /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.0/igraph/libs/igraph.so
+7f6d58a63000-7f6d58a67000 rw-p 00000000 00:00 0 
+7f6d58a67000-7f6d58a8d000 r-xp 00000000 00:69 2042576754                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/rlang/libs/rlang.so
+7f6d58a8d000-7f6d58c8c000 ---p 00026000 00:69 2042576754                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/rlang/libs/rlang.so
+7f6d58c8c000-7f6d58c8e000 r--p 00025000 00:69 2042576754                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/rlang/libs/rlang.so
+7f6d58c8e000-7f6d58c8f000 rw-p 00027000 00:69 2042576754                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/rlang/libs/rlang.so
+7f6d58c8f000-7f6d58c92000 r-xp 00000000 00:69 1303676498                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/magrittr/libs/magrittr.so
+7f6d58c92000-7f6d58e91000 ---p 00003000 00:69 1303676498                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/magrittr/libs/magrittr.so
+7f6d58e91000-7f6d58e92000 r--p 00002000 00:69 1303676498                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/magrittr/libs/magrittr.so
+7f6d58e92000-7f6d58e93000 rw-p 00003000 00:69 1303676498                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/magrittr/libs/magrittr.so
+7f6d58e93000-7f6d58ef3000 r-xp 00000000 fd:01 4343483                    /usr/lib64/libpcre.so.1.2.0
+7f6d58ef3000-7f6d590f3000 ---p 00060000 fd:01 4343483                    /usr/lib64/libpcre.so.1.2.0
+7f6d590f3000-7f6d590f4000 r--p 00060000 fd:01 4343483                    /usr/lib64/libpcre.so.1.2.0
+7f6d590f4000-7f6d590f5000 rw-p 00061000 fd:01 4343483                    /usr/lib64/libpcre.so.1.2.0
+7f6d590f5000-7f6d590f7000 r-xp 00000000 fd:01 4343338                    /usr/lib64/libfreebl3.so
+7f6d590f7000-7f6d592f6000 ---p 00002000 fd:01 4343338                    /usr/lib64/libfreebl3.so
+7f6d592f6000-7f6d592f7000 r--p 00001000 fd:01 4343338                    /usr/lib64/libfreebl3.so
+7f6d592f7000-7f6d592f8000 rw-p 00002000 fd:01 4343338                    /usr/lib64/libfreebl3.so
+7f6d592f8000-7f6d5931c000 r-xp 00000000 fd:01 4346701                    /usr/lib64/libselinux.so.1
+7f6d5931c000-7f6d5951b000 ---p 00024000 fd:01 4346701                    /usr/lib64/libselinux.so.1
+7f6d5951b000-7f6d5951c000 r--p 00023000 fd:01 4346701                    /usr/lib64/libselinux.so.1
+7f6d5951c000-7f6d5951d000 rw-p 00024000 fd:01 4346701                    /usr/lib64/libselinux.so.1
+7f6d5951d000-7f6d5951f000 rw-p 00000000 00:00 0 
+7f6d5951f000-7f6d59527000 r-xp 00000000 fd:01 4343374                    /usr/lib64/libcrypt-2.17.so
+7f6d59527000-7f6d59726000 ---p 00008000 fd:01 4343374                    /usr/lib64/libcrypt-2.17.so
+7f6d59726000-7f6d59727000 r--p 00007000 fd:01 4343374                    /usr/lib64/libcrypt-2.17.so
+7f6d59727000-7f6d59728000 rw-p 00008000 fd:01 4343374                    /usr/lib64/libcrypt-2.17.so
+7f6d59728000-7f6d59756000 rw-p 00000000 00:00 0 
+7f6d59756000-7f6d59759000 r-xp 00000000 fd:01 4346603                    /usr/lib64/libkeyutils.so.1.5
+7f6d59759000-7f6d59958000 ---p 00003000 fd:01 4346603                    /usr/lib64/libkeyutils.so.1.5
+7f6d59958000-7f6d59959000 r--p 00002000 fd:01 4346603                    /usr/lib64/libkeyutils.so.1.5
+7f6d59959000-7f6d5995a000 rw-p 00003000 fd:01 4346603                    /usr/lib64/libkeyutils.so.1.5
+7f6d5995a000-7f6d59968000 r-xp 00000000 fd:01 4343517                    /usr/lib64/libkrb5support.so.0.1
+7f6d59968000-7f6d59b68000 ---p 0000e000 fd:01 4343517                    /usr/lib64/libkrb5support.so.0.1
+7f6d59b68000-7f6d59b69000 r--p 0000e000 fd:01 4343517                    /usr/lib64/libkrb5support.so.0.1
+7f6d59b69000-7f6d59b6a000 rw-p 0000f000 fd:01 4343517                    /usr/lib64/libkrb5support.so.0.1
+7f6d59b6a000-7f6d59ba4000 r-xp 00000000 fd:01 4343484                    /usr/lib64/libnspr4.so
+7f6d59ba4000-7f6d59da4000 ---p 0003a000 fd:01 4343484                    /usr/lib64/libnspr4.so
+7f6d59da4000-7f6d59da5000 r--p 0003a000 fd:01 4343484                    /usr/lib64/libnspr4.so
+7f6d59da5000-7f6d59da7000 rw-p 0003b000 fd:01 4343484                    /usr/lib64/libnspr4.so
+7f6d59da7000-7f6d59da9000 rw-p 00000000 00:00 0 
+7f6d59da9000-7f6d59dad000 r-xp 00000000 fd:01 4345125                    /usr/lib64/libplc4.so
+7f6d59dad000-7f6d59fac000 ---p 00004000 fd:01 4345125                    /usr/lib64/libplc4.so
+7f6d59fac000-7f6d59fad000 r--p 00003000 fd:01 4345125                    /usr/lib64/libplc4.so
+7f6d59fad000-7f6d59fae000 rw-p 00004000 fd:01 4345125                    /usr/lib64/libplc4.so
+7f6d59fae000-7f6d59fb1000 r-xp 00000000 fd:01 4343364                    /usr/lib64/libplds4.so
+7f6d59fb1000-7f6d5a1b0000 ---p 00003000 fd:01 4343364                    /usr/lib64/libplds4.so
+7f6d5a1b0000-7f6d5a1b1000 r--p 00002000 fd:01 4343364                    /usr/lib64/libplds4.so
+7f6d5a1b1000-7f6d5a1b2000 rw-p 00003000 fd:01 4343364                    /usr/lib64/libplds4.so
+7f6d5a1b2000-7f6d5a1db000 r-xp 00000000 fd:01 4343496                    /usr/lib64/libnssutil3.so
+7f6d5a1db000-7f6d5a3da000 ---p 00029000 fd:01 4343496                    /usr/lib64/libnssutil3.so
+7f6d5a3da000-7f6d5a3e1000 r--p 00028000 fd:01 4343496                    /usr/lib64/libnssutil3.so
+7f6d5a3e1000-7f6d5a3e2000 rw-p 0002f000 fd:01 4343496                    /usr/lib64/libnssutil3.so
+7f6d5a3e2000-7f6d5a513000 r-xp 00000000 fd:01 4345139                    /usr/lib64/libnss3.so
+7f6d5a513000-7f6d5a713000 ---p 00131000 fd:01 4345139                    /usr/lib64/libnss3.so
+7f6d5a713000-7f6d5a718000 r--p 00131000 fd:01 4345139                    /usr/lib64/libnss3.so
+7f6d5a718000-7f6d5a71b000 rw-p 00136000 fd:01 4345139                    /usr/lib64/libnss3.so
+7f6d5a71b000-7f6d5a71c000 rw-p 00000000 00:00 0 
+7f6d5a71c000-7f6d5a741000 r-xp 00000000 fd:01 4343450                    /usr/lib64/libsmime3.so
+7f6d5a741000-7f6d5a940000 ---p 00025000 fd:01 4343450                    /usr/lib64/libsmime3.so
+7f6d5a940000-7f6d5a943000 r--p 00024000 fd:01 4343450                    /usr/lib64/libsmime3.so
+7f6d5a943000-7f6d5a944000 rw-p 00027000 fd:01 4343450                    /usr/lib64/libsmime3.so
+7f6d5a944000-7f6d5a9a3000 r-xp 00000000 fd:01 4343476                    /usr/lib64/libssl3.so
+7f6d5a9a3000-7f6d5aba3000 ---p 0005f000 fd:01 4343476                    /usr/lib64/libssl3.so
+7f6d5aba3000-7f6d5aba7000 r--p 0005f000 fd:01 4343476                    /usr/lib64/libssl3.so
+7f6d5aba7000-7f6d5aba8000 rw-p 00063000 fd:01 4343476                    /usr/lib64/libssl3.so
+7f6d5aba8000-7f6d5aba9000 rw-p 00000000 00:00 0 
+7f6d5aba9000-7f6d5abc5000 r-xp 00000000 fd:01 4343453                    /usr/lib64/libsasl2.so.3.0.0
+7f6d5abc5000-7f6d5adc4000 ---p 0001c000 fd:01 4343453                    /usr/lib64/libsasl2.so.3.0.0
+7f6d5adc4000-7f6d5adc5000 r--p 0001b000 fd:01 4343453                    /usr/lib64/libsasl2.so.3.0.0
+7f6d5adc5000-7f6d5adc6000 rw-p 0001c000 fd:01 4343453                    /usr/lib64/libsasl2.so.3.0.0
+7f6d5adc6000-7f6d5addc000 r-xp 00000000 fd:01 4343558                    /usr/lib64/libresolv-2.17.so
+7f6d5addc000-7f6d5afdc000 ---p 00016000 fd:01 4343558                    /usr/lib64/libresolv-2.17.so
+7f6d5afdc000-7f6d5afdd000 r--p 00016000 fd:01 4343558                    /usr/lib64/libresolv-2.17.so
+7f6d5afdd000-7f6d5afde000 rw-p 00017000 fd:01 4343558                    /usr/lib64/libresolv-2.17.so
+7f6d5afde000-7f6d5afe0000 rw-p 00000000 00:00 0 
+7f6d5afe0000-7f6d5afee000 r-xp 00000000 fd:01 4346592                    /usr/lib64/liblber-2.4.so.2.10.7
+7f6d5afee000-7f6d5b1ed000 ---p 0000e000 fd:01 4346592                    /usr/lib64/liblber-2.4.so.2.10.7
+7f6d5b1ed000-7f6d5b1ee000 r--p 0000d000 fd:01 4346592                    /usr/lib64/liblber-2.4.so.2.10.7
+7f6d5b1ee000-7f6d5b1ef000 rw-p 0000e000 fd:01 4346592                    /usr/lib64/liblber-2.4.so.2.10.7
+7f6d5b1ef000-7f6d5b220000 r-xp 00000000 fd:01 4343354                    /usr/lib64/libk5crypto.so.3.1
+7f6d5b220000-7f6d5b41f000 ---p 00031000 fd:01 4343354                    /usr/lib64/libk5crypto.so.3.1
+7f6d5b41f000-7f6d5b421000 r--p 00030000 fd:01 4343354                    /usr/lib64/libk5crypto.so.3.1
+7f6d5b421000-7f6d5b422000 rw-p 00032000 fd:01 4343354                    /usr/lib64/libk5crypto.so.3.1
+7f6d5b422000-7f6d5b425000 r-xp 00000000 fd:01 4345164                    /usr/lib64/libcom_err.so.2.1
+7f6d5b425000-7f6d5b624000 ---p 00003000 fd:01 4345164                    /usr/lib64/libcom_err.so.2.1
+7f6d5b624000-7f6d5b625000 r--p 00002000 fd:01 4345164                    /usr/lib64/libcom_err.so.2.1
+7f6d5b625000-7f6d5b626000 rw-p 00003000 fd:01 4345164                    /usr/lib64/libcom_err.so.2.1
+7f6d5b626000-7f6d5b6ff000 r-xp 00000000 fd:01 4343463                    /usr/lib64/libkrb5.so.3.3
+7f6d5b6ff000-7f6d5b8fe000 ---p 000d9000 fd:01 4343463                    /usr/lib64/libkrb5.so.3.3
+7f6d5b8fe000-7f6d5b90c000 r--p 000d8000 fd:01 4343463                    /usr/lib64/libkrb5.so.3.3
+7f6d5b90c000-7f6d5b90f000 rw-p 000e6000 fd:01 4343463                    /usr/lib64/libkrb5.so.3.3
+7f6d5b90f000-7f6d5b959000 r-xp 00000000 fd:01 4343365                    /usr/lib64/libgssapi_krb5.so.2.2
+7f6d5b959000-7f6d5bb59000 ---p 0004a000 fd:01 4343365                    /usr/lib64/libgssapi_krb5.so.2.2
+7f6d5bb59000-7f6d5bb5a000 r--p 0004a000 fd:01 4343365                    /usr/lib64/libgssapi_krb5.so.2.2
+7f6d5bb5a000-7f6d5bb5c000 rw-p 0004b000 fd:01 4343365                    /usr/lib64/libgssapi_krb5.so.2.2
+7f6d5bb5c000-7f6d5bbae000 r-xp 00000000 fd:01 4343481                    /usr/lib64/libldap-2.4.so.2.10.7
+7f6d5bbae000-7f6d5bdae000 ---p 00052000 fd:01 4343481                    /usr/lib64/libldap-2.4.so.2.10.7
+7f6d5bdae000-7f6d5bdb0000 r--p 00052000 fd:01 4343481                    /usr/lib64/libldap-2.4.so.2.10.7
+7f6d5bdb0000-7f6d5bdb1000 rw-p 00054000 fd:01 4343481                    /usr/lib64/libldap-2.4.so.2.10.7
+7f6d5bdb1000-7f6d5bfe8000 r-xp 00000000 fd:01 4343480                    /usr/lib64/libcrypto.so.1.0.2k
+7f6d5bfe8000-7f6d5c1e7000 ---p 00237000 fd:01 4343480                    /usr/lib64/libcrypto.so.1.0.2k
+7f6d5c1e7000-7f6d5c203000 r--p 00236000 fd:01 4343480                    /usr/lib64/libcrypto.so.1.0.2k
+7f6d5c203000-7f6d5c210000 rw-p 00252000 fd:01 4343480                    /usr/lib64/libcrypto.so.1.0.2k
+7f6d5c210000-7f6d5c214000 rw-p 00000000 00:00 0 
+7f6d5c214000-7f6d5c27b000 r-xp 00000000 fd:01 4343452                    /usr/lib64/libssl.so.1.0.2k
+7f6d5c27b000-7f6d5c47b000 ---p 00067000 fd:01 4343452                    /usr/lib64/libssl.so.1.0.2k
+7f6d5c47b000-7f6d5c47f000 r--p 00067000 fd:01 4343452                    /usr/lib64/libssl.so.1.0.2k
+7f6d5c47f000-7f6d5c486000 rw-p 0006b000 fd:01 4343452                    /usr/lib64/libssl.so.1.0.2k
+7f6d5c486000-7f6d5c4f7000 r-xp 00000000 00:69 3708303486                 /panfs/roc/msisoft/curl/7.59.0_gcc7.2.0/lib/libcurl.so.4.5.0
+7f6d5c4f7000-7f6d5c6f7000 ---p 00071000 00:69 3708303486                 /panfs/roc/msisoft/curl/7.59.0_gcc7.2.0/lib/libcurl.so.4.5.0
+7f6d5c6f7000-7f6d5c6fa000 rw-p 00071000 00:69 3708303486                 /panfs/roc/msisoft/curl/7.59.0_gcc7.2.0/lib/libcurl.so.4.5.0
+7f6d5c6fa000-7f6d5c70e000 r-xp 00000000 00:69 574204434                  /panfs/roc/msisoft/R/4.0.4/lib64/R/modules/internet.so
+7f6d5c70e000-7f6d5c90d000 ---p 00014000 00:69 574204434                  /panfs/roc/msisoft/R/4.0.4/lib64/R/modules/internet.so
+7f6d5c90d000-7f6d5c90e000 r--p 00013000 00:69 574204434                  /panfs/roc/msisoft/R/4.0.4/lib64/R/modules/internet.so
+7f6d5c90e000-7f6d5c90f000 rw-p 00014000 00:69 574204434                  /panfs/roc/msisoft/R/4.0.4/lib64/R/modules/internet.so
+7f6d5c90f000-7f6d5ca19000 rw-p 00000000 00:00 0 
+7f6d5ca19000-7f6d5d284000 r--s 00000000 fd:03 1049130                    /var/lib/sss/mc/passwd
+7f6d5d284000-7f6d5d28c000 r-xp 00000000 fd:01 4538766                    /usr/lib64/libnss_sss.so.2
+7f6d5d28c000-7f6d5d48b000 ---p 00008000 fd:01 4538766                    /usr/lib64/libnss_sss.so.2
+7f6d5d48b000-7f6d5d48c000 r--p 00007000 fd:01 4538766                    /usr/lib64/libnss_sss.so.2
+7f6d5d48c000-7f6d5d48d000 rw-p 00008000 fd:01 4538766                    /usr/lib64/libnss_sss.so.2
+7f6d5d48d000-7f6d5d499000 r-xp 00000000 fd:01 4343513                    /usr/lib64/libnss_files-2.17.so
+7f6d5d499000-7f6d5d698000 ---p 0000c000 fd:01 4343513                    /usr/lib64/libnss_files-2.17.so
+7f6d5d698000-7f6d5d699000 r--p 0000b000 fd:01 4343513                    /usr/lib64/libnss_files-2.17.so
+7f6d5d699000-7f6d5d69a000 rw-p 0000c000 fd:01 4343513                    /usr/lib64/libnss_files-2.17.so
+7f6d5d69a000-7f6d5d6a0000 rw-p 00000000 00:00 0 
+7f6d5d6a0000-7f6d5d6a6000 r-xp 00000000 00:69 1071676698                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/parallel/libs/parallel.so
+7f6d5d6a6000-7f6d5d8a5000 ---p 00006000 00:69 1071676698                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/parallel/libs/parallel.so
+7f6d5d8a5000-7f6d5d8a6000 r--p 00005000 00:69 1071676698                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/parallel/libs/parallel.so
+7f6d5d8a6000-7f6d5d8a7000 rw-p 00006000 00:69 1071676698                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/parallel/libs/parallel.so
+7f6d5d8a7000-7f6d5da80000 r-xp 00000000 00:69 2644055230                 /panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libRlapack.so
+7f6d5da80000-7f6d5dc80000 ---p 001d9000 00:69 2644055230                 /panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libRlapack.so
+7f6d5dc80000-7f6d5dc81000 r--p 001d9000 00:69 2644055230                 /panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libRlapack.so
+7f6d5dc81000-7f6d5dc82000 rw-p 001da000 00:69 2644055230                 /panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libRlapack.so
+7f6d5dc82000-7f6d5dc9c000 rw-p 00000000 00:00 0 
+7f6d5dc9c000-7f6d5dd41000 r-xp 00000000 00:69 393987396                  /panfs/roc/msisoft/R/4.0.4/lib64/R/library/stats/libs/stats.so
+7f6d5dd41000-7f6d5df40000 ---p 000a5000 00:69 393987396                  /panfs/roc/msisoft/R/4.0.4/lib64/R/library/stats/libs/stats.so
+7f6d5df40000-7f6d5df42000 r--p 000a4000 00:69 393987396                  /panfs/roc/msisoft/R/4.0.4/lib64/R/library/stats/libs/stats.so
+7f6d5df42000-7f6d5df44000 rw-p 000a6000 00:69 393987396                  /panfs/roc/msisoft/R/4.0.4/lib64/R/library/stats/libs/stats.so
+7f6d5df44000-7f6d5df8d000 r-xp 00000000 00:69 971217648                  /panfs/roc/msisoft/R/4.0.4/lib64/R/library/graphics/libs/graphics.so
+7f6d5df8d000-7f6d5e18d000 ---p 00049000 00:69 971217648                  /panfs/roc/msisoft/R/4.0.4/lib64/R/library/graphics/libs/graphics.so
+7f6d5e18d000-7f6d5e18e000 r--p 00049000 00:69 971217648                  /panfs/roc/msisoft/R/4.0.4/lib64/R/library/graphics/libs/graphics.so
+7f6d5e18e000-7f6d5e18f000 rw-p 0004a000 00:69 971217648                  /panfs/roc/msisoft/R/4.0.4/lib64/R/library/graphics/libs/graphics.so
+7f6d5e18f000-7f6d5e19b000 r-xp 00000000 00:69 2972328962                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/utils/libs/utils.so
+7f6d5e19b000-7f6d5e39b000 ---p 0000c000 00:69 2972328962                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/utils/libs/utils.so
+7f6d5e39b000-7f6d5e39c000 r--p 0000c000 00:69 2972328962                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/utils/libs/utils.so
+7f6d5e39c000-7f6d5e39d000 rw-p 0000d000 00:69 2972328962                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/utils/libs/utils.so
+7f6d5e39d000-7f6d5e39e000 rw-p 00000000 00:00 0 
+7f6d5e535000-7f6d5e56c000 r-xp 00000000 00:69 3036522180                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/grDevices/libs/grDevices.so
+7f6d5e56c000-7f6d5e76c000 ---p 00037000 00:69 3036522180                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/grDevices/libs/grDevices.so
+7f6d5e76c000-7f6d5e771000 r--p 00037000 00:69 3036522180                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/grDevices/libs/grDevices.so
+7f6d5e771000-7f6d5e773000 rw-p 0003c000 00:69 3036522180                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/grDevices/libs/grDevices.so
+7f6d5e773000-7f6d5e85a000 rw-p 00000000 00:00 0 
+7f6d5e926000-7f6d5ea67000 rw-p 00000000 00:00 0 
+7f6d5ea67000-7f6d5ea70000 r-xp 00000000 00:69 2950386032                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/methods/libs/methods.so
+7f6d5ea70000-7f6d5ec6f000 ---p 00009000 00:69 2950386032                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/methods/libs/methods.so
+7f6d5ec6f000-7f6d5ec70000 r--p 00008000 00:69 2950386032                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/methods/libs/methods.so
+7f6d5ec70000-7f6d5ec71000 rw-p 00009000 00:69 2950386032                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/methods/libs/methods.so
+7f6d5eccf000-7f6d5f223000 rw-p 00000000 00:00 0 
+7f6d5f223000-7f6d5f3ab000 r-xp 00000000 00:69 3978068154                 /panfs/roc/msisoft/gcc/8.1.0/lib64/libstdc++.so.6.0.25
+7f6d5f3ab000-7f6d5f5aa000 ---p 00188000 00:69 3978068154                 /panfs/roc/msisoft/gcc/8.1.0/lib64/libstdc++.so.6.0.25
+7f6d5f5aa000-7f6d5f5b5000 r--p 00187000 00:69 3978068154                 /panfs/roc/msisoft/gcc/8.1.0/lib64/libstdc++.so.6.0.25
+7f6d5f5b5000-7f6d5f5b7000 rw-p 00192000 00:69 3978068154                 /panfs/roc/msisoft/gcc/8.1.0/lib64/libstdc++.so.6.0.25
+7f6d5f5b7000-7f6d5f5bb000 rw-p 00000000 00:00 0 
+7f6d5f5bb000-7f6d6098d000 r-xp 00000000 fd:01 4548534                    /usr/lib64/libicudata.so.50.2
+7f6d6098d000-7f6d60b8c000 ---p 013d2000 fd:01 4548534                    /usr/lib64/libicudata.so.50.2
+7f6d60b8c000-7f6d60b8d000 r--p 013d1000 fd:01 4548534                    /usr/lib64/libicudata.so.50.2
+7f6d60b8d000-7f6d60b8e000 rw-p 013d2000 fd:01 4548534                    /usr/lib64/libicudata.so.50.2
+7f6d60b8e000-7f6d60bb3000 r-xp 00000000 fd:01 4346730                    /usr/lib64/libtinfo.so.5.9
+7f6d60bb3000-7f6d60db3000 ---p 00025000 fd:01 4346730                    /usr/lib64/libtinfo.so.5.9
+7f6d60db3000-7f6d60db7000 r--p 00025000 fd:01 4346730                    /usr/lib64/libtinfo.so.5.9
+7f6d60db7000-7f6d60db8000 rw-p 00029000 fd:01 4346730                    /usr/lib64/libtinfo.so.5.9
+7f6d60db8000-7f6d60dcf000 r-xp 00000000 00:69 1558037918                 /panfs/roc/msisoft/gcc/8.1.0/lib64/libgcc_s.so.1
+7f6d60dcf000-7f6d60fce000 ---p 00017000 00:69 1558037918                 /panfs/roc/msisoft/gcc/8.1.0/lib64/libgcc_s.so.1
+7f6d60fce000-7f6d60fcf000 rw-p 00016000 00:69 1558037918                 /panfs/roc/msisoft/gcc/8.1.0/lib64/libgcc_s.so.1
+7f6d60fcf000-7f6d611bf000 r-xp 00000000 fd:01 4508628                    /usr/lib64/libicui18n.so.50.2
+7f6d611bf000-7f6d613bf000 ---p 001f0000 fd:01 4508628                    /usr/lib64/libicui18n.so.50.2
+7f6d613bf000-7f6d613cb000 r--p 001f0000 fd:01 4508628                    /usr/lib64/libicui18n.so.50.2
+7f6d613cb000-7f6d613cd000 rw-p 001fc000 fd:01 4508628                    /usr/lib64/libicui18n.so.50.2
+7f6d613cd000-7f6d613ce000 rw-p 00000000 00:00 0 
+7f6d613ce000-7f6d61532000 r-xp 00000000 fd:01 4510389                    /usr/lib64/libicuuc.so.50.2
+7f6d61532000-7f6d61732000 ---p 00164000 fd:01 4510389                    /usr/lib64/libicuuc.so.50.2
+7f6d61732000-7f6d61742000 r--p 00164000 fd:01 4510389                    /usr/lib64/libicuuc.so.50.2
+7f6d61742000-7f6d61743000 rw-p 00174000 fd:01 4510389                    /usr/lib64/libicuuc.so.50.2
+7f6d61743000-7f6d61747000 rw-p 00000000 00:00 0 
+7f6d61747000-7f6d61749000 r-xp 00000000 fd:01 4345160                    /usr/lib64/libdl-2.17.so
+7f6d61749000-7f6d61949000 ---p 00002000 fd:01 4345160                    /usr/lib64/libdl-2.17.so
+7f6d61949000-7f6d6194a000 r--p 00002000 fd:01 4345160                    /usr/lib64/libdl-2.17.so
+7f6d6194a000-7f6d6194b000 rw-p 00003000 fd:01 4345160                    /usr/lib64/libdl-2.17.so
+7f6d6194b000-7f6d61952000 r-xp 00000000 fd:01 4346675                    /usr/lib64/librt-2.17.so
+7f6d61952000-7f6d61b51000 ---p 00007000 fd:01 4346675                    /usr/lib64/librt-2.17.so
+7f6d61b51000-7f6d61b52000 r--p 00006000 fd:01 4346675                    /usr/lib64/librt-2.17.so
+7f6d61b52000-7f6d61b53000 rw-p 00007000 fd:01 4346675                    /usr/lib64/librt-2.17.so
+7f6d61b53000-7f6d61b6f000 r-xp 00000000 00:69 1419062886                 /panfs/roc/msisoft/zlib/1.2.11_gcc7.2.0/lib/libz.so.1.2.11
+7f6d61b6f000-7f6d61d6e000 ---p 0001c000 00:69 1419062886                 /panfs/roc/msisoft/zlib/1.2.11_gcc7.2.0/lib/libz.so.1.2.11
+7f6d61d6e000-7f6d61d6f000 rw-p 0001b000 00:69 1419062886                 /panfs/roc/msisoft/zlib/1.2.11_gcc7.2.0/lib/libz.so.1.2.11
+7f6d61d6f000-7f6d61d7e000 r-xp 00000000 fd:01 4343367                    /usr/lib64/libbz2.so.1.0.6
+7f6d61d7e000-7f6d61f7d000 ---p 0000f000 fd:01 4343367                    /usr/lib64/libbz2.so.1.0.6
+7f6d61f7d000-7f6d61f7e000 r--p 0000e000 fd:01 4343367                    /usr/lib64/libbz2.so.1.0.6
+7f6d61f7e000-7f6d61f7f000 rw-p 0000f000 fd:01 4343367                    /usr/lib64/libbz2.so.1.0.6
+7f6d61f7f000-7f6d61fa4000 r-xp 00000000 00:69 2513746894                 /panfs/roc/msisoft/xz-utils/5.2.3_gcc7.2.0/lib/liblzma.so.5.2.3
+7f6d61fa4000-7f6d621a3000 ---p 00025000 00:69 2513746894                 /panfs/roc/msisoft/xz-utils/5.2.3_gcc7.2.0/lib/liblzma.so.5.2.3
+7f6d621a3000-7f6d621a4000 rw-p 00024000 00:69 2513746894                 /panfs/roc/msisoft/xz-utils/5.2.3_gcc7.2.0/lib/liblzma.so.5.2.3
+7f6d621a4000-7f6d621fd000 r-xp 00000000 00:69 747702476                  /panfs/roc/msisoft/pcre2/10.34/lib/libpcre2-8.so.0.9.0
+7f6d621fd000-7f6d623fc000 ---p 00059000 00:69 747702476                  /panfs/roc/msisoft/pcre2/10.34/lib/libpcre2-8.so.0.9.0
+7f6d623fc000-7f6d623fd000 r--p 00058000 00:69 747702476                  /panfs/roc/msisoft/pcre2/10.34/lib/libpcre2-8.so.0.9.0
+7f6d623fd000-7f6d623fe000 rw-p 00059000 00:69 747702476                  /panfs/roc/msisoft/pcre2/10.34/lib/libpcre2-8.so.0.9.0
+7f6d623fe000-7f6d6243a000 r-xp 00000000 fd:01 4343469                    /usr/lib64/libreadline.so.6.2
+7f6d6243a000-7f6d6263a000 ---p 0003c000 fd:01 4343469                    /usr/lib64/libreadline.so.6.2
+7f6d6263a000-7f6d6263c000 r--p 0003c000 fd:01 4343469                    /usr/lib64/libreadline.so.6.2
+7f6d6263c000-7f6d62642000 rw-p 0003e000 fd:01 4343469                    /usr/lib64/libreadline.so.6.2
+7f6d62642000-7f6d62644000 rw-p 00000000 00:00 0 
+7f6d62644000-7f6d62683000 r-xp 00000000 00:69 2329697392                 /panfs/roc/msisoft/gcc/8.1.0/lib64/libquadmath.so.0.0.0
+7f6d62683000-7f6d62882000 ---p 0003f000 00:69 2329697392                 /panfs/roc/msisoft/gcc/8.1.0/lib64/libquadmath.so.0.0.0
+7f6d62882000-7f6d62883000 rw-p 0003e000 00:69 2329697392                 /panfs/roc/msisoft/gcc/8.1.0/lib64/libquadmath.so.0.0.0
+7f6d62883000-7f6d62984000 r-xp 00000000 fd:01 4345178                    /usr/lib64/libm-2.17.so
+7f6d62984000-7f6d62b83000 ---p 00101000 fd:01 4345178                    /usr/lib64/libm-2.17.so
+7f6d62b83000-7f6d62b84000 r--p 00100000 fd:01 4345178                    /usr/lib64/libm-2.17.so
+7f6d62b84000-7f6d62b85000 rw-p 00101000 fd:01 4345178                    /usr/lib64/libm-2.17.so
+7f6d62b85000-7f6d62d8c000 r-xp 00000000 00:69 75369812                   /panfs/roc/msisoft/gcc/8.1.0/lib64/libgfortran.so.5.0.0
+7f6d62d8c000-7f6d62f8b000 ---p 00207000 00:69 75369812                   /panfs/roc/msisoft/gcc/8.1.0/lib64/libgfortran.so.5.0.0
+7f6d62f8b000-7f6d62f8e000 rw-p 00206000 00:69 75369812                   /panfs/roc/msisoft/gcc/8.1.0/lib64/libgfortran.so.5.0.0
+7f6d62f8e000-7f6d63152000 r-xp 00000000 fd:01 4346673                    /usr/lib64/libc-2.17.so
+7f6d63152000-7f6d63351000 ---p 001c4000 fd:01 4346673                    /usr/lib64/libc-2.17.so
+7f6d63351000-7f6d63355000 r--p 001c3000 fd:01 4346673                    /usr/lib64/libc-2.17.so
+7f6d63355000-7f6d63357000 rw-p 001c7000 fd:01 4346673                    /usr/lib64/libc-2.17.so
+7f6d63357000-7f6d6335c000 rw-p 00000000 00:00 0 
+7f6d6335c000-7f6d63373000 r-xp 00000000 fd:01 4346683                    /usr/lib64/libpthread-2.17.so
+7f6d63373000-7f6d63572000 ---p 00017000 fd:01 4346683                    /usr/lib64/libpthread-2.17.so
+7f6d63572000-7f6d63573000 r--p 00016000 fd:01 4346683                    /usr/lib64/libpthread-2.17.so
+7f6d63573000-7f6d63574000 rw-p 00017000 fd:01 4346683                    /usr/lib64/libpthread-2.17.so
+7f6d63574000-7f6d63578000 rw-p 00000000 00:00 0 
+7f6d63578000-7f6d635a5000 r-xp 00000000 00:69 1038831776                 /panfs/roc/msisoft/gcc/8.1.0/lib64/libgomp.so.1.0.0
+7f6d635a5000-7f6d637a4000 ---p 0002d000 00:69 1038831776                 /panfs/roc/msisoft/gcc/8.1.0/lib64/libgomp.so.1.0.0
+7f6d637a4000-7f6d637a5000 rw-p 0002c000 00:69 1038831776                 /panfs/roc/msisoft/gcc/8.1.0/lib64/libgomp.so.1.0.0
+7f6d637a5000-7f6d637ce000 r-xp 00000000 00:69 2605505140                 /panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libRblas.so
+7f6d637ce000-7f6d639cd000 ---p 00029000 00:69 2605505140                 /panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libRblas.so
+7f6d639cd000-7f6d639ce000 r--p 00028000 00:69 2605505140                 /panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libRblas.so
+7f6d639ce000-7f6d639cf000 rw-p 00029000 00:69 2605505140                 /panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libRblas.so
+7f6d639cf000-7f6d63cf2000 r-xp 00000000 00:69 21882552                   /panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so
+7f6d63cf2000-7f6d63ef1000 ---p 00323000 00:69 21882552                   /panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so
+7f6d63ef1000-7f6d63f0f000 r--p 00322000 00:69 21882552                   /panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so
+7f6d63f0f000-7f6d63f1d000 rw-p 00340000 00:69 21882552                   /panfs/roc/msisoft/R/4.0.4/lib64/R/lib/libR.so
+7f6d63f1d000-7f6d6406d000 rw-p 00000000 00:00 0 
+7f6d6406d000-7f6d6408f000 r-xp 00000000 fd:01 4346735                    /usr/lib64/ld-2.17.so
+7f6d640dd000-7f6d64266000 r--p 00000000 fd:01 10216605                   /usr/lib/locale/locale-archive
+7f6d64266000-7f6d64271000 rw-p 00000000 00:00 0 
+7f6d64280000-7f6d64281000 rw-p 00000000 00:00 0 
+7f6d64281000-7f6d64288000 r--s 00000000 fd:01 12757458                   /usr/lib64/gconv/gconv-modules.cache
+7f6d64288000-7f6d64289000 r--p 00000000 00:69 2115814522                 /panfs/roc/msisoft/R/4.0.4/lib64/R/library/translations/en/LC_MESSAGES/R.mo
+7f6d64289000-7f6d6428e000 rw-p 00000000 00:00 0 
+7f6d6428e000-7f6d6428f000 r--p 00021000 fd:01 4346735                    /usr/lib64/ld-2.17.so
+7f6d6428f000-7f6d64290000 rw-p 00022000 fd:01 4346735                    /usr/lib64/ld-2.17.so
+7f6d64290000-7f6d64291000 rw-p 00000000 00:00 0 
+7ffdd0289000-7ffdd0357000 rw-p 00000000 00:00 0                          [stack]
+7ffdd036c000-7ffdd036e000 r-xp 00000000 00:00 0                          [vdso]
+ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsyscall]
+Error in unserialize(socklist[[n]]) : error reading from connection
+Calls: parLapplyLB ... recvOneData -> recvOneData.SOCKcluster -> unserialize
+Execution halted
