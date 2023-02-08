@@ -52,6 +52,11 @@ postPredFit <- function(incData, modelType,
     parentNodes <- parentNodes[-which(parentNodes %in% dataNodes)]
     parentNodes <- myModelPred$expandNodeNames(parentNodes, returnScalarComponents = TRUE)
     
+    # add detectIStar to paramsSamples
+    detectIstarSamples <- matrix(incData, ncol = tau, nrow = nrow(paramsSamples), byrow = T)
+    colnames(detectIstarSamples) <- paste0('detectIstar[', 1:tau, ']')
+    paramsSamples <- cbind(paramsSamples, detectIstarSamples)
+    
     nPost <- 10000
     postPredInc <- matrix(NA, nrow = tau, ncol = nPost)
     postPredHosp <- matrix(NA, nrow = tau, ncol = nPost)

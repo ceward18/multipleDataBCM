@@ -20,9 +20,9 @@ summarizePost <- function(resThree, incData, modelType,
                           smoothC, smoothD, hospData, deathData,
                           N, S0, I0, H0, D0, R0, Istar0, Dstar0) {
     
-    paramSamples1 <- resThree[[1]][,-grep('alarm|R0|yAlarm|Rstar', colnames(resThree[[1]]))]
-    paramSamples2 <- resThree[[2]][,-grep('alarm|R0|yAlarm|Rstar', colnames(resThree[[2]]))]
-    paramSamples3 <- resThree[[3]][,-grep('alarm|R0|yAlarm|Rstar', colnames(resThree[[3]]))]
+    paramSamples1 <- resThree[[1]][,-grep('alarm|R0|yAlarm|Rstar|Istar', colnames(resThree[[1]]))]
+    paramSamples2 <- resThree[[2]][,-grep('alarm|R0|yAlarm|Rstar|Istar', colnames(resThree[[2]]))]
+    paramSamples3 <- resThree[[3]][,-grep('alarm|R0|yAlarm|Rstar|Istar', colnames(resThree[[3]]))]
     
     ##############################################################################
     ### gelman-rubin
@@ -120,6 +120,23 @@ summarizePost <- function(resThree, incData, modelType,
     rownames(postAlarmTime) <- NULL
     
     ##############################################################################
+    ### posterior distribution of total incidence vs. observed incidence
+    
+    IstarSamples1 <- resThree[[1]][,grep('Istar', colnames(resThree[[1]]))]
+    IstarSamples2 <- resThree[[2]][,grep('Istar', colnames(resThree[[2]]))]
+    IstarSamples3 <- resThree[[3]][,grep('Istar', colnames(resThree[[3]]))]
+    IstarSamples <- rbind(IstarSamples1, IstarSamples2, IstarSamples3)
+    
+    postMeans <- colMeans(IstarSamples)
+    postCI <- apply(IstarSamples, 2, quantile, probs = c(0.025, 0.975))
+    
+    postIstar <- data.frame(time = 1:tau,
+                            obs = incData,
+                            mean = postMeans,
+                            lower = postCI[1,],
+                            upper = postCI[2,])
+    
+    ##############################################################################
     ### posterior distribution of R0
     
     R0Samples1 <- resThree[[1]][,grep('R0', colnames(resThree[[1]]))]
@@ -195,6 +212,7 @@ summarizePost <- function(resThree, incData, modelType,
          postParams = postParams,
          postAlarm = postAlarm,
          postAlarmTime = postAlarmTime,
+         postIstar = postIstar,
          postR0 = postR0,
          waic = waic,
          postPredictFit = postPredictFit)

@@ -72,14 +72,14 @@ for (i in batchIdx) {
     smoothD <- dat$smoothD[which(dat$peak == peak_i)]
     
     if (peak_i == 1) {
-        idxStart <- 10
+        idxStart <- 5
         incData <- incData[-c(1:idxStart)]
         hospData <- hospData[-c(1:idxStart)]
         deathData <- deathData[-c(1:idxStart)]
         
         smoothC <- smoothC[-c(1:idxStart)]
         smoothD <- smoothD[-c(1:idxStart)]
-        idxStart <- min(which(dat$peak == peak_i)) + 10
+        idxStart <- min(which(dat$peak == peak_i)) + 5
     } else {
         idxStart <- min(which(dat$peak == peak_i))
     }
@@ -89,22 +89,18 @@ for (i in batchIdx) {
     cumInf <- dat$cumulativeCases[max(1, (idxStart - 1))]
     cumHosp <- round(cumsum(dat$dailyHosp)[max(1, (idxStart - 1))])
     
-    if (peak_i == 1) {
-        S0 <- N - cumInf - cumHosp 
+    if (city_i == 'montreal' & peak_i == 1) {
+        S0 <- N - cumInf - cumHosp
     } else {
-        S0 <- N - cumInf 
+        S0 <- N - cumInf -  5 * cumInf
     }
     
     I0 <- sum(dat$smoothedCases[max(1, (idxStart - lengthI)):(idxStart - 1)])
+    # plus undetected
+    I0 <- I0 + 5 * I0
     H0 <- cumHosp
-    if (peak_i == 1) {
-        # move H0 to I0
-        I0 <- I0 + H0 
-        H0 <- 0
-    }
     D0 <- round(cumsum(dat$dailyDeaths)[max(1, (idxStart - 1))])
     R0 <- N - S0 - I0 - H0 - D0 # should be > 0
-    c(S0, I0, H0, R0, D0)
     
     # used for posterior predictive fit 
     # previously observed incidence for correct smoothing at beginning of prediction
@@ -117,7 +113,7 @@ for (i in batchIdx) {
                            'deathData', 'hospData',
                            'N', 'S0', 'I0', 'H0', 'D0', 'R0'))
     
-    resThree <- parLapply(cl, 1:3, function(x) {
+    resThree <- parLapplyLB(cl, 1:3, function(x) {
         
         library(nimble)
         

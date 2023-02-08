@@ -34,18 +34,17 @@ fitAlarmModel <- function(incData, modelType,
     myConfig <- configureMCMC(myModel)
     
     # need to ensure all stochastic nodes are monitored for WAIC calculation
-    if (modelType != 'inc') { # modelType == 'full'
+    if (modelType != 'inc') {
         
         myConfig$addMonitors(c('yAlarmC', 'yAlarmD', 'alarmC', 'alarmD', 
                                'R0', 'delta'))
         
-        paramsForSlice <- c('beta', 'Z', 'x0C', 'x0D', 'nuC', 'nuD')
+        paramsForSlice <- c('Z', 'x0C', 'x0D', 'nuC', 'nuD')
         myConfig$removeSampler(paramsForSlice)
         myConfig$addSampler(target = paramsForSlice, 
                             type = "RW_block",
-                            control = list(propCov = diag(c(0.2,
-                                                            0.7, 0.7, 
-                                                            100, 50, 
+                            control = list(propCov = diag(c(0.7, 0.7, 
+                                                            30, 10, 
                                                             3, 3))))
         
     } else { # if model == 'inc'
@@ -65,6 +64,7 @@ fitAlarmModel <- function(incData, modelType,
         myConfig$removeSampler(c('beta', 'w0'))
         myConfig$addSampler(target = c('beta', 'w0'), type = "AF_slice")
         
+        myConfig$addMonitors('I0')
     }
     
     if (modelType == 'full') {
@@ -81,7 +81,7 @@ fitAlarmModel <- function(incData, modelType,
         
         
         myConfig$addMonitors(c('RstarI', 'RstarH'))
-        
+
         # use slice sampling for rate parameters
         paramsForSlice <- c('gamma1', 'gamma2', 'lambda','phi')
         myConfig$removeSampler(paramsForSlice)
@@ -89,9 +89,12 @@ fitAlarmModel <- function(incData, modelType,
             myConfig$addSampler(target = paramsForSlice[j], type = "slice")
         }
         
-        
-        
     }
+    
+    myConfig$removeSamplers('Istar') # Nodes will be expanded
+    myConfig$addSampler(target = c('Istar'),
+                        type = "RstarUpdate")
+    myConfig$addMonitors(c('Istar'))
     
     # browser()
     nimbleOptions(MCMCusePredictiveDependenciesInCalculations = TRUE)

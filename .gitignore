@@ -3,10 +3,11 @@
 *.qmd
 *.docx
 output/chains*
-new/output/chains*
+less_old/output/chains*
 old/output/chains*
 simulation_study/output/chains*
 simulation_study2/output/chains*
 simulation_study3/output/chains*
 simulation_study4/output/chains*
 simulation_study5/output/chains*
+data_analysius/output/chains*

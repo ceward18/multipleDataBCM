@@ -25,18 +25,12 @@ getWAIC <- function(samples, modelType, smoothC, smoothD,
     
     compiled <- compileNimble(myModel) 
     
-    
-    incDataSamples <- matrix(rep(incData), NROW(samples),
-                             ncol = length(incData), byrow = T)
-    colnames(incDataSamples) <- paste0('Istar[', 1:ncol(incDataSamples), ']')
-    samplesIstar <- cbind(samples, incDataSamples)
-    
     if (modelType %in% c('full', 'fullThresh')) {
         
         hospDataSamples <- matrix(rep(hospData), NROW(samples),
                                  ncol = length(hospData), byrow = T)
         colnames(hospDataSamples) <- paste0('Hstar[', 1:ncol(hospDataSamples), ']')
-        samplesHstar <- cbind(samplesIstar, hospDataSamples)
+        samplesHstar <- cbind(samples, hospDataSamples)
         
         deathDataSamples <- matrix(rep(deathData), NROW(samples),
                                  ncol = length(deathData), byrow = T)
@@ -47,7 +41,7 @@ getWAIC <- function(samples, modelType, smoothC, smoothD,
         
     } else {
         
-        waicList <- calculateWAIC(samplesIstar, compiled)
+        waicList <- calculateWAIC(samples, compiled)
     }
     
     

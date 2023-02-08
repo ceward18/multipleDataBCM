@@ -199,6 +199,8 @@ SIHRD_full <-  nimbleCode({
         # SIHRD model
         # S -> I
         Istar[t] ~ dbin(probSI[t], S[t])
+        # Istar[t] <- detectIstar[t] + undetectIstar[t]
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         # I -> H or R using sequential binomial
         Hstar[t] ~ dbin(probIH, I[t])
         RstarI[t] ~ dbin(probIR / (1 - probIH), I[t] - Hstar[t])
@@ -230,6 +232,9 @@ SIHRD_full <-  nimbleCode({
     }
     
     ### Priors 
+    
+    # detection probability (1/4 reported)
+    probDetect ~ dbeta(2.5, 7.5)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -290,6 +295,8 @@ SIHRD_full_sim <-  nimbleCode({
     # SIHRD model
     # S -> I
     Istar[1] ~ dbin(probSI[1], S[1])
+    # Istar[t] <- detectIstar[t] + undetectIstar[t]
+    detectIstar[1] ~ dbin(probDetect, Istar[1]) # e.g. 25% of cases are detected
     # I -> H or R using sequential binomial
     Hstar[1] ~ dbin(probIH, I[1])
     RstarI[1] ~ dbin(probIR / (1 - probIH), I[1] - Hstar[1])
@@ -309,7 +316,7 @@ SIHRD_full_sim <-  nimbleCode({
     for(t in 2:tau) {
         
         # compute moving average up to t-1
-        smoothC[t] <- get_smooth(Istar[1:(t-1)], t, Istar0[1:Istar0Length], Istar0Length, bw)
+        smoothC[t] <- get_smooth(detectIstar[1:(t-1)], t, Istar0[1:Istar0Length], Istar0Length, bw)
         smoothD[t] <- get_smooth(Dstar[1:(t-1)], t, Dstar0[1:Dstar0Length], Dstar0Length, bw)
         
         # compute alarms for each component
@@ -324,6 +331,8 @@ SIHRD_full_sim <-  nimbleCode({
         # SIHRD model
         # S -> I
         Istar[t] ~ dbin(probSI[t], S[t])
+        # Istar[t] <- detectIstar[t] + undetectIstar[t]
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         # I -> H or R using sequential binomial
         Hstar[t] ~ dbin(probIH, I[t])
         RstarI[t] ~ dbin(probIR / (1 - probIH), I[t] - Hstar[t])
@@ -341,6 +350,9 @@ SIHRD_full_sim <-  nimbleCode({
     }
     
     ### Priors
+    
+    # detection probability (1/4 reported = 3/4 unreported)
+    probDetect ~ dbeta(2.5, 7.5)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -373,11 +385,11 @@ SIHRD_full_sim <-  nimbleCode({
 SIHRD_simple <-  nimbleCode({
     
     # compartment initial values
-    # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    comp_init[1:3] ~ dmulti(prob = initProb[1:3], size = N)
     S[1] <- comp_init[1] - 1
-    I[1, 1] <- comp_init[2] + 1
-    I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
+    I0[1:maxInf] ~ dmulti(prob = I0Prob[1:maxInf], 
+                          size = comp_init[2] + 1) 
+    I[1, 1:maxInf] <- I0[1:maxInf]
     
     idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
     
@@ -396,6 +408,8 @@ SIHRD_simple <-  nimbleCode({
         
         # SIR model
         Istar[t] ~ dbin(probSI[t], S[t])
+        # Istar[t] <- detectIstar[t] + undetectIstar[t]
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         
         # update S and I
         S[t + 1] <- S[t] - Istar[t]
@@ -420,6 +434,9 @@ SIHRD_simple <-  nimbleCode({
     }
     
     ### Priors
+    
+    # detection probability (1/4 reported)
+    probDetect ~ dbeta(2.5, 7.5)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -449,11 +466,11 @@ SIHRD_simple <-  nimbleCode({
 SIHRD_inc <-  nimbleCode({
     
     # compartment initial values
-    # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    comp_init[1:3] ~ dmulti(prob = initProb[1:3], size = N)
     S[1] <- comp_init[1] - 1
-    I[1, 1] <- comp_init[2] + 1
-    I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
+    I0[1:maxInf] ~ dmulti(prob = I0Prob[1:maxInf], 
+                          size = comp_init[2] + 1) 
+    I[1, 1:maxInf] <- I0[1:maxInf]
     
     idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
     
@@ -468,6 +485,8 @@ SIHRD_inc <-  nimbleCode({
         
         # SIR model
         Istar[t] ~ dbin(probSI[t], S[t])
+        # Istar[t] <- detectIstar[t] + undetectIstar[t]
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         
         # update S and I
         S[t + 1] <- S[t] - Istar[t]
@@ -492,6 +511,9 @@ SIHRD_inc <-  nimbleCode({
     
     ### Priors
     
+    # detection probability (1/4 reported)
+    probDetect ~ dbeta(2.5, 7.5)
+    
     # transmission
     beta ~ dgamma(0.1, 0.1)
     
@@ -512,11 +534,11 @@ SIHRD_inc <-  nimbleCode({
 SIHRD_inc_sim <-  nimbleCode({
     
     # compartment initial values
-    # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    comp_init[1:3] ~ dmulti(prob = initProb[1:3], size = N)
     S[1] <- comp_init[1] - 1
-    I[1, 1] <- comp_init[2] + 1
-    I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
+    I0[1:maxInf] ~ dmulti(prob = I0Prob[1:maxInf], 
+                          size = comp_init[2] + 1) 
+    I[1, 1:maxInf] <- I0[1:maxInf]
     
     idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
     
@@ -529,6 +551,8 @@ SIHRD_inc_sim <-  nimbleCode({
     
     # SIR model
     Istar[1] ~ dbin(probSI[1], S[1])
+    # Istar[t] <- detectIstar[t] + undetectIstar[t]
+    detectIstar[1] ~ dbin(probDetect, Istar[1]) # e.g. 25% of cases are detected
     
     # update S and I
     S[2] <- S[1] - Istar[1]
@@ -539,7 +563,7 @@ SIHRD_inc_sim <-  nimbleCode({
     for(t in 2:tau) {
         
         # moving average observed incidence
-        smoothC[t] <- get_smooth(Istar[1:(t-1)], t, Istar0[1:Istar0Length], Istar0Length, bw)
+        smoothC[t] <- get_smooth(detectIstar[1:(t-1)], t, Istar0[1:Istar0Length], Istar0Length, bw)
         
         # alarm is function of incidence only
         alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, deltaC)
@@ -549,6 +573,8 @@ SIHRD_inc_sim <-  nimbleCode({
         
         # SIR model
         Istar[t] ~ dbin(probSI[t], S[t])
+        # Istar[t] <- detectIstar[t] + undetectIstar[t]
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         
         # update S and I
         S[t + 1] <- S[t] - Istar[t]
@@ -558,6 +584,9 @@ SIHRD_inc_sim <-  nimbleCode({
     }
     
     ### Priors
+    
+    # detection probability (1/4 reported)
+    probDetect ~ dbeta(2.5, 7.5)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -670,4 +699,3 @@ RstarUpdate <- nimbleFunction(
 )
 
 assign('RstarUpdate', RstarUpdate, envir = .GlobalEnv)
-
