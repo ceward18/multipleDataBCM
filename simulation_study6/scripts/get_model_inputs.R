@@ -7,25 +7,30 @@
 
 
 getModelInput <- function(incData, modelType, smoothC, smoothD,
-                          hospData, deathData,
-                          N, S0, I0, H0, D0, R0) {
+                          hospData, deathData) {
     
+    # constants that are the same for all models
+    N <- 1e6
+    I0 <- 5
+    R0 <- 0
+    S0 <- N - I0 - R0
+    tau <- length(incData)
     maxInf <- 10
     
     ### initial conditions probability
     if (modelType == 'full') {
-        # SIHRD model
-        initProb <- (pmax(c(S0, I0, H0, R0, D0), 0) + c(-3, 0, 1, 1, 1))/N
+        
+        # SIHRD model - start of epidemic so no H, R, D
+        initProb <- c(S0, I0, 0, 0, 0)/N
         comp_init <- rmulti(1, N, initProb)
         
     } else if (modelType %in% c('simple', 'inc')) {
-        # SIR models
-        initProb <- c(S0 - 1, rep(I0/maxInf, maxInf), N - S0 - I0 + 1)/N
+        
+        # SIR models - start of epidemic so R[0] = 0
+        initProb <- c(S0, rep(I0/maxInf, maxInf), R0)/N
         comp_init <- rmulti(1, N, initProb)
         
     }
-    
-    tau <- length(incData)
     
     ### constants
     n <- 50
@@ -59,7 +64,7 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
                           Sigma = Sigma)
     
     ### data
-    dataList <- list(Istar = incData,
+    dataList <- list(detectIstar = incData,
                      smoothC = smoothC,
                      smoothD = smoothD,
                      constrain_deltas = 1)
@@ -69,12 +74,14 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
         repeat {
             ### inits 
             initsList <- list(comp_init = comp_init,
+                              probDetect = rbeta(1, 25, 75),
                               beta = runif(1, 1/7, 1),
                               nuC = rinvgamma(1, 7, 26),
                               nuD = rinvgamma(1, 7, 26),
                               x0C = runif(1, minC + 1, maxC/10),
                               x0D = runif(1, minD + 1, maxD/10),
                               Z = rmnorm_chol(1, rep(0, 2), chol(Sigma), prec_param = FALSE),
+                              Istar = round(dataList$detectIstar * 5) + dataList$detectIstar,
                               w0 = rnorm(1, 5, 0.5),
                               k = rgamma(1, 100, 100))
             
@@ -95,6 +102,7 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
             
             ### inits 
             initsList <- list(comp_init = comp_init,
+                              probDetect = rbeta(1, 25, 75),
                               beta = runif(1, 1/7, 1),
                               gamma1 = rgamma(1, 2, 10), # IR
                               gamma2 = rgamma(1, 2, 10), # HR
@@ -105,8 +113,9 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
                               x0C = runif(1, minC + 1, maxC/10),
                               x0D = runif(1, minD + 1, maxD/10),
                               Z = rmnorm_chol(1, rep(0, 2), chol(Sigma), prec_param = FALSE),
-                              RstarI = round(0.1 * c(rep(0, 3), comp_init[2] + 1, dataList$Istar[1:(tau-4)])),
-                              RstarH = round(0.1 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
+                              Istar = round(dataList$detectIstar * 5) + dataList$detectIstar,
+                              RstarI = round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)])),
+                              RstarH = round(0.3 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
             
             probIH <- 1 - exp(-initsList$lambda)
             probIR <- 1 - exp(-initsList$gamma1)
@@ -136,18 +145,22 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
                               maxC = maxC,
                               n = n,
                               xC = xC,
-                              maxInf = maxInf)
+                              maxInf = maxInf,
+                              zeros = rep(0, 2),
+                              Sigma = Sigma)
         
         ### data
-        dataList <- list(Istar = incData,
+        dataList <- list(detectIstar = incData,
                          smoothC = smoothC)
         
         ### inits 
         initsList <- list(comp_init = comp_init,
+                          probDetect = rbeta(1, 25, 75),
                           beta = runif(1, 1/7, 1),
                           nuC = runif(1, 1, 10),
                           x0C = runif(1, maxC/20, maxC/5),
                           deltaC = runif(1, 0, 1),
+                          Istar = round(dataList$detectIstar * 5) + dataList$detectIstar,
                           w0 = rnorm(1, 3, 0.5),
                           k = rgamma(1, 100, 100))
         
@@ -164,9 +177,10 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
     
     
     ### MCMC specifications
-    niter <- 100
-    nburn <- 0
-    nthin <- 1
+    niter <- 40000
+    nburn <- 20000
+    nthin <- 10
+    
     
     list(constantsList = constantsList,
          dataList = dataList,
