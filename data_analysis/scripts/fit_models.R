@@ -45,7 +45,7 @@ fitAlarmModel <- function(incData, modelType,
                             type = "RW_block",
                             control = list(propCov = diag(c(0.2,
                                                             0.7, 0.7, 
-                                                            100, 50, 
+                                                            100^2, 50^2, 
                                                             3, 3))))
         
     } else { # if model == 'inc'

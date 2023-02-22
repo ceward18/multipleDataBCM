@@ -78,8 +78,8 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
                               beta = runif(1, 1/7, 1),
                               nuC = rinvgamma(1, 7, 26),
                               nuD = rinvgamma(1, 7, 26),
-                              x0C = runif(1, minC + 1, maxC/10),
-                              x0D = runif(1, minD + 1, maxD/10),
+                              x0C = runif(1, minC + 1, maxC/3),
+                              x0D = runif(1, minD + 1, maxD/3),
                               Z = rmnorm_chol(1, rep(0, 2), chol(Sigma), prec_param = FALSE),
                               Istar = round(dataList$detectIstar * 5) + dataList$detectIstar,
                               w0 = rnorm(1, 5, 0.5),
@@ -110,8 +110,8 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
                               phi = rgamma(1, 1, 10) ,   # HD
                               nuC = rinvgamma(1, 7, 26),
                               nuD = rinvgamma(1, 7, 26),
-                              x0C = runif(1, minC + 1, maxC/10),
-                              x0D = runif(1, minD + 1, maxD/10),
+                              x0C = runif(1, minC + 1, maxC/3),
+                              x0D = runif(1, minD + 1, maxD/3),
                               Z = rmnorm_chol(1, rep(0, 2), chol(Sigma), prec_param = FALSE),
                               Istar = round(dataList$detectIstar * 5) + dataList$detectIstar,
                               RstarI = round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)])),
@@ -158,7 +158,7 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
                           probDetect = rbeta(1, 25, 75),
                           beta = runif(1, 1/7, 1),
                           nuC = runif(1, 1, 10),
-                          x0C = runif(1, maxC/20, maxC/5),
+                          x0C = runif(1, minC + 1, maxC/3),
                           deltaC = runif(1, 0, 1),
                           Istar = round(dataList$detectIstar * 5) + dataList$detectIstar,
                           w0 = rnorm(1, 3, 0.5),
@@ -174,12 +174,6 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
     niter <- 8e5
     nburn <- 4e5
     nthin <- 20
-    
-    
-    ### MCMC specifications
-    niter <- 40000
-    nburn <- 20000
-    nthin <- 10
     
     
     list(constantsList = constantsList,

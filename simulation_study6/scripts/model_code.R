@@ -244,7 +244,7 @@ SIHRD_sim <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(2.5, 7.5)
+    probDetect ~ dbeta(25, 75)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -333,7 +333,7 @@ SIHRD_full <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(2.5, 7.5)
+    probDetect ~ dbeta(25, 75)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -444,7 +444,7 @@ SIHRD_full_sim <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(2.5, 7.5)
+    probDetect ~ dbeta(25, 75)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -527,7 +527,7 @@ SIHRD_simple <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(1, 1)
+    probDetect ~ dbeta(25, 75)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -603,7 +603,7 @@ SIHRD_inc <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(2.5, 7.5)
+    probDetect ~ dbeta(25, 75)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -676,7 +676,7 @@ SIHRD_inc_sim <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(2.5, 7.5)
+    probDetect ~ dbeta(25, 75)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)

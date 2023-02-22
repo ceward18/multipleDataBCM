@@ -146,7 +146,7 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
         initsList <- list(comp_init = comp_init,
                           beta = runif(1, 1/7, 1),
                           nuC = runif(1, 1, 10),
-                          x0C = runif(1, maxC/20, maxC/5),
+                          x0C = runif(1, minC + 1, maxC/5),
                           deltaC = runif(1, 0, 1),
                           w0 = rnorm(1, 3, 0.5),
                           k = rgamma(1, 100, 100))
@@ -161,6 +161,7 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
     niter <- 8e5
     nburn <- 4e5
     nthin <- 20
+    
     
     list(constantsList = constantsList,
          dataList = dataList,

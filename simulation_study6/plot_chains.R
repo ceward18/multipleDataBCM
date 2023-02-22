@@ -1,4 +1,3 @@
-library(ggplot2)
 
 plot_param_chains <- function(chains, param) {
     ylims <- c(min(chains[[1]][,param],

@@ -45,7 +45,7 @@ fitAlarmModel <- function(incData, modelType, alarmBase,
                             type = "RW_block",
                             control = list(propCov = diag(c(0.3,
                                                             0.7, 0.7, 
-                                                            30, 10, 
+                                                            150, 50, 
                                                             3, 3)))) 
         
         # samplers for RstarI and RstarH
@@ -75,9 +75,14 @@ fitAlarmModel <- function(incData, modelType, alarmBase,
         myConfig$removeSampler(paramsForBlock)
         myConfig$addSampler(target = paramsForBlock, 
                             type = "RW_block",
-                            control = list(propCov = diag(c(0.7, 0.7, 
-                                                            30, 10, 
+                            control = list(propCov = diag(c(1.7, 1.7, 
+                                                            30^2, 10^2, 
                                                             3, 3))))
+        
+        # use slice sampling for hill parameters
+        paramsForSlice <- c('Z', 'x0C', 'x0D', 'nuC', 'nuD')
+        myConfig$removeSampler(paramsForSlice)
+        myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
         
         # joint sampler for beta and w0
         myConfig$removeSampler(c('beta', 'w0'))
