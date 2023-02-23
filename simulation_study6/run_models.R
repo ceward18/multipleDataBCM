@@ -112,7 +112,7 @@ for (i in batchIdx) {
         paramsPost <- cbind.data.frame(postSummaries$postParams, modelInfo)
         alarmPost <- cbind.data.frame(postSummaries$postAlarm, modelInfo)
         alarmTimePost <- cbind.data.frame(postSummaries$postAlarmTime, modelInfo)
-        IstarPost <- cbind.data.frame(postSummaries$IstarPost, modelInfo)
+        IstarPost <- cbind.data.frame(postSummaries$postIstar, modelInfo)
         waicPost <- cbind.data.frame(postSummaries$waic, modelInfo)
         predFitPost <- cbind.data.frame(postSummaries$postPredictFit, modelInfo)
         
@@ -126,7 +126,7 @@ for (i in batchIdx) {
         alarmTimePost <- rbind.data.frame(alarmTimePost, 
                                           cbind.data.frame(postSummaries$postAlarmTime, modelInfo))
         IstarPost <- rbind.data.frame(IstarPost, 
-                                      cbind.data.frame(postSummaries$IstarPost, modelInfo))
+                                      cbind.data.frame(postSummaries$postIstar, modelInfo))
         waicPost <- rbind.data.frame(waicPost, 
                                      cbind.data.frame(postSummaries$waic, modelInfo))
         predFitPost <- rbind.data.frame(predFitPost, 
