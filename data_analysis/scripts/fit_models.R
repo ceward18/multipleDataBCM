@@ -34,7 +34,7 @@ fitAlarmModel <- function(incData, modelType,
     myConfig <- configureMCMC(myModel)
     
     # need to ensure all stochastic nodes are monitored for WAIC calculation
-    if (modelType != 'inc') { # modelType == 'full'
+    if (modelType != 'inc') { # modelType == 'full' and 'simple'
         
         myConfig$addMonitors(c('yAlarmC', 'yAlarmD', 'alarmC', 'alarmD', 
                                'R0', 'delta'))
@@ -45,8 +45,13 @@ fitAlarmModel <- function(incData, modelType,
                             type = "RW_block",
                             control = list(propCov = diag(c(0.2,
                                                             0.7, 0.7, 
-                                                            100^2, 50^2, 
+                                                            100^2, 10^2, 
                                                             3, 3))))
+        
+        # use slice sampling for hill parameters
+        paramsForSlice <- c('beta', 'Z', 'x0C', 'x0D', 'nuC', 'nuD')
+        myConfig$removeSampler(paramsForSlice)
+        myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
         
     } else { # if model == 'inc'
         
@@ -88,8 +93,7 @@ fitAlarmModel <- function(incData, modelType,
         for (j in 1:length(paramsForSlice)) {
             myConfig$addSampler(target = paramsForSlice[j], type = "slice")
         }
-        
-        
+    
         
     }
     

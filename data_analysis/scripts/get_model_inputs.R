@@ -35,6 +35,15 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
     maxC <- ceiling(max(smoothC))
     maxD <- ceiling(max(smoothD))
     
+    # initial values for x0C based on previous analysis of NYC data
+    if (maxC == 4343) {
+        meanX0C <- 143
+    } else if (maxC == 4569) {
+        meanX0C <- 4557
+    } else {
+        meanX0C <- maxC / 2
+    }
+    
     xC <- seq(0, maxC, length.out = n)
     xD <- seq(0, maxD, length.out = n)
     
@@ -72,8 +81,8 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
                               beta = runif(1, 1/7, 1),
                               nuC = rinvgamma(1, 7, 26),
                               nuD = rinvgamma(1, 7, 26),
-                              x0C = runif(1, minC + 1, maxC/10),
-                              x0D = runif(1, minD + 1, maxD/10),
+                              x0C = rnorm(1, meanX0C, 20),
+                              x0D = runif(1, minD + 1, maxD - 1),
                               Z = rmnorm_chol(1, rep(0, 2), chol(Sigma), prec_param = FALSE),
                               w0 = rnorm(1, 5, 0.5),
                               k = rgamma(1, 100, 100))
@@ -81,7 +90,8 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
             
             delta <- multiBeta(initsList$Z)
             
-            if (sum(delta) <= 1) break
+            if ((sum(delta) <= 1) & (initsList$x0C > minC) & (initsList$x0D > minD) & 
+                (initsList$x0C < maxC) & (initsList$x0D < maxD)) break
         }
         
         # end modeltype == 'simple'
@@ -102,8 +112,8 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
                               phi = rgamma(1, 1, 10) ,   # HD
                               nuC = rinvgamma(1, 7, 26),
                               nuD = rinvgamma(1, 7, 26),
-                              x0C = runif(1, minC + 1, maxC/10),
-                              x0D = runif(1, minD + 1, maxD/10),
+                              x0C = rnorm(1, meanX0C, 20),
+                              x0D = runif(1, minD + 1, maxD - 1),
                               Z = rmnorm_chol(1, rep(0, 2), chol(Sigma), prec_param = FALSE),
                               RstarI = round(0.1 * c(rep(0, 3), comp_init[2] + 1, dataList$Istar[1:(tau-4)])),
                               RstarH = round(0.1 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
@@ -117,7 +127,9 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
             
             delta <- multiBeta(initsList$Z)
             
-            if ((probIH + probIR < 1) & (probHR + probHD < 1) & sum(delta) <= 1) break
+            if ((probIH + probIR < 1) & (probHR + probHD < 1) & sum(delta) <= 1 & 
+                (initsList$x0C > minC) & (initsList$x0D > minD) & 
+                (initsList$x0C < maxC) & (initsList$x0D < maxD)) break
             
         } 
         
@@ -142,14 +154,20 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
         dataList <- list(Istar = incData,
                          smoothC = smoothC)
         
-        ### inits 
-        initsList <- list(comp_init = comp_init,
-                          beta = runif(1, 1/7, 1),
-                          nuC = runif(1, 1, 10),
-                          x0C = runif(1, minC + 1, maxC/5),
-                          deltaC = runif(1, 0, 1),
-                          w0 = rnorm(1, 3, 0.5),
-                          k = rgamma(1, 100, 100))
+        repeat {
+            ### inits 
+            initsList <- list(comp_init = comp_init,
+                              beta = runif(1, 1/7, 1),
+                              nuC = runif(1, 1, 10),
+                              x0C = rnorm(1, meanX0C, 20),
+                              deltaC = runif(1, 0, 1),
+                              w0 = rnorm(1, 3, 0.5),
+                              k = rgamma(1, 100, 100))
+            
+            if ((probIH + probIR < 1) & (probHR + probHD < 1) & sum(delta) <= 1 & 
+                (initsList$x0C > minC) & (initsList$x0C < maxC)) break
+        }
+        
         
         
         
@@ -162,6 +180,10 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
     nburn <- 4e5
     nthin <- 20
     
+    ### MCMC specifications
+    niter <- 50000
+    nburn <- 0
+    nthin <- 20
     
     list(constantsList = constantsList,
          dataList = dataList,

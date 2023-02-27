@@ -58,23 +58,6 @@ saveRDS(alarmAll, paste0('./', resultsFolder, '/alarmTimePostAll.rds'))
 
 
 ################################################################################
-# posterior Istar
-
-IstarFiles <- outputFiles[grep('IstarPost', outputFiles)]
-
-IstarAll <- readRDS(paste0('./', outputFolder, '/', IstarFiles[1]))
-
-for (i in 2:length(IstarFiles)) {
-    Istar_i <- readRDS(paste0('./', outputFolder, '/', IstarFiles[i]))
-    IstarAll <-rbind.data.frame(IstarAll, Istar_i)
-}
-
-rownames(IstarAll) <- NULL
-
-saveRDS(IstarAll, paste0('./', resultsFolder, '/IstarPostAll.rds'))
-
-
-################################################################################
 # posterior R0 
 
 R0Files <- outputFiles[grep('R0Post', outputFiles)]

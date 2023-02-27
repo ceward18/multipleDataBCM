@@ -74,7 +74,7 @@ plot_inc_chains <- function(chains) {
 }
 
 
-plot_full_chains(resThree)
+plot_simple_chains(resThree)
 
 
 
