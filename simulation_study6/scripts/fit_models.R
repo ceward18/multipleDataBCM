@@ -5,7 +5,6 @@
 fitAlarmModel <- function(incData, modelType, alarmBase, 
                           smoothC, smoothD, hospData, deathData, seed) {
     
-    
     source('./scripts/model_code.R')
     source('./scripts/get_model_inputs.R')
     
@@ -105,7 +104,8 @@ fitAlarmModel <- function(incData, modelType, alarmBase,
     
     myConfig$removeSamplers('Istar') # Nodes will be expanded
     myConfig$addSampler(target = c('Istar'),
-                        type = "RstarUpdate")
+                        type = "RstarUpdate",
+                        control = list(nUpdates = 500))
     myConfig$addMonitors(c('Istar'))
     
     print(myConfig)

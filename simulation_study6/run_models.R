@@ -68,6 +68,8 @@ for (i in batchIdx) {
         # source relevant scripts
         source('./scripts/fit_models.R')
         
+        # debugonce(fitAlarmModel), 
+
         fitAlarmModel(incData = incData, modelType = modelType_i, 
                       smoothC = smoothC,  smoothD = smoothD,
                       hospData = hospData, deathData = deathData, seed = x)
@@ -96,7 +98,7 @@ for (i in batchIdx) {
         
         saveRDS(resThree,
                 paste0('./output/chains_', dataType_i, '_', modelType_i,
-                       '_', simNumber_i, '.rds'))
+                       '_', sprintf("%02d", simNumber_i), '.rds'))
     }
     
     

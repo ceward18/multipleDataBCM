@@ -244,7 +244,7 @@ SIHRD_sim <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(25, 75)
+    probDetect ~ dbeta(250, 750)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -333,7 +333,7 @@ SIHRD_full <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(25, 75)
+    probDetect ~ dbeta(250, 750)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -444,7 +444,7 @@ SIHRD_full_sim <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(25, 75)
+    probDetect ~ dbeta(250, 750)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -527,7 +527,7 @@ SIHRD_simple <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(25, 75)
+    probDetect ~ dbeta(250, 750)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -603,7 +603,7 @@ SIHRD_inc <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(25, 75)
+    probDetect ~ dbeta(250, 750)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -676,7 +676,7 @@ SIHRD_inc_sim <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(25, 75)
+    probDetect ~ dbeta(250, 750)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -703,8 +703,9 @@ RstarUpdate <- nimbleFunction(
         calcNodes <- model$getDependencies(target) 
         # percent <- if(!is.null(control$percent)) control$percent else 0.05   
         
-        # number of update attempts is some % of the final epidemic size (total # of removals)
-        nUpdates <- 200
+        # number of update attempts at each iteration
+        nUpdates <- if(!is.null(control$nUpdates)) control$nUpdates else 200
+
     },                                                                  # setup can't return anything
     run = function() {
         currentValue <- model[[target]]                                   
