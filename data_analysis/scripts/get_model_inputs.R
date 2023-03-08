@@ -164,13 +164,8 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
                               w0 = rnorm(1, 3, 0.5),
                               k = rgamma(1, 100, 100))
             
-            if ((probIH + probIR < 1) & (probHR + probHD < 1) & sum(delta) <= 1 & 
-                (initsList$x0C > minC) & (initsList$x0C < maxC)) break
+            if ((initsList$x0C > minC) & (initsList$x0C < maxC)) break
         }
-        
-        
-        
-        
         # end modeltype == 'inc'
         
     } 

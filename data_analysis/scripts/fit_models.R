@@ -96,6 +96,7 @@ fitAlarmModel <- function(incData, modelType,
     
         
     }
+    print(myConfig)
     
     # browser()
     nimbleOptions(MCMCusePredictiveDependenciesInCalculations = TRUE)

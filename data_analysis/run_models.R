@@ -17,7 +17,7 @@ library(nimble)
 ### source scripts (for movingAverage function)
 source('./scripts/model_code.R')
 
-cities <- c('nyc', 'london', 'montreal')
+cities <- c('nyc')
 peak <- c('1', '2', '3', '4', '5')
 smoothWindow <- 30
 modelType <- c('simple', 'full', 'inc')
@@ -36,8 +36,15 @@ rownames(allModels) <- NULL
 
 tmp <- allModels[seq(1,nrow(allModels), 5),]
 
-batchSize <- 5
-batchIdx <- batchSize * (idx - 1) + 1:batchSize
+if (idx < 6) {
+    batchIdx <- idx
+} else {
+    
+    batchSize <- 5
+    batchIdx <- batchSize * (idx - 5) + 1:batchSize
+}
+batchIdx
+
 
 
 for (i in batchIdx) {
