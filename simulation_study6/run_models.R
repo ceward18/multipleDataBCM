@@ -24,13 +24,13 @@ allFits <- expand.grid(simNumber = 1:nSim,
                        stringsAsFactors = FALSE)
 
 
-tmp <- allFits[seq(1,nrow(allFits), 10),]
+tmp <- allFits[seq(1,nrow(allFits), 5),]
 # rownames(tmp) <- NULL
 
 ################################################################################
 
-# fit models in batches of 25 (60 batches total)
-batchSize <- 10
+# fit models in batches of 5 (90 batches total)
+batchSize <- 5
 batchIdx <- batchSize * (idx - 1) + 1:batchSize
 
 for (i in batchIdx) {

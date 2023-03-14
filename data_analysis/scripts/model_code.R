@@ -584,7 +584,7 @@ RstarUpdate <- nimbleFunction(
         calcNodes <- model$getDependencies(target) 
         # percent <- if(!is.null(control$percent)) control$percent else 0.05   
         
-        # number of update attempts is some % of the final epidemic size (total # of removals)
+        # number of update attempts
         nUpdates <- 200
     },                                                                  # setup can't return anything
     run = function() {
