@@ -15,15 +15,17 @@ source('./scripts/model_code.R')
 # set up grid of models to fit
 nSim <- 50
 dataType <- c('inc', 'death', 'equal')
-modelType <- c('simple', 'full', 'inc')
+modelType <- c('simple', 'full', 'inc', 'simpleNoAlarm', 'fullNoAlarm')
+assumeType <- c('undetected', 'casesOnly')
 
-# 750
+# 1500
 allFits <- expand.grid(simNumber = 1:nSim,
                        dataType = dataType,
                        modelType = modelType,
+                       assumeType = assumeType,
                        stringsAsFactors = FALSE)
 
-
+# 300
 tmp <- allFits[seq(1,nrow(allFits), 5),]
 # rownames(tmp) <- NULL
 
@@ -37,10 +39,12 @@ for (i in batchIdx) {
     
     dataType_i <- allFits$dataType[i]
     modelType_i <- allFits$modelType[i]
+    assumeType_i <- allFits$assumeType[i]
     simNumber_i <- allFits$simNumber[i]
     
     print(paste0('Data Gen: ', dataType_i,
                  ', model fit: ', modelType_i, 
+                 ', assumption: ', assumeType_i, 
                  ', simulation: ', simNumber_i))
     
     # load data
@@ -58,7 +62,8 @@ for (i in batchIdx) {
     
     # run three chains in parallel
     cl <- makeCluster(3)
-    clusterExport(cl, list('incData', 'modelType_i', 'smoothC', 'smoothD',
+    clusterExport(cl, list('incData', 'modelType_i', 'assumeType_i', 
+                           'smoothC', 'smoothD',
                            'hospData', 'deathData'))
     
     resThree <- parLapplyLB(cl, 1:3, function(x) {
@@ -71,6 +76,7 @@ for (i in batchIdx) {
         # debugonce(fitAlarmModel), 
 
         fitAlarmModel(incData = incData, modelType = modelType_i, 
+                      assumeType = assumeType_i,
                       smoothC = smoothC,  smoothD = smoothD,
                       hospData = hospData, deathData = deathData, seed = x)
     })
@@ -83,7 +89,7 @@ for (i in batchIdx) {
     source('./scripts/summarize_post.R')
     # debugonce(summarizePost)
     postSummaries <- summarizePost(resThree = resThree, incData = incData,
-                                   modelType = modelType_i, 
+                                   modelType = modelType_i, assumeType = assumeType_i,
                                    smoothC = smoothC, smoothD = smoothD,
                                    hospData = hospData, deathData = deathData,
                                    trueInc = trueInc)

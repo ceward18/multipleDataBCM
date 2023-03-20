@@ -6,7 +6,7 @@
 ################################################################################
 
 
-getModelInput <- function(incData, modelType, smoothC, smoothD,
+getModelInput <- function(incData, modelType, assumeType, smoothC, smoothD,
                           hospData, deathData) {
     
     # constants that are the same for all models
@@ -18,13 +18,13 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
     maxInf <- 10
     
     ### initial conditions probability
-    if (modelType == 'full') {
+    if (modelType %in% c('full', 'fullNoAlarm')) {
         
         # SIHRD model - start of epidemic so no H, R, D
         initProb <- c(S0, I0, 0, 0, 0)/N
         comp_init <- rmulti(1, N, initProb)
         
-    } else if (modelType %in% c('simple', 'inc')) {
+    } else if (modelType %in% c('simple', 'inc', 'simpleNoAlarm')) {
         
         # SIR models - start of epidemic so R[0] = 0
         initProb <- c(S0, rep(I0/maxInf, maxInf), R0)/N
@@ -69,6 +69,7 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
                      smoothD = smoothD,
                      constrain_deltas = 1)
     
+    
     if (modelType == 'simple') {
         
         repeat {
@@ -78,8 +79,8 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
                               beta = runif(1, 1/7, 1),
                               nuC = rinvgamma(1, 7, 26),
                               nuD = rinvgamma(1, 7, 26),
-                              x0C = runif(1, minC + 1, maxC/3),
-                              x0D = runif(1, minD + 1, maxD/3),
+                              x0C = runif(1, minC + 1, maxC/4),
+                              x0D = runif(1, minD + 1, maxD/4),
                               Z = rmnorm_chol(1, rep(0, 2), chol(Sigma), prec_param = FALSE),
                               w0 = rnorm(1, 5, 0.5),
                               k = rgamma(1, 100, 100))
@@ -110,8 +111,8 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
                               phi = rgamma(1, 1, 10) ,   # HD
                               nuC = rinvgamma(1, 7, 26),
                               nuD = rinvgamma(1, 7, 26),
-                              x0C = runif(1, minC + 1, maxC/3),
-                              x0D = runif(1, minD + 1, maxD/3),
+                              x0C = runif(1, minC + 1, maxC/4),
+                              x0D = runif(1, minD + 1, maxD/4),
                               Z = rmnorm_chol(1, rep(0, 2), chol(Sigma), prec_param = FALSE),
                               RstarI = round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)])),
                               RstarH = round(0.3 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
@@ -157,7 +158,7 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
                           probDetect = rbeta(1, 250, 750),
                           beta = runif(1, 1/7, 1),
                           nuC = runif(1, 1, 10),
-                          x0C = runif(1, minC + 1, maxC/3),
+                          x0C = runif(1, minC + 1, maxC/4),
                           deltaC = runif(1, 0, 1),
                           w0 = rnorm(1, 3, 0.5),
                           k = rgamma(1, 100, 100))
@@ -167,7 +168,79 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
         
         # end modeltype == 'inc'
         
-    } 
+    } else if (modelType == 'fullNoAlarm') {
+        
+        ### constants
+        constantsList <- list(tau = tau,
+                              N = N,
+                              initProb = initProb,
+                              maxInf = maxInf)
+        
+        ### data
+        dataList <- list(detectIstar = incData,
+                         Hstar = hospData,
+                         Dstar = deathData)
+        
+        repeat {
+            
+            ### inits 
+            initsList <- list(comp_init = comp_init,
+                              probDetect = rbeta(1, 250, 750),
+                              beta = runif(1, 1/7, 1),
+                              gamma1 = rgamma(1, 2, 10), # IR
+                              gamma2 = rgamma(1, 2, 10), # HR
+                              lambda = rgamma(1, 1, 10), # IH
+                              phi = rgamma(1, 1, 10) ,   # HD
+                              RstarI = round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)])),
+                              RstarH = round(0.3 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
+            
+            initsList$Istar <- round(incData / initsList$probDetect)
+            
+            probIH <- 1 - exp(-initsList$lambda)
+            probIR <- 1 - exp(-initsList$gamma1)
+            
+            probHR <- 1 - exp(-initsList$gamma2)
+            probHD <- 1 - exp(-initsList$phi)
+            
+            if ((probIH + probIR < 1) & (probHR + probHD < 1)) break
+        }
+        
+        # end modeltype == 'fullNoAlarm'
+        
+    } else if (modelType == 'simpleNoAlarm') {
+        
+        ### constants
+        constantsList <- list(tau = tau,
+                              N = N,
+                              initProb = initProb,
+                              maxInf = maxInf)
+        
+        ### data
+        dataList <- list(detectIstar = incData)
+        
+        ### inits 
+        initsList <- list(comp_init = comp_init,
+                          probDetect = rbeta(1, 250, 750),
+                          beta = runif(1, 1/7, 1),
+                          w0 = rnorm(1, 5, 0.5),
+                          k = rgamma(1, 100, 100))
+        
+        initsList$Istar <- round(incData / initsList$probDetect)
+        
+        # end modeltype == 'simpleNoAlarm'
+        
+    }
+    
+    if (assumeType == 'casesOnly') {
+        initsList$probDetect <- NULL
+        initsList$Istar <- NULL
+        
+        # change data
+        dataList$detectIstar <- NULL
+        dataList$Istar <- incData
+        
+        
+    }
     
     ### MCMC specifications
     niter <- 8e5

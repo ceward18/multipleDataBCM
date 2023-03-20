@@ -4,18 +4,25 @@
 
 # can only run if modelType == 'full' or 'fullThresh' or 'inc'
 
-postPredFit <- function(incData, modelType, 
+postPredFit <- function(incData, modelType, assumeType,
                         smoothC, smoothD, hospData, deathData, 
                         paramsSamples) {
     
     # model-specific constants, data, and inits
-    modelInputs <- getModelInput(incData, modelType, smoothC, smoothD,
+    modelInputs <- getModelInput(incData, modelType, assumeType, smoothC, smoothD,
                                  hospData, deathData)
     
     modelInputs$constantsList$bw <- 30
     
     # get model code
-    modelCode <- get(paste0('SIHRD_', modelType, '_sim'))
+    if (modelType %in% c('full', 'inc')) {
+        modelCode <- get(paste0('SIHRD_', modelType, '_', assumeType, '_sim')) 
+    } else if (modelType %in% c('fullNoAlarm', 'simpleNoAlarm')){
+        # don't need separate code to simulate from these models, as they 
+        #   have an alarm function which depends on epidemic trajectory
+        modelCode <- get(paste0('SIHRD_', modelType, '_', assumeType))
+    }
+    
     
     # compile model and simulator
     myModelPred <- nimbleModel(modelCode, 
@@ -25,11 +32,13 @@ postPredFit <- function(incData, modelType,
     
     tau <- modelInputs$constantsList$tau
     
-    if (modelType == 'full') {
+    if (modelType %in% c('full', 'fullNoAlarm')) {
         dataNodes <- c('Istar', 'Hstar', 'Dstar', 'RstarH', 'RstarI')
     } else {
         dataNodes <- 'Istar'
     }
+    if (assumeType == 'undetected') dataNodes <- c(dataNodes, 'detectIstar')
+    
     dataNodes <- myModelPred$expandNodeNames(dataNodes)
     
     sim_R <- simulator(myModelPred, dataNodes)
@@ -40,14 +49,9 @@ postPredFit <- function(incData, modelType,
     parentNodes <- parentNodes[-which(parentNodes %in% dataNodes)]
     parentNodes <- myModelPred$expandNodeNames(parentNodes, returnScalarComponents = TRUE)
     
-    # add detectIStar to paramsSamples
-    detectIstarSamples <- matrix(incData, ncol = tau, 
-                                 nrow = nrow(paramsSamples), byrow = T)
-    colnames(detectIstarSamples) <- paste0('detectIstar[', 1:tau, ']')
-    paramsSamples <- cbind(paramsSamples, detectIstarSamples)
-    
     nPost <- 10000
     postPredInc <- matrix(NA, nrow = tau, ncol = nPost)
+    postPredCases <- matrix(NA, nrow = tau, ncol = nPost)
     postPredHosp <- matrix(NA, nrow = tau, ncol = nPost)
     postPredDeath <- matrix(NA, nrow = tau, ncol = nPost)
     set.seed(1)
@@ -60,14 +64,18 @@ postPredFit <- function(incData, modelType,
         postPredAll <- apply(sim_C$run(trueVals, 10), 2, median)
         
         
-        postPredInc[,j] <- postPredAll[grep('Istar', dataNodes)]
+        postPredInc[,j] <- postPredAll[grep('^Istar', dataNodes)]
         
-        if (modelType  == 'full') {
+        if (modelType %in% c('full', 'fullNoAlarm')) {
             postPredHosp[,j] <- postPredAll[grep('Hstar', dataNodes)]
             postPredDeath[,j] <- postPredAll[grep('Dstar', dataNodes)]
         }
+        
+        if (assumeType == 'undetected') {
+            postPredCases[,j] <- postPredAll[grep('detectIstar', dataNodes)]
+        }
     }
     
-    rbind(postPredInc, postPredHosp, postPredDeath)
+    rbind(postPredInc, postPredCases, postPredHosp, postPredDeath)
     
 }

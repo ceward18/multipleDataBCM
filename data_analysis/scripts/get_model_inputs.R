@@ -90,7 +90,7 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
             
             delta <- multiBeta(initsList$Z)
             
-            if ((sum(delta) <= 1) & (initsList$x0C > minC) & (initsList$x0D > minD) & 
+            if ((sum(delta) <= 0.2) & (initsList$x0C > minC) & (initsList$x0D > minD) & 
                 (initsList$x0C < maxC) & (initsList$x0D < maxD)) break
         }
         
@@ -127,7 +127,7 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
             
             delta <- multiBeta(initsList$Z)
             
-            if ((probIH + probIR < 1) & (probHR + probHD < 1) & sum(delta) <= 1 & 
+            if ((probIH + probIR < 1) & (probHR + probHD < 1) & sum(delta) <= 0.2 & 
                 (initsList$x0C > minC) & (initsList$x0D > minD) & 
                 (initsList$x0C < maxC) & (initsList$x0D < maxD)) break
             
@@ -172,8 +172,8 @@ getModelInput <- function(incData, modelType, smoothC, smoothD,
     
     ### MCMC specifications
     niter <- 8e5
-    nburn <- 4e5
-    nthin <- 20
+    nburn <- 5e5
+    nthin <- 10
     
     list(constantsList = constantsList,
          dataList = dataList,
