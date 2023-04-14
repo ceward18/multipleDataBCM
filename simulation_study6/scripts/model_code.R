@@ -605,7 +605,7 @@ SIHRD_full_casesOnly_sim <-  nimbleCode({
     for(t in 2:tau) {
         
         # compute moving average up to t-1
-        smoothC[t] <- movingAverage(detectIstar[1:(t-1)], bw)[t-1]
+        smoothC[t] <- movingAverage(Istar[1:(t-1)], bw)[t-1]
         smoothD[t] <- movingAverage(Dstar[1:(t-1)], bw)[t-1]
         
         # compute alarms for each component
@@ -1277,7 +1277,7 @@ SIHRD_inc_casesOnly_sim <-  nimbleCode({
     for(t in 2:tau) {
         
         # moving average incidence
-        smoothC[t] <- movingAverage(detectIstar[1:(t-1)], bw)[t-1]
+        smoothC[t] <- movingAverage(Istar[1:(t-1)], bw)[t-1]
         
         # alarm is function of incidence only
         alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, deltaC)

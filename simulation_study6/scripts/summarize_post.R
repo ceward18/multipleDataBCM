@@ -11,6 +11,7 @@ library(coda)
 library(nimble)
 
 # source relevant scripts
+source('./scripts/model_code.R')
 source('./scripts/get_model_inputs.R')
 source('./scripts/get_WAIC.R')
 source('./scripts/post_pred_fit.R')
@@ -18,9 +19,18 @@ source('./scripts/post_pred_fit.R')
 summarizePost <- function(resThree, incData, modelType, assumeType,
                           smoothC, smoothD, hospData, deathData, trueInc) {
     
-    paramSamples1 <- resThree[[1]][,-grep('alarm|R0|yAlarm|Rstar|Istar|comp_init\\[12\\]', colnames(resThree[[1]]))]
-    paramSamples2 <- resThree[[2]][,-grep('alarm|R0|yAlarm|Rstar|Istar|comp_init\\[12\\]', colnames(resThree[[2]]))]
-    paramSamples3 <- resThree[[3]][,-grep('alarm|R0|yAlarm|Rstar|Istar|comp_init\\[12\\]', colnames(resThree[[3]]))]
+    if (modelType %in% c('full', 'fullNoAlarm')) {
+        paramSamples1 <- resThree[[1]][,-grep('alarm|R0|yAlarm|Rstar|Istar|
+                                              |comp_init\\[3\\]|comp_init\\[4\\]|comp_init\\[5\\]', colnames(resThree[[1]]))]
+        paramSamples2 <- resThree[[2]][,-grep('alarm|R0|yAlarm|Rstar|Istar|
+                                              |comp_init\\[3\\]|comp_init\\[4\\]|comp_init\\[5\\]', colnames(resThree[[2]]))]
+        paramSamples3 <- resThree[[3]][,-grep('alarm|R0|yAlarm|Rstar|Istar|
+                                              |comp_init\\[3\\]|comp_init\\[4\\]|comp_init\\[5\\]', colnames(resThree[[3]]))]
+    } else if (modelType %in% c('simple', 'inc', 'simpleNoAlarm')) {
+        paramSamples1 <- resThree[[1]][,-grep('alarm|R0|yAlarm|Rstar|Istar|comp_init\\[12\\]', colnames(resThree[[1]]))]
+        paramSamples2 <- resThree[[2]][,-grep('alarm|R0|yAlarm|Rstar|Istar|comp_init\\[12\\]', colnames(resThree[[2]]))]
+        paramSamples3 <- resThree[[3]][,-grep('alarm|R0|yAlarm|Rstar|Istar|comp_init\\[12\\]', colnames(resThree[[3]]))]
+    }
     
     ##############################################################################
     ### gelman-rubin

@@ -104,7 +104,7 @@ for (i in batchIdx) {
         
         saveRDS(resThree,
                 paste0('./output/chains_', dataType_i, '_', modelType_i,
-                       '_', sprintf("%02d", simNumber_i), '.rds'))
+                       '_', sprintf("%03d", simNumber_i), '.rds'))
     }
     
     
@@ -143,7 +143,7 @@ for (i in batchIdx) {
     
 } # end loop
 
-idxPrint <- sprintf("%02d",idx)
+idxPrint <- sprintf("%03d",idx)
 
 
 # save output in RDS form

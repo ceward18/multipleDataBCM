@@ -23,7 +23,6 @@ postPredFit <- function(incData, modelType, assumeType,
         modelCode <- get(paste0('SIHRD_', modelType, '_', assumeType))
     }
     
-    
     # compile model and simulator
     myModelPred <- nimbleModel(modelCode, 
                                constants = modelInputs$constantsList)
@@ -48,6 +47,7 @@ postPredFit <- function(incData, modelType, assumeType,
     parentNodes <- myModelPred$getParents(dataNodes, stochOnly = TRUE)
     parentNodes <- parentNodes[-which(parentNodes %in% dataNodes)]
     parentNodes <- myModelPred$expandNodeNames(parentNodes, returnScalarComponents = TRUE)
+
     
     nPost <- 10000
     postPredInc <- matrix(NA, nrow = tau, ncol = nPost)
