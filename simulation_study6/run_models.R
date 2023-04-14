@@ -111,6 +111,7 @@ for (i in batchIdx) {
     # save results in separate files
     modelInfo <- data.frame(dataType = dataType_i,
                             modelType = modelType_i,
+                            assumeType = assumeType_i,
                             simNumber = simNumber_i)
     
     # posterior summaries
