@@ -1,7 +1,6 @@
 ################################################################################
 # Nimble model codes for simulation study
 # alarm based on only incidence and deaths
-# add in only a proportion of cases are detected
 ################################################################################
 
 
@@ -27,17 +26,6 @@ hillAlarm <- nimbleFunction(
         return(result)
     })
 assign('hillAlarm', hillAlarm, envir = .GlobalEnv)
-
-# threshold alarm function
-thresholdAlarm <- nimbleFunction(     
-  run = function(x = double(0), N = double(0), delta = double(0), H = double(0)) {
-    returnType(double(0))
-    
-    result <- delta * (x / N > H)
-    
-    return(result)
-  })
-assign('thresholdAlarm', thresholdAlarm, envir = .GlobalEnv)
 
 # nimbleFunction for Gaussian copula with beta distribution
 multiBeta <- nimbleFunction(     
@@ -75,6 +63,26 @@ movingAverage <- nimbleFunction(
         return(out)
     })
 assign('movingAverage', movingAverage, envir = .GlobalEnv)
+
+
+# get smoothC or smoothD at time t when doing posterior prediction
+get_smooth <- nimbleFunction(     
+    run = function(Xstar = double(1), t = double(0), Xstar0 = double(1), 
+                   Xstar0Length = double(0),  bw = double(0)) {
+        returnType(double(0))
+        
+        if (t < bw) {
+            
+            # incorporate previously observed incidence
+            result <- movingAverage(c(Xstar0, Xstar), bw)[Xstar0Length + t - 1]
+            
+        } else {
+            result <- movingAverage(Xstar, bw)[t - 1]
+        }
+        
+        return(result)
+    })
+assign('get_smooth', get_smooth, envir = .GlobalEnv)
 
 # get effective reproductive number at time t using a forward sum
 get_R0 <- nimbleFunction(     
@@ -156,114 +164,16 @@ simulator <- nimbleFunction(
     })
 assign('simulator', simulator, envir = .GlobalEnv)
 
-
 ################################################################################
-# SIHRD Model
-
-SIHRD_sim <-  nimbleCode({
-    
-    S[1] <- S0
-    I[1] <- I0
-    H[1] <- 0
-    R[1] <- 0
-    D[1] <- 0
-    
-    probIH <- 1 - exp(-lambda)
-    probIR <- 1 - exp(-gamma1)
-    fromIProb[1:3] <- c(probIH, probIR, 1 - probIH - probIR)
-    
-    probHR <- 1 - exp(-gamma2)
-    probHD <- 1 - exp(-phi)
-    fromHProb[1:3] <- c(probHR, probHD, 1 - probHR - probHD)
-    
-    ### first time point
-    
-    # weighted sum of each component
-    alarm[1] <- 0
-    
-    probSI[1] <- 1 - exp(- beta * (1 - alarm[1]) * I[1] / N)
-    
-    # SIHRD model
-    Istar[1] ~ dbin(probSI[1], S[1])
-    # Istar[t] <- detectIstar[t] + undetectIstar[t]
-    detectIstar[1] ~ dbin(probDetect, Istar[1]) # e.g. 25% of cases are detected
-    
-    fromI[1, 1:3] ~ dmulti(prob = fromIProb[1:3], size = I[1])
-    Hstar[1] <- fromI[1, 1]
-    RstarI[1] <- fromI[1, 2]
-    fromH[1, 1:3] ~ dmulti(prob = fromHProb[1:3], size = H[1])
-    RstarH[1] <- fromH[1, 1]
-    Dstar[1] <- fromH[1, 2]
-    
-    # update S, I, H, R, D
-    S[2] <- S[1] - Istar[1]
-    I[2] <- I[1] + Istar[1] - Hstar[1] - RstarI[1]
-    H[2] <- H[1] + Hstar[1] - RstarH[1] - Dstar[1] 
-    R[2] <- R[1] + RstarI[1] + RstarH[1]
-    D[2] <- D[1] + Dstar[1] 
-    
-    ### rest of time points
-    for(t in 2:tau) {
-        
-        # alarm is only based on observed data
-        smoothC[t] <- movingAverage(detectIstar[1:(t-1)], bw)[t-1]
-        smoothD[t] <- movingAverage(Dstar[1:(t-1)], bw)[t-1]
-        
-        # compute alarms for each component
-        alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, deltaC)
-        alarmD[t] <- hillAlarm(smoothD[t], nuD, x0D, deltaD)
-        
-        # weighted sum of each component
-        alarm[t] <- alarmC[t] + alarmD[t]
-        
-        probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * I[t] / N)
-        
-        # SIHRD model
-        # S -> I
-        Istar[t] ~ dbin(probSI[t], S[t])
-        # Istar[t] <- detectIstar[t] + undetectIstar[t]
-        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
-        # I -> H or R
-        fromI[t, 1:3] ~ dmulti(prob = fromIProb[1:3], size = I[t])
-        Hstar[t] <- fromI[t, 1]
-        RstarI[t] <- fromI[t, 2]
-        # H -> R or D
-        fromH[t, 1:3] ~ dmulti(prob = fromHProb[1:3], size = H[t])
-        RstarH[t] <- fromH[t, 1]
-        Dstar[t] <- fromH[t, 2]
-        
-        # update S, I, H, R, D
-        S[t + 1] <- S[t] - Istar[t]
-        I[t + 1] <- I[t] + Istar[t] - Hstar[t] - RstarI[t]
-        H[t + 1] <- H[t] + Hstar[t] - RstarH[t] - Dstar[t] 
-        R[t + 1] <- R[t] + RstarI[t] + RstarH[t]
-        D[t + 1] <- D[t] + Dstar[t] 
-        
-    }
-    
-    ### Priors
-    
-    # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
-    
-    # transmission
-    beta ~ dgamma(0.1, 0.1)
-    
-    # transitions
-    gamma1 ~ dgamma(0.1, 0.1) # IR
-    gamma2 ~ dgamma(0.1, 0.1) # HR
-    lambda ~ dgamma(0.1, 0.1) # IH
-    phi ~ dgamma(0.1, 0.1)    # HD
-    
-    # alarm functions - priors don't matter as this is used for simulation only
-    deltaC ~ dbeta(1, 1)
-    nuC ~ dunif(0, 50)
-    x0C ~ dunif(0, 20000)
-    deltaD ~ dbeta(1, 1)
-    nuD ~ dunif(0, 50)
-    x0D ~ dunif(0, 20000)
-    
-})
+# Model scripts:
+#   - SIHRD model with alarm based on incidence and deaths (SIHRD_full)
+#   - SIR model with alarm based on incidence and deaths (SIR_full)
+#   - SIR model with alarm based on incidence only (SIR_inc)
+#   - SIHRD model with no alarm (SIHRD_noAlarm)
+#   - SIR model with no alarm (SIR_noAlarm)
+# Models either allow for undetected cases to be estimated (undetected), or
+#   assume all cases were observed (casesOnly)
+################################################################################
 
 ################################################################################
 
@@ -353,8 +263,8 @@ SIHRD_full_undetected <-  nimbleCode({
     
     nuC ~ dinvgamma(7, 26)
     nuD ~ dinvgamma(7, 26)
-    x0C ~ dunif(minC + 1, maxC - 1)
-    x0D ~ dunif(minD + 1, maxD - 1)
+    x0C ~ dunif(minC, maxC)
+    x0D ~ dunif(minD, maxD)
     
     # constrain deltas to sum to 1
     constrain_deltas ~ dconstraint(delta[1] + delta[2] <= 1)
@@ -464,8 +374,8 @@ SIHRD_full_undetected_sim <-  nimbleCode({
     
     nuC ~ dinvgamma(7, 26)
     nuD ~ dinvgamma(7, 26)
-    x0C ~ dunif(minC + 1, maxC - 1)
-    x0D ~ dunif(minD + 1, maxD - 1)
+    x0C ~ dunif(minC, maxC)
+    x0D ~ dunif(minD, maxD)
     
     # constrain deltas to sum to 1
     constrain_deltas ~ dconstraint(delta[1] + delta[2] <= 1)
@@ -555,8 +465,8 @@ SIHRD_full_casesOnly <-  nimbleCode({
     
     nuC ~ dinvgamma(7, 26)
     nuD ~ dinvgamma(7, 26)
-    x0C ~ dunif(minC + 1, maxC - 1)
-    x0D ~ dunif(minD + 1, maxD - 1)
+    x0C ~ dunif(minC, maxC)
+    x0D ~ dunif(minD, maxD)
     
     # constrain deltas to sum to 1
     constrain_deltas ~ dconstraint(delta[1] + delta[2] <= 1)
@@ -659,8 +569,8 @@ SIHRD_full_casesOnly_sim <-  nimbleCode({
     
     nuC ~ dinvgamma(7, 26)
     nuD ~ dinvgamma(7, 26)
-    x0C ~ dunif(minC + 1, maxC - 1)
-    x0D ~ dunif(minD + 1, maxD - 1)
+    x0C ~ dunif(minC, maxC)
+    x0D ~ dunif(minD, maxD)
     
     # constrain deltas to sum to 1
     constrain_deltas ~ dconstraint(delta[1] + delta[2] <= 1)
@@ -670,7 +580,7 @@ SIHRD_full_casesOnly_sim <-  nimbleCode({
 ################################################################################
 
 # SIHRD model with no alarm
-SIHRD_fullNoAlarm_undetected <-  nimbleCode({
+SIHRD_noAlarm_undetected <-  nimbleCode({
     
     # compartment initial values
     comp_init[1:5] ~ dmulti(prob = initProb[1:5], size = N)
@@ -718,7 +628,7 @@ SIHRD_fullNoAlarm_undetected <-  nimbleCode({
     R0[1:(tau-maxInf-1)] <- get_R0_full(betat = betat[1:tau], 
                                         N = N, gamma1 = gamma1, lambda = lambda,
                                         S = S[1:tau], maxInf = maxInf)
- 
+    
     ### Priors
     
     # detection probability (1/4 reported)
@@ -738,7 +648,7 @@ SIHRD_fullNoAlarm_undetected <-  nimbleCode({
 ################################################################################
 
 # SIHRD model with no alarm
-SIHRD_fullNoAlarm_casesOnly <-  nimbleCode({
+SIHRD_noAlarm_casesOnly <-  nimbleCode({
     
     # compartment initial values
     comp_init[1:5] ~ dmulti(prob = initProb[1:5], size = N)
@@ -801,7 +711,7 @@ SIHRD_fullNoAlarm_casesOnly <-  nimbleCode({
 ################################################################################
 
 # SIR model with alarm based on incidence and deaths
-SIHRD_simple_undetected <-  nimbleCode({
+SIR_full_undetected <-  nimbleCode({
     
     # compartment initial values
     # 1 = S0, 2 - 11 = I0, 12 = R0
@@ -867,8 +777,8 @@ SIHRD_simple_undetected <-  nimbleCode({
     
     nuC ~ dinvgamma(7, 26)
     nuD ~ dinvgamma(7, 26)
-    x0C ~ dunif(minC + 1, maxC - 1)
-    x0D ~ dunif(minD + 1, maxD - 1)
+    x0C ~ dunif(minC, maxC)
+    x0D ~ dunif(minD, maxD)
     
     # IDD Curve
     w0 ~ dnorm(5, sd = 0.5)
@@ -882,7 +792,7 @@ SIHRD_simple_undetected <-  nimbleCode({
 ################################################################################
 
 # SIR model with alarm based on incidence and deaths
-SIHRD_simple_casesOnly <-  nimbleCode({
+SIR_full_casesOnly <-  nimbleCode({
     
     # compartment initial values
     # 1 = S0, 2 - 11 = I0, 12 = R0
@@ -943,8 +853,8 @@ SIHRD_simple_casesOnly <-  nimbleCode({
     
     nuC ~ dinvgamma(7, 26)
     nuD ~ dinvgamma(7, 26)
-    x0C ~ dunif(minC + 1, maxC - 1)
-    x0D ~ dunif(minD + 1, maxD - 1)
+    x0C ~ dunif(minC, maxC)
+    x0D ~ dunif(minD, maxD)
     
     # IDD Curve
     w0 ~ dnorm(5, sd = 0.5)
@@ -958,7 +868,7 @@ SIHRD_simple_casesOnly <-  nimbleCode({
 ################################################################################
 
 # SIR model with no alarm
-SIHRD_simpleNoAlarm_undetected <-  nimbleCode({
+SIR_noAlarm_undetected <-  nimbleCode({
     
     # compartment initial values
     # 1 = S0, 2 - 11 = I0, 12 = R0
@@ -971,7 +881,7 @@ SIHRD_simpleNoAlarm_undetected <-  nimbleCode({
     
     ### rest of time points
     for(t in 1:tau) {
-    
+        
         probSI[t] <- 1 - exp(- beta * sum(idd_curve[1:maxInf] * I[t, 1:maxInf]) / N)
         
         # SIR model
@@ -1011,7 +921,7 @@ SIHRD_simpleNoAlarm_undetected <-  nimbleCode({
 ################################################################################
 
 # SIR model with no alarm
-SIHRD_simpleNoAlarm_casesOnly <-  nimbleCode({
+SIR_noAlarm_casesOnly <-  nimbleCode({
     
     # compartment initial values
     # 1 = S0, 2 - 11 = I0, 12 = R0
@@ -1058,7 +968,7 @@ SIHRD_simpleNoAlarm_casesOnly <-  nimbleCode({
 ################################################################################
 
 # SIR model with incidence only alarm
-SIHRD_inc_undetected <-  nimbleCode({
+SIR_inc_undetected <-  nimbleCode({
     
     # compartment initial values
     # 1 = S0, 2 - 11 = I0, 12 = R0
@@ -1115,7 +1025,7 @@ SIHRD_inc_undetected <-  nimbleCode({
     # alarm functions
     deltaC ~ dunif(0, 1)
     nuC ~ dinvgamma(7, 26)
-    x0C ~ dunif(minC + 1, maxC - 1)
+    x0C ~ dunif(minC, maxC)
     
     # IDD Curve
     w0 ~ dnorm(5, sd = 0.5)
@@ -1126,7 +1036,7 @@ SIHRD_inc_undetected <-  nimbleCode({
 ################################################################################
 
 # SIR model with incidence only alarm
-SIHRD_inc_undetected_sim <-  nimbleCode({
+SIR_inc_undetected_sim <-  nimbleCode({
     
     # compartment initial values
     # 1 = S0, 2 - 11 = I0, 12 = R0
@@ -1188,7 +1098,7 @@ SIHRD_inc_undetected_sim <-  nimbleCode({
     # alarm functions
     deltaC ~ dunif(0, 1)
     nuC ~ dinvgamma(7, 26)
-    x0C ~ dunif(minC + 1, maxC - 1)
+    x0C ~ dunif(minC, maxC)
     
     # IDD Curve
     w0 ~ dnorm(5, sd = 0.5)
@@ -1199,7 +1109,7 @@ SIHRD_inc_undetected_sim <-  nimbleCode({
 ################################################################################
 
 # SIR model with incidence only alarm
-SIHRD_inc_casesOnly <-  nimbleCode({
+SIR_inc_casesOnly <-  nimbleCode({
     
     # compartment initial values
     # 1 = S0, 2 - 11 = I0, 12 = R0
@@ -1251,7 +1161,7 @@ SIHRD_inc_casesOnly <-  nimbleCode({
     # alarm functions
     deltaC ~ dunif(0, 1)
     nuC ~ dinvgamma(7, 26)
-    x0C ~ dunif(minC + 1, maxC - 1)
+    x0C ~ dunif(minC, maxC)
     
     # IDD Curve
     w0 ~ dnorm(5, sd = 0.5)
@@ -1262,7 +1172,7 @@ SIHRD_inc_casesOnly <-  nimbleCode({
 ################################################################################
 
 # SIR model with incidence only alarm
-SIHRD_inc_casesOnly_sim <-  nimbleCode({
+SIR_inc_casesOnly_sim <-  nimbleCode({
     
     # compartment initial values
     # 1 = S0, 2 - 11 = I0, 12 = R0
@@ -1317,13 +1227,14 @@ SIHRD_inc_casesOnly_sim <-  nimbleCode({
     # alarm functions
     deltaC ~ dunif(0, 1)
     nuC ~ dinvgamma(7, 26)
-    x0C ~ dunif(minC + 1, maxC - 1)
+    x0C ~ dunif(minC, maxC)
     
     # IDD Curve
     w0 ~ dnorm(5, sd = 0.5)
     k ~ dgamma(100, 100)
     
 })
+
 
 ################################################################################
 ### Special proposal function for removal times in exponential model
@@ -1335,9 +1246,8 @@ RstarUpdate <- nimbleFunction(
         calcNodes <- model$getDependencies(target) 
         # percent <- if(!is.null(control$percent)) control$percent else 0.05   
         
-        # number of update attempts at each iteration
-        nUpdates <- if(!is.null(control$nUpdates)) control$nUpdates else 200
-
+        # number of update attempts
+        nUpdates <- 200
     },                                                                  # setup can't return anything
     run = function() {
         currentValue <- model[[target]]                                   
@@ -1422,3 +1332,4 @@ RstarUpdate <- nimbleFunction(
 )
 
 assign('RstarUpdate', RstarUpdate, envir = .GlobalEnv)
+
