@@ -254,7 +254,7 @@ getModelInput <- function(incData, modelType, assumeType,
     
     ### MCMC specifications
     niter <- 500000
-    nburn <- 100000
+    nburn <- 200000
     nthin <- 10
     
     list(constantsList = constantsList,

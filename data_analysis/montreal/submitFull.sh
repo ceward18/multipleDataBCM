@@ -4,7 +4,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=6
-#SBATCH --time=96:00:00
+#SBATCH --time=72:00:00
 #SBATCH --mem=248G
 #SBATCH --array=1-4
 #SBATCH --output=./out/Array.%A_%a.out

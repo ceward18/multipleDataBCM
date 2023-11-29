@@ -17,7 +17,7 @@ library(nimble)
 ### source scripts (for movingAverage function)
 source('./scripts/model_code.R')
 
-peak <- 1:4
+peak <- c(1,2,4)
 smoothWindow <- 30
 modelType <- c('SIHRD_full', 'SIR_full', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')
 assumeType <- c('undetected', 'casesOnly')
@@ -34,9 +34,9 @@ allModels <- allModels[order(allModels$modelType,
                              allModels$peak),]
 rownames(allModels) <- NULL
 
-tmp <- allModels[seq(1,nrow(allModels), 4),]
+tmp <- allModels[seq(1,nrow(allModels), 3),]
 
-batchSize <- 4
+batchSize <- 3
 batchIdx <- batchSize * (idx - 1) + 1:batchSize
 
 
@@ -132,11 +132,12 @@ for (i in batchIdx) {
         source('./scripts/fit_models.R')
         
         # debugonce(fitAlarmModel)
-        out <- fitAlarmModel(incData = incData, modelType = modelType_i,
-                             assumeType = assumeType_i,
-                             smoothC = smoothC, smoothD = smoothD, 
-                             deathData = deathData, hospData = hospData,
-                             N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0, seed = 1)
+        fitAlarmModel(incData = incData, modelType = modelType_i,
+                      assumeType = assumeType_i,
+                      smoothC = smoothC, smoothD = smoothD, 
+                      deathData = deathData, hospData = hospData,
+                      N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0,
+                      seed = x)
         
     })
     stopCluster(cl)
@@ -154,7 +155,7 @@ for (i in batchIdx) {
     # if the model did not converge save the chains so these can be examined later
     if (!all(postSummaries$gdiag$gr < 1.1)) {
         
-        # create thinned version
+        # create thinned version to save memory
         resThree[[1]] <- resThree[[1]][seq(1,nrow(resThree[[1]]), 100),]
         resThree[[2]] <- resThree[[2]][seq(1,nrow(resThree[[2]]), 100),]
         resThree[[3]] <- resThree[[3]][seq(1,nrow(resThree[[3]]), 100),]
