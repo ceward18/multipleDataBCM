@@ -161,7 +161,7 @@ for (i in batchIdx) {
         resThree[[3]] <- resThree[[3]][seq(1,nrow(resThree[[3]]), 100),]
         
         saveRDS(resThree, 
-                paste0('./output/chains_', city_i, '_', modelType_i, 
+                paste0('./output/chains_', modelType_i, '_', assumeType_i, 
                        '_peak', peak_i, '.rds'))
     }
     
