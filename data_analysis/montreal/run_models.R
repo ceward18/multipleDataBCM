@@ -166,9 +166,9 @@ for (i in batchIdx) {
     }
     
     # save results in separate files
-    modelInfo <- data.frame(city = city_i,
-                            modelType = modelType_i, 
-                            peak = peak_i)
+    modelInfo <- data.frame(modelType = modelType_i, 
+                            peak = peak_i,
+                            assumeType = assumeType_i)
     
     if (i == batchIdx[1]) {
         
