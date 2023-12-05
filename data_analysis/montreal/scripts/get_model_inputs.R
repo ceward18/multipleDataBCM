@@ -6,7 +6,7 @@
 ################################################################################
 
 
-getModelInput <- function(incData, modelType, assumeType, 
+getModelInput <- function(incData, modelType, assumeType, peak,
                           smoothC, smoothD,
                           hospData, deathData,
                           N, S0, I0, H0, D0, R0) {
@@ -58,6 +58,24 @@ getModelInput <- function(incData, modelType, assumeType,
     sds <- rep(0.7, 2)
     Sigma <- diag(sds) %*% corMat %*% diag(sds)
     
+    
+    # prior for probDetect depends on peak 
+    #   (https://www.healthdata.org/sites/default/files/covid_briefs/101_briefing_Canada.pdf)
+    # wave 1: Feb 25 - 11 July 2020          25% detection
+    # wave 2: Aug 23, 2020 - March 20, 2021  40% detection
+    # wave 3: March 21 - July 17, 2021       
+    # wave 4: July 18 - Dec 4, 2021          20% detection
+    if (peak == 1) {
+        detectA <- 250
+        detectB <- 750
+    } else if (peak == 2) {
+        detectA <- 400
+        detectB <- 600
+    } else if (peak == 4) {
+        detectA <- 200
+        detectB <- 800
+    } 
+    
     constantsList <- list(tau = tau,
                           N = N,
                           initProb = initProb,
@@ -70,7 +88,9 @@ getModelInput <- function(incData, modelType, assumeType,
                           xD = xD,
                           maxInf = maxInf,
                           zeros = rep(0, 2),
-                          Sigma = Sigma)
+                          Sigma = Sigma,
+                          detectA = detectA,
+                          detectB = detectB)
     
     ### data
     dataList <- list(detectIstar = incData,
@@ -83,7 +103,7 @@ getModelInput <- function(incData, modelType, assumeType,
         repeat {
             ### inits 
             initsList <- list(comp_init = comp_init,
-                              probDetect = rbeta(1, 250, 750),
+                              probDetect = rbeta(1, constantsList$detectA, constantsList$detectB),
                               beta = runif(1, 1/7, 1),
                               nuC = rinvgamma(1, 7, 26),
                               nuD = rinvgamma(1, 7, 26),
@@ -111,7 +131,7 @@ getModelInput <- function(incData, modelType, assumeType,
             
             ### inits 
             initsList <- list(comp_init = comp_init,
-                              probDetect = rbeta(1, 250, 750),
+                              probDetect = rbeta(1, constantsList$detectA, constantsList$detectB),
                               beta = runif(1, 1/7, 1),
                               gamma1 = rgamma(1, 2, 10), # IR
                               gamma2 = rgamma(1, 2, 10), # HR
@@ -164,7 +184,7 @@ getModelInput <- function(incData, modelType, assumeType,
         
         ### inits 
         initsList <- list(comp_init = comp_init,
-                          probDetect = rbeta(1, 250, 750),
+                          probDetect = rbeta(1, constantsList$detectA, constantsList$detectB),
                           beta = runif(1, 1/7, 1),
                           nuC = runif(1, 1, 10),
                           x0C = runif(1, minC, maxC),
@@ -194,7 +214,7 @@ getModelInput <- function(incData, modelType, assumeType,
             
             ### inits 
             initsList <- list(comp_init = comp_init,
-                              probDetect = rbeta(1, 250, 750),
+                              probDetect = rbeta(1, constantsList$detectA, constantsList$detectB),
                               beta = runif(1, 1/7, 1),
                               gamma1 = rgamma(1, 2, 10), # IR
                               gamma2 = rgamma(1, 2, 10), # HR
@@ -229,7 +249,7 @@ getModelInput <- function(incData, modelType, assumeType,
         
         ### inits 
         initsList <- list(comp_init = comp_init,
-                          probDetect = rbeta(1, 250, 750),
+                          probDetect = rbeta(1, constantsList$detectA, constantsList$detectB),
                           beta = runif(1, 1/7, 1),
                           w0 = rnorm(1, 5, 0.5),
                           k = rgamma(1, 100, 100))
@@ -249,13 +269,13 @@ getModelInput <- function(incData, modelType, assumeType,
         dataList$detectIstar <- NULL
         dataList$Istar <- incData
         
-        
     }
+   
     
     ### MCMC specifications
-    niter <- 500000
-    nburn <- 200000
-    nthin <- 10
+    niter <- 800000
+    nburn <- 400000
+    nthin <- 20
     
     list(constantsList = constantsList,
          dataList = dataList,

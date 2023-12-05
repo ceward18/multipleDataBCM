@@ -119,7 +119,7 @@ for (i in batchIdx) {
     
     # run three chains in parallel
     cl <- makeCluster(3)
-    clusterExport(cl, list('incData', 'modelType_i', 'assumeType_i',
+    clusterExport(cl, list('incData', 'modelType_i', 'assumeType_i', 'peak_i',
                            'smoothC', 'smoothD', 
                            'deathData', 'hospData',
                            'N', 'S0', 'I0', 'H0', 'D0', 'R0'))
@@ -133,7 +133,7 @@ for (i in batchIdx) {
         
         # debugonce(fitAlarmModel)
         fitAlarmModel(incData = incData, modelType = modelType_i,
-                      assumeType = assumeType_i,
+                      assumeType = assumeType_i, peak = peak_i, 
                       smoothC = smoothC, smoothD = smoothD, 
                       deathData = deathData, hospData = hospData,
                       N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0,
@@ -147,6 +147,7 @@ for (i in batchIdx) {
     # debugonce(summarizePost)
     postSummaries <- summarizePost(resThree = resThree, incData = incData,
                                    modelType = modelType_i, assumeType = assumeType_i,
+                                   peak = peak_i, 
                                    smoothC = smoothC, smoothD = smoothD,
                                    hospData = hospData, deathData = deathData,
                                    N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0,

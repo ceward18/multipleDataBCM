@@ -5,13 +5,13 @@
 # called from summarize post after samples have been combined across chains
 ################################################################################
 
-getWAIC <- function(samples, modelType, assumeType,
+getWAIC <- function(samples, modelType, assumeType, peak,
                     smoothC, smoothD,
                     hospData, deathData,
                     N, S0, I0, H0, D0, R0) {
     
     # model-specific constants, data, and inits
-    modelInputs <- getModelInput(incData, modelType, assumeType,
+    modelInputs <- getModelInput(incData, modelType, assumeType, peak,
                                  smoothC, smoothD,
                                  hospData, deathData,
                                  N, S0, I0, H0, D0, R0)

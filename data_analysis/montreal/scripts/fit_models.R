@@ -2,7 +2,7 @@
 # function to fit models 
 ################################################################################
 
-fitAlarmModel <- function(incData, modelType, assumeType,
+fitAlarmModel <- function(incData, modelType, assumeType, peak,
                           smoothC, smoothD, hospData, deathData, 
                           N, S0, I0, H0, D0, R0, seed) {
     
@@ -14,7 +14,7 @@ fitAlarmModel <- function(incData, modelType, assumeType,
     set.seed(seed + 3)
     
     # model-specific constants, data, and inits
-    modelInputs <- getModelInput(incData, modelType, assumeType,
+    modelInputs <- getModelInput(incData, modelType, assumeType, peak,
                                  smoothC, smoothD,
                                  hospData, deathData,
                                  N, S0, I0, H0, D0, R0)
@@ -124,8 +124,8 @@ fitAlarmModel <- function(incData, modelType, assumeType,
     
     if (assumeType == 'undetected') {
         
-        myConfig$removeSampler('probDetect')
-        myConfig$addSampler(target = 'probDetect', type = "slice")
+        # myConfig$removeSampler('probDetect')
+        # myConfig$addSampler(target = 'probDetect', type = "slice")
         
         myConfig$removeSamplers('Istar') # Nodes will be expanded
         myConfig$addSampler(target = c('Istar'),

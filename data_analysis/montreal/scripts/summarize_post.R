@@ -16,7 +16,7 @@ source('./scripts/get_model_inputs.R')
 source('./scripts/get_WAIC.R')
 source('./scripts/post_pred_fit.R')
 
-summarizePost <- function(resThree, incData, modelType, assumeType,
+summarizePost <- function(resThree, incData, modelType, assumeType, peak,
                           smoothC, smoothD, hospData, deathData,
                           N, S0, I0, H0, D0, R0, Istar0, Dstar0) {
     
@@ -60,7 +60,7 @@ summarizePost <- function(resThree, incData, modelType, assumeType,
     ### posterior distribution of alarm function over range observed
     
     # get xC and xD (range of observed incidence/deaths)
-    modelInputs <- getModelInput(incData, modelType, assumeType,
+    modelInputs <- getModelInput(incData, modelType, assumeType, peak,
                                  smoothC, smoothD,
                                  hospData, deathData,
                                  N, S0, I0, H0, D0, R0)
@@ -189,7 +189,6 @@ summarizePost <- function(resThree, incData, modelType, assumeType,
     } else if (assumeType == 'casesOnly') {
         
         postIstar <- data.frame(time = NA,
-                                truth = NA,
                                 obs = NA,
                                 mean = NA,
                                 lower = NA,
@@ -203,7 +202,7 @@ summarizePost <- function(resThree, incData, modelType, assumeType,
     samples <- rbind(resThree[[1]], resThree[[2]], resThree[[3]])
     
     waic <- getWAIC(samples = samples, modelType = modelType, 
-                    assumeType = assumeType,
+                    assumeType = assumeType, peak = peak,
                     smoothC = smoothC, smoothD = smoothD,
                     hospData = hospData, deathData = deathData,
                     N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0)
@@ -214,7 +213,7 @@ summarizePost <- function(resThree, incData, modelType, assumeType,
     
     if (modelType %in% c('SIHRD_full', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')) {
         postPred <- postPredFit(incData = incData, modelType = modelType,
-                                assumeType = assumeType,
+                                assumeType = assumeType, peak = peak,
                                 smoothC = smoothC, smoothD = smoothD, 
                                 hospData = hospData, deathData = deathData, 
                                 paramsSamples = samples,

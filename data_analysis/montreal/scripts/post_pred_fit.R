@@ -4,13 +4,13 @@
 
 # can only run if modelType %in% 'SIHRD_full', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')
 
-postPredFit <- function(incData, modelType, assumeType,
+postPredFit <- function(incData, modelType, assumeType, peak,
                         smoothC, smoothD, hospData, deathData, 
                         paramsSamples, N, S0, I0, H0, D0, R0,
                         Istar0, Dstar0) {
     
     # model-specific constants, data, and inits
-    modelInputs <- getModelInput(incData, modelType, assumeType,
+    modelInputs <- getModelInput(incData, modelType, assumeType, peak,
                                  smoothC, smoothD,
                                  hospData, deathData,
                                  N, S0, I0, H0, D0, R0)
