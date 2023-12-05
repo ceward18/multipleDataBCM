@@ -176,7 +176,9 @@ getModelInput <- function(incData, modelType, assumeType, peak,
                               maxC = maxC,
                               n = n,
                               xC = xC,
-                              maxInf = maxInf)
+                              maxInf = maxInf,
+                              detectA = detectA,
+                              detectB = detectB)
         
         ### data
         dataList <- list(detectIstar = incData,
@@ -203,7 +205,9 @@ getModelInput <- function(incData, modelType, assumeType, peak,
         constantsList <- list(tau = tau,
                               N = N,
                               initProb = initProb,
-                              maxInf = maxInf)
+                              maxInf = maxInf,
+                              detectA = detectA,
+                              detectB = detectB)
         
         ### data
         dataList <- list(detectIstar = incData,
@@ -242,7 +246,9 @@ getModelInput <- function(incData, modelType, assumeType, peak,
         constantsList <- list(tau = tau,
                               N = N,
                               initProb = initProb,
-                              maxInf = maxInf)
+                              maxInf = maxInf,
+                              detectA = detectA,
+                              detectB = detectB)
         
         ### data
         dataList <- list(detectIstar = incData)
@@ -262,6 +268,8 @@ getModelInput <- function(incData, modelType, assumeType, peak,
     
     
     if (assumeType == 'casesOnly') {
+        constantsList$detectA <- NULL
+        constantsList$detectB <- NULL
         initsList$probDetect <- NULL
         initsList$Istar <- NULL
         
