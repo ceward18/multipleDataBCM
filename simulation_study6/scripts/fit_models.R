@@ -30,7 +30,6 @@ fitAlarmModel <- function(incData, modelType, assumeType, alarmBase,
                            inits = modelInputs$initsList)
     myConfig <- configureMCMC(myModel)
 
-    
     myConfig$addMonitors('R0')
     
     if (modelType == 'full') {
@@ -117,13 +116,13 @@ fitAlarmModel <- function(incData, modelType, assumeType, alarmBase,
     
     if (assumeType == 'undetected') {
         
-        myConfig$removeSampler('probDetect')
-        myConfig$addSampler(target = 'probDetect', type = "slice")
+        # myConfig$removeSampler('probDetect')
+        # myConfig$addSampler(target = 'probDetect', type = "slice")
         
         myConfig$removeSamplers('Istar') # Nodes will be expanded
         myConfig$addSampler(target = c('Istar'),
                             type = "RstarUpdate",
-                            control = list(nUpdates = 1000))
+                            control = list(nUpdates = 2000))
         myConfig$addMonitors(c('Istar'))
         
     }

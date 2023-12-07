@@ -16,6 +16,7 @@ source('./scripts/model_code.R')
 nSim <- 50
 dataType <- c('inc', 'death', 'equal')
 modelType <- c('simple', 'full', 'inc', 'simpleNoAlarm', 'fullNoAlarm')
+# SIR inc+deaths, SIHRD inc+deaths, SIR inc, SIR no alarm, SIHRD no alarm
 assumeType <- c('undetected', 'casesOnly')
 
 # 1500
@@ -74,14 +75,14 @@ for (i in batchIdx) {
         source('./scripts/fit_models.R')
         
         # debugonce(fitAlarmModel), 
-
+        
         fitAlarmModel(incData = incData, modelType = modelType_i, 
                       assumeType = assumeType_i,
                       smoothC = smoothC,  smoothD = smoothD,
                       hospData = hospData, deathData = deathData, seed = x)
     })
     stopCluster(cl)
-  
+    
     
     # true incidence (to compare to estimated)
     trueInc <- simData[simNumber_i, grep('^Istar', colnames(simData))]
@@ -104,7 +105,7 @@ for (i in batchIdx) {
         
         saveRDS(resThree,
                 paste0('./output/chains_', dataType_i, '_', modelType_i,
-                       '_', sprintf("%03d", simNumber_i), '.rds'))
+                       '_', assumeType_i, '_',  sprintf("%03d", simNumber_i), '.rds'))
     }
     
     
@@ -121,6 +122,7 @@ for (i in batchIdx) {
         paramsPost <- cbind.data.frame(postSummaries$postParams, modelInfo)
         alarmPost <- cbind.data.frame(postSummaries$postAlarm, modelInfo)
         alarmTimePost <- cbind.data.frame(postSummaries$postAlarmTime, modelInfo)
+        R0Post <- cbind.data.frame(postSummaries$postR0, modelInfo)
         IstarPost <- cbind.data.frame(postSummaries$postIstar, modelInfo)
         waicPost <- cbind.data.frame(postSummaries$waic, modelInfo)
         predFitPost <- cbind.data.frame(postSummaries$postPredictFit, modelInfo)
@@ -134,6 +136,8 @@ for (i in batchIdx) {
                                       cbind.data.frame(postSummaries$postAlarm, modelInfo))
         alarmTimePost <- rbind.data.frame(alarmTimePost, 
                                           cbind.data.frame(postSummaries$postAlarmTime, modelInfo))
+        R0Post <- rbind.data.frame(R0Post, 
+                                   cbind.data.frame(postSummaries$postR0, modelInfo))
         IstarPost <- rbind.data.frame(IstarPost, 
                                       cbind.data.frame(postSummaries$postIstar, modelInfo))
         waicPost <- rbind.data.frame(waicPost, 
@@ -152,6 +156,7 @@ saveRDS(gr, paste0('./output/gr_Batch', idxPrint, '.rds'))
 saveRDS(paramsPost, paste0('./output/paramsPost_Batch', idxPrint, '.rds'))
 saveRDS(alarmPost, paste0('./output/alarmPost_Batch', idxPrint, '.rds'))
 saveRDS(alarmTimePost, paste0('./output/alarmTimePost_Batch', idxPrint, '.rds'))
+saveRDS(R0Post, paste0('./output/R0Post_Batch', idxPrint, '.rds'))
 saveRDS(IstarPost, paste0('./output/IstarPost_Batch', idxPrint, '.rds'))
 saveRDS(waicPost, paste0('./output/waicPost_Batch', idxPrint, '.rds'))
 saveRDS(predFitPost, paste0('./output/predFitPostBatch', idxPrint, '.rds'))

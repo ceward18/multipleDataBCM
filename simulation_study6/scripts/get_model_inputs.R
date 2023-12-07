@@ -85,7 +85,7 @@ getModelInput <- function(incData, modelType, assumeType, smoothC, smoothD,
                               w0 = rnorm(1, 5, 0.5),
                               k = rgamma(1, 100, 100))
             
-            initsList$Istar <- round(incData / initsList$probDetect)
+            initsList$Istar <- round(incData / 0.25)
             
             delta <- multiBeta(initsList$Z)
             
@@ -117,7 +117,7 @@ getModelInput <- function(incData, modelType, assumeType, smoothC, smoothD,
                               RstarI = round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)])),
                               RstarH = round(0.3 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
             
-            initsList$Istar <- round(incData / initsList$probDetect)
+            initsList$Istar <- round(incData / 0.25)
             
             probIH <- 1 - exp(-initsList$lambda)
             probIR <- 1 - exp(-initsList$gamma1)
@@ -163,7 +163,7 @@ getModelInput <- function(incData, modelType, assumeType, smoothC, smoothD,
                           w0 = rnorm(1, 3, 0.5),
                           k = rgamma(1, 100, 100))
         
-        initsList$Istar <- round(incData / initsList$probDetect)
+        initsList$Istar <- round(incData / 0.25)
         
         
         # end modeltype == 'inc'
@@ -194,7 +194,7 @@ getModelInput <- function(incData, modelType, assumeType, smoothC, smoothD,
                               RstarI = round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)])),
                               RstarH = round(0.3 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
             
-            initsList$Istar <- round(incData / initsList$probDetect)
+            initsList$Istar <- round(incData / 0.25)
             
             probIH <- 1 - exp(-initsList$lambda)
             probIR <- 1 - exp(-initsList$gamma1)
@@ -225,7 +225,7 @@ getModelInput <- function(incData, modelType, assumeType, smoothC, smoothD,
                           w0 = rnorm(1, 5, 0.5),
                           k = rgamma(1, 100, 100))
         
-        initsList$Istar <- round(incData / initsList$probDetect)
+        initsList$Istar <- round(incData / 0.25)
         
         # end modeltype == 'simpleNoAlarm'
         
@@ -238,15 +238,13 @@ getModelInput <- function(incData, modelType, assumeType, smoothC, smoothD,
         # change data
         dataList$detectIstar <- NULL
         dataList$Istar <- incData
-        
-        
+
     }
     
     ### MCMC specifications
     niter <- 8e5
     nburn <- 4e5
     nthin <- 20
-    
     
     list(constantsList = constantsList,
          dataList = dataList,

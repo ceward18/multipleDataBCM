@@ -150,6 +150,23 @@ summarizePost <- function(resThree, incData, modelType, assumeType,
     
     
     ##############################################################################
+    ### posterior distribution of R0
+    
+    R0Samples1 <- resThree[[1]][,grep('R0', colnames(resThree[[1]]))]
+    R0Samples2 <- resThree[[2]][,grep('R0', colnames(resThree[[2]]))]
+    R0Samples3 <- resThree[[3]][,grep('R0', colnames(resThree[[3]]))]
+    R0Samples <- rbind(R0Samples1, R0Samples2, R0Samples3)
+    
+    postMeans <- colMeans(R0Samples)
+    postCI <- apply(R0Samples, 2, quantile, probs = c(0.025, 0.975))
+    
+    postR0 <- data.frame(time = 1:length(postMeans),
+                         mean = postMeans,
+                         lower = postCI[1,],
+                         upper = postCI[2,])
+    
+    
+    ##############################################################################
     ### posterior distribution of total incidence vs. observed incidence
     
     if (assumeType == 'undetected') {
@@ -258,6 +275,7 @@ summarizePost <- function(resThree, incData, modelType, assumeType,
          postParams = postParams,
          postAlarm = postAlarm,
          postAlarmTime = postAlarmTime,
+         postR0 = postR0,
          postIstar = postIstar,
          waic = waic,
          postPredictFit = postPredictFit)
