@@ -28,7 +28,7 @@ allFits <- expand.grid(simNumber = 1:nSim,
 
 # 300
 tmp <- allFits[seq(1,nrow(allFits), 5),]
-# rownames(tmp) <- NULL
+rownames(tmp) <- NULL
 
 ################################################################################
 

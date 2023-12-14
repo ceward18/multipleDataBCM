@@ -250,10 +250,10 @@ SIHRD_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(0.1, 0.1) # IR
-    gamma2 ~ dgamma(0.1, 0.1) # HR
-    lambda ~ dgamma(0.1, 0.1) # IH
-    phi ~ dgamma(0.1, 0.1)    # HD
+    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
+    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
+    lambda ~ dgamma(5, 100) # IH (mean 0.05)
+    phi ~ dgamma(10, 100)    # HD (mean 0.1)
     
     # alarm functions - priors don't matter as this is used for simulation only
     deltaC ~ dbeta(1, 1)
@@ -340,10 +340,10 @@ SIHRD_full_undetected <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
-    gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
-    lambda ~ dgamma(0.5, 10) # IH (mean 0.05)
-    phi ~ dgamma(1, 10)    # HD (mean 0.1)
+    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
+    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
+    lambda ~ dgamma(5, 100) # IH (mean 0.05)
+    phi ~ dgamma(10, 100)    # HD (mean 0.1)
     
     # alarm functions
     
@@ -451,10 +451,10 @@ SIHRD_full_undetected_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
-    gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
-    lambda ~ dgamma(1, 10) # IH (mean 0.1)
-    phi ~ dgamma(1, 10)    # HD (mean 0.1)
+    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
+    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
+    lambda ~ dgamma(5, 100) # IH (mean 0.05)
+    phi ~ dgamma(10, 100)    # HD (mean 0.1)
     
     # alarm functions
     
@@ -542,10 +542,10 @@ SIHRD_full_casesOnly <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
-    gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
-    lambda ~ dgamma(0.5, 10) # IH (mean 0.05)
-    phi ~ dgamma(1, 10)    # HD (mean 0.1)
+    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
+    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
+    lambda ~ dgamma(5, 100) # IH (mean 0.05)
+    phi ~ dgamma(10, 100)    # HD (mean 0.1)
     
     # alarm functions
     
@@ -646,10 +646,10 @@ SIHRD_full_casesOnly_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
-    gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
-    lambda ~ dgamma(1, 10) # IH (mean 0.1)
-    phi ~ dgamma(1, 10)    # HD (mean 0.1)
+    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
+    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
+    lambda ~ dgamma(5, 100) # IH (mean 0.05)
+    phi ~ dgamma(10, 100)    # HD (mean 0.1)
     
     # alarm functions
     
@@ -728,10 +728,10 @@ SIHRD_fullNoAlarm_undetected <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
-    gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
-    lambda ~ dgamma(0.5, 10) # IH (mean 0.05)
-    phi ~ dgamma(1, 10)    # HD (mean 0.1)
+    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
+    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
+    lambda ~ dgamma(5, 100) # IH (mean 0.05)
+    phi ~ dgamma(10, 100)    # HD (mean 0.1)
     
 })
 
@@ -791,10 +791,10 @@ SIHRD_fullNoAlarm_casesOnly <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
-    gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
-    lambda ~ dgamma(0.5, 10) # IH (mean 0.05)
-    phi ~ dgamma(1, 10)    # HD (mean 0.1)
+    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
+    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
+    lambda ~ dgamma(5, 100) # IH (mean 0.05)
+    phi ~ dgamma(10, 100)    # HD (mean 0.1)
     
 })
 
@@ -1336,7 +1336,7 @@ RstarUpdate <- nimbleFunction(
         # percent <- if(!is.null(control$percent)) control$percent else 0.05   
         
         # number of update attempts at each iteration
-        nUpdates <- if(!is.null(control$nUpdates)) control$nUpdates else 200
+        nUpdates <- if(!is.null(control$nUpdates)) control$nUpdates else 500
 
     },                                                                  # setup can't return anything
     run = function() {
