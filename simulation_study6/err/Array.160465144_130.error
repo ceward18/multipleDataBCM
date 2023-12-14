@@ -100,3 +100,4 @@ Compiling
 Compiling
   [Note] This may take a minute.
   [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.
+slurmstepd: error: *** JOB 160467997 ON cn1009 CANCELLED AT 2023-12-12T18:22:11 DUE TO TIME LIMIT ***
