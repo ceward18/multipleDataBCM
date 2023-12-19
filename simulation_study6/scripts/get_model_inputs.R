@@ -77,8 +77,8 @@ getModelInput <- function(incData, modelType, assumeType, smoothC, smoothD,
             initsList <- list(comp_init = comp_init,
                               probDetect = rbeta(1, 250, 750),
                               beta = runif(1, 1/7, 1),
-                              nuC = rinvgamma(1, 7, 26),
-                              nuD = rinvgamma(1, 7, 26),
+                              nuC = rinvgamma(1, 11, 40),
+                              nuD = rinvgamma(1, 11, 40),
                               x0C = runif(1, minC + 1, maxC/4),
                               x0D = runif(1, minD + 1, maxD/4),
                               Z = rmnorm_chol(1, rep(0, 2), chol(Sigma), prec_param = FALSE),
@@ -105,12 +105,12 @@ getModelInput <- function(incData, modelType, assumeType, smoothC, smoothD,
             initsList <- list(comp_init = comp_init,
                               probDetect = rbeta(1, 250, 750),
                               beta = runif(1, 1/7, 1),
-                              gamma1 = rgamma(1, 2, 10), # IR
-                              gamma2 = rgamma(1, 2, 10), # HR
-                              lambda = rgamma(1, 1, 10), # IH
-                              phi = rgamma(1, 1, 10) ,   # HD
-                              nuC = rinvgamma(1, 7, 26),
-                              nuD = rinvgamma(1, 7, 26),
+                              gamma1 = rgamma(1, 20, 100), # IR
+                              gamma2 = rgamma(1, 20, 100), # HR
+                              lambda = rgamma(1, 3, 100), # IH
+                              phi = rgamma(1, 10, 100) ,   # HD
+                              nuC = rinvgamma(1, 11, 40),
+                              nuD = rinvgamma(1, 11, 40),
                               x0C = runif(1, minC + 1, maxC/4),
                               x0D = runif(1, minD + 1, maxD/4),
                               Z = rmnorm_chol(1, rep(0, 2), chol(Sigma), prec_param = FALSE),
@@ -187,10 +187,10 @@ getModelInput <- function(incData, modelType, assumeType, smoothC, smoothD,
             initsList <- list(comp_init = comp_init,
                               probDetect = rbeta(1, 250, 750),
                               beta = runif(1, 1/7, 1),
-                              gamma1 = rgamma(1, 2, 10), # IR
-                              gamma2 = rgamma(1, 2, 10), # HR
-                              lambda = rgamma(1, 1, 10), # IH
-                              phi = rgamma(1, 1, 10) ,   # HD
+                              gamma1 = rgamma(1, 20, 100), # IR
+                              gamma2 = rgamma(1, 20, 100), # HR
+                              lambda = rgamma(1, 3, 100), # IH
+                              phi = rgamma(1, 10, 100) ,   # HD
                               RstarI = round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)])),
                               RstarH = round(0.3 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
             

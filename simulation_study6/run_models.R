@@ -51,12 +51,12 @@ for (i in batchIdx) {
     # load data
     simData <- readRDS(paste0('./data/sim_', dataType_i, '.rds'))
     
-    # gather incidence, hospitalizations, and deaths
+    # gather cases, hospitalizations, and deaths
     incData <- simData[simNumber_i, grep('detectIstar', colnames(simData))]
     hospData <- simData[simNumber_i, grep('fromI.*1\\]', colnames(simData))]
     deathData <- simData[simNumber_i, grep('fromH.*2\\]', colnames(simData))]
     
-    # smoothed incidence/hosp/deaths to inform alarm function 
+    # smoothed cases/hosp/deaths to inform alarm function 
     # (shifted so alarm is informed only by data up to time t-1)
     smoothC <- head(movingAverage(c(0, incData), 30), -1)
     smoothD <- head(movingAverage(c(0, deathData), 30), -1)

@@ -34,7 +34,7 @@ for (dataType in c('inc', 'death', 'equal')) {
     deathData <- simData[, grep('fromH.*2\\]', colnames(simData))]
     
     plotTitle <- switch(dataType,
-                        'inc' = 'High incidence importance',
+                        'inc' = 'High cases importance',
                         'death' = 'High deaths importance',
                         'equal' = 'Equal importance')
     
@@ -91,7 +91,7 @@ paramsPostAll <- paramsPostAll[order(paramsPostAll$dataType,
 
 paramsPostAll$dataType <- factor(paramsPostAll$dataType,
                                  levels = c('inc', 'death', 'equal'),
-                                 labels = c('Incidence importance',
+                                 labels = c('Cases importance',
                                             'Deaths importance',
                                             'Equal importance'))
 
@@ -111,9 +111,9 @@ paramsPostAll$param <- factor(paramsPostAll$param,
 
 paramsPostAll$modelType <- factor(paramsPostAll$modelType,
                                   levels = c('full', 'simple', 'inc'),
-                                  labels = c('SIHRD incidence + deaths', 
-                                             'SIR incidence + deaths',
-                                             'SIR incidence only'))
+                                  labels = c('SIHRD cases + deaths', 
+                                             'SIR cases + deaths',
+                                             'SIR cases only'))
 
 paramsPostAll$assumeType <- factor(paramsPostAll$assumeType,
                                    levels = c('casesOnly', 'undetected'),
@@ -126,8 +126,8 @@ paramsPostAll$assumeType <- factor(paramsPostAll$assumeType,
 toReuse <- sample(c(1:10, 16:50), 5)
 
 reuseDat <- paramsPostAll[paramsPostAll$assumeType == 'Cases Only' & 
-                              paramsPostAll$modelType == 'SIHRD incidence + deaths' & 
-                              paramsPostAll$dataType == 'Incidence importance' &
+                              paramsPostAll$modelType == 'SIHRD cases + deaths' & 
+                              paramsPostAll$dataType == 'Cases importance' &
                               paramsPostAll$param %in% c('delta[C]', 'delta[D]') & 
                               paramsPostAll$simNumber %in% toReuse,]
 reuseDat$simNumber <- rep(11:15, each = 2)
@@ -156,7 +156,9 @@ ggplot(data = subset(paramsPostAll,
           strip.text = element_text(size = 12),
           axis.title = element_text(size = 12),
           axis.text = element_text(size = 10),
-          plot.title = element_text(size = 14, h = 0.5)) + 
+          plot.title = element_text(size = 14, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) + 
     guides(col = 'none')
 dev.off()
 
@@ -207,7 +209,8 @@ dev.off()
 # Posterior predictive fit
 
 postPredFitAll <- readRDS('./results/postPredFitAll.rds')
-
+postPredFitAll$marg[postPredFitAll$marg == 'inc' &
+                        postPredFitAll$assumeType == 'casesOnly'] <- 'cases'
 
 postPredFitSim <- list()
 
@@ -217,6 +220,7 @@ for (i in 1:8) {
         simData <- readRDS(paste0('./data/sim_', dataType, '.rds'))
         
         incData <- simData[i, grep('^Istar', colnames(simData))]
+        caseData <- simData[i, grep('detect', colnames(simData))]
         hospData <- simData[i, grep('fromI.*1\\]', colnames(simData))]
         deathData <- simData[i, grep('fromH.*2\\]', colnames(simData))]
         
@@ -224,8 +228,8 @@ for (i in 1:8) {
         
         
         trueEpi <- data.frame(time = 1:tau,
-                              truth = c(incData, hospData, deathData),
-                              marg = rep(c('inc', 'hosp', 'death'), each = tau),
+                              truth = c(incData, caseData, hospData, deathData),
+                              marg = rep(c('inc', 'cases', 'hosp', 'death'), each = tau),
                               dataType = dataType)
         
         assign(paste0('trueEpidemic', tools::toTitleCase(dataType)), trueEpi)
@@ -244,13 +248,14 @@ postPredFitSimFinal <- do.call('rbind.data.frame', postPredFitSim)
 
 postPredFitSimFinal$dataType <- factor(postPredFitSimFinal$dataType,
                                        levels = c('inc', 'death', 'equal'),
-                                       labels = c('Incidence importance',
+                                       labels = c('Cases importance',
                                                   'Deaths importance',
                                                   'Equal importance'))
 
 postPredFitSimFinal$marg <- factor(postPredFitSimFinal$marg, 
-                                   levels = c('inc', 'hosp', 'death'),
-                                   labels = c('Incidence', 'Hospitalizations',
+                                   levels = c('inc', 'cases', 'hosp', 'death'),
+                                   labels = c('True Incidence', 'Observed Cases',
+                                              'Hospitalizations',
                                               'Deaths'))
 
 postPredFitSimFinal$modelType <- factor(postPredFitSimFinal$modelType,
@@ -258,8 +263,8 @@ postPredFitSimFinal$modelType <- factor(postPredFitSimFinal$modelType,
                                                    'inc', 
                                                    'fullNoAlarm', 
                                                    'simpleNoAlarm'),
-                                        labels = c('SIHRD incidence + deaths',
-                                                   'SIR incidence only',
+                                        labels = c('SIHRD cases + deaths',
+                                                   'SIR cases only',
                                                    'SIHRD no alarm',
                                                    'SIR no alarm'))
 
@@ -277,21 +282,23 @@ postPredFitSimFinal$assumeType <- factor(postPredFitSimFinal$assumeType,
                                                     'Undetected'))
 
 p1 <- ggplot(subset(postPredFitSimFinal, simNumber == 1 & 
-                        modelType %in% c('SIHRD incidence + deaths', 'SIR incidence only')), 
+                        modelType %in% c('SIHRD cases + deaths', 'SIR cases only')), 
              aes(x = time, ymin = lower, ymax = upper, col = marg, fill = marg)) + 
     geom_line(linewidth = 0.5, aes(y = truth)) +
     geom_line(aes(y = mean), linetype = 2, linewidth = 0.5) + 
     geom_ribbon(alpha = 0.3) +
     facet_nested(dataType~modelType + assumeType,  scales = 'free_y') +
-    scale_color_manual(values = c('grey45', 'goldenrod2', 'royalblue')) + 
-    scale_fill_manual(values = c('grey45', 'goldenrod2', 'royalblue')) +
+    scale_color_manual(values = c('grey50', 'black', 'goldenrod2', 'royalblue')) + 
+    scale_fill_manual(values = c('grey50', 'black', 'goldenrod2', 'royalblue')) +
     theme_bw() + 
     theme(strip.placement = "outside",
           strip.background = element_rect(fill = 'white'),
           strip.text = element_text(size = 10),
           axis.title = element_text(size = 10),
           axis.text = element_text(size = 8),
-          plot.title = element_text(size = 12, h = 0.5)) +
+          plot.title = element_text(size = 12, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
     labs(y = 'Epidemic Time', x = 'Count') + 
     guides(fill = 'none', col = 'none')
 
@@ -303,8 +310,8 @@ p2 <- ggplot(subset(postPredFitSimFinal, simNumber == 1 &
     geom_line(aes(y = mean), linetype = 2, linewidth = 0.5) + 
     geom_ribbon(alpha = 0.3) +
     facet_nested(dataType~modelType + assumeType,  scales = 'free_y') +
-    scale_color_manual(values = c('grey45', 'goldenrod2', 'royalblue')) + 
-    scale_fill_manual(values = c('grey45', 'goldenrod2', 'royalblue')) + 
+    scale_color_manual(values = c('grey50', 'black', 'goldenrod2', 'royalblue')) + 
+    scale_fill_manual(values = c('grey50', 'black', 'goldenrod2', 'royalblue')) +
     theme_bw() + 
     ylim(0, 200) +
     theme(strip.placement = "outside",
@@ -312,7 +319,9 @@ p2 <- ggplot(subset(postPredFitSimFinal, simNumber == 1 &
           strip.text = element_text(size = 10),
           axis.title = element_text(size = 10),
           axis.text = element_text(size = 8),
-          plot.title = element_text(size = 12, h = 0.5)) +
+          plot.title = element_text(size = 12, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
     labs(y = 'Epidemic Time', x = 'Count',
          col = '', fill = '')
 

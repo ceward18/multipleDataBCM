@@ -46,7 +46,7 @@ SIR_sim_model <- nimbleModel(code = SIHRD_sim,
                              constants = constantsList)
 SIR_sim_model_C <- compileNimble(SIR_sim_model)
 
-dataNodes <- c('Istar', 'detectIstar', 'fromI', 'fromH')
+dataNodes <- c('Istar', 'detectIstar', 'fromI', 'fromH', 'R0')
 dataNodes <- SIR_sim_model$expandNodeNames(dataNodes)
 sim_R <- simulator(SIR_sim_model, dataNodes)
 sim_C <- compileNimble(sim_R, project = SIR_sim_model)
@@ -65,10 +65,10 @@ trueVals <- c(probDetect = probDetect,
               lambda = lambda,
               phi = phi,
               deltaC = deltaC,
-              nuC = 3,
+              nuC = 5,
               x0C = 100,
               deltaD = deltaD,
-              nuD = 3,
+              nuD = 5,
               x0D = 15)
 
 set.seed(1)
@@ -113,10 +113,10 @@ trueVals <- c(probDetect = probDetect,
               lambda = lambda,
               phi = phi,
               deltaC = deltaC,
-              nuC = 3,
+              nuC = 5,
               x0C = 100,
               deltaD = deltaD,
-              nuD = 3,
+              nuD = 5,
               x0D = 15)
 
 set.seed(1)
@@ -160,10 +160,10 @@ trueVals <- c(probDetect = probDetect,
               lambda = lambda,
               phi = phi,
               deltaC = deltaC,
-              nuC = 3,
+              nuC = 5,
               x0C = 100,
               deltaD = deltaD,
-              nuD = 3,
+              nuD = 5,
               x0D = 15)
 
 set.seed(1)
