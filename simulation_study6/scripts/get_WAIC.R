@@ -5,12 +5,13 @@
 # called from summarize post after samples have been combined across chains
 ################################################################################
 
-getWAIC <- function(samples, modelType, assumeType, incData, smoothC, smoothD,
+getWAIC <- function(samples, modelType, assumeType, prior,
+                    incData, smoothC, smoothD,
                     hospData, deathData) {
     
     # model-specific constants, data, and inits
-    modelInputs <- getModelInput(incData, modelType, assumeType, smoothC, smoothD,
-                                 hospData, deathData)
+    modelInputs <- getModelInput(incData, modelType, assumeType, prior,
+                                 smoothC, smoothD, hospData, deathData)
     
     ### get appropriate model code
     modelCode <- get(paste0('SIHRD_', modelType, '_', assumeType))

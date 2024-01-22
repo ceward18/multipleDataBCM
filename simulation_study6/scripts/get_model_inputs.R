@@ -6,8 +6,8 @@
 ################################################################################
 
 
-getModelInput <- function(incData, modelType, assumeType, smoothC, smoothD,
-                          hospData, deathData) {
+getModelInput <- function(incData, modelType, assumeType, prior,
+                          smoothC, smoothD, hospData, deathData) {
     
     # constants that are the same for all models
     N <- 1e6
@@ -49,6 +49,26 @@ getModelInput <- function(incData, modelType, assumeType, smoothC, smoothD,
     sds <- rep(0.7, 2)
     Sigma <- diag(sds) %*% corMat %*% diag(sds)
     
+    # different priors on mean of Gaussian copula
+    if (prior == 1) {
+        
+        # equal importance on deaths and cases
+        zMean <- rep(0, 2)
+        
+    } else if (prior == 2) {
+        
+        # cases more important than deaths
+        zMean <- c(1, -1) * 0.8
+        
+    } else if (prior == 3) {
+        
+        # deaths more important than cases
+        zMean <- c(-1, 1) * 0.8
+        
+    }
+    
+    
+    
     constantsList <- list(tau = tau,
                           N = N,
                           initProb = initProb,
@@ -60,7 +80,7 @@ getModelInput <- function(incData, modelType, assumeType, smoothC, smoothD,
                           xC = xC,
                           xD = xD,
                           maxInf = maxInf,
-                          zeros = rep(0, 2),
+                          zMean = zMean,
                           Sigma = Sigma)
     
     ### data
@@ -242,9 +262,9 @@ getModelInput <- function(incData, modelType, assumeType, smoothC, smoothD,
     }
     
     ### MCMC specifications
-    niter <- 4e5
+    niter <- 3e5
     nburn <- 2e5
-    nthin <- 20
+    nthin <- 10
     
     list(constantsList = constantsList,
          dataList = dataList,

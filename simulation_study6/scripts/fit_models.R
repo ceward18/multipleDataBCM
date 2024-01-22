@@ -2,7 +2,7 @@
 # function to fit models 
 ################################################################################
 
-fitAlarmModel <- function(incData, modelType, assumeType, alarmBase, 
+fitAlarmModel <- function(incData, modelType, assumeType, prior, alarmBase, 
                           smoothC, smoothD, hospData, deathData, seed) {
     
     source('./scripts/model_code.R')
@@ -12,8 +12,8 @@ fitAlarmModel <- function(incData, modelType, assumeType, alarmBase,
     set.seed(seed + 3)
     
     # model-specific constants, data, and inits
-    modelInputs <- getModelInput(incData, modelType, assumeType, smoothC, smoothD,
-                                 hospData, deathData)
+    modelInputs <- getModelInput(incData, modelType, assumeType, prior,
+                                 smoothC, smoothD, hospData, deathData)
     
     ### MCMC specifications
     niter <- modelInputs$niter
@@ -122,7 +122,7 @@ fitAlarmModel <- function(incData, modelType, assumeType, alarmBase,
         myConfig$removeSamplers('Istar') # Nodes will be expanded
         myConfig$addSampler(target = c('Istar'),
                             type = "RstarUpdate",
-                            control = list(nUpdates = 3000))
+                            control = list(nUpdates = 5000))
         myConfig$addMonitors(c('Istar'))
         
     }

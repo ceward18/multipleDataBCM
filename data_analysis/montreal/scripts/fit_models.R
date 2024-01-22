@@ -130,7 +130,7 @@ fitAlarmModel <- function(incData, modelType, assumeType, peak,
         myConfig$removeSamplers('Istar') # Nodes will be expanded
         myConfig$addSampler(target = c('Istar'),
                             type = "RstarUpdate",
-                            control = list(nUpdates = 1000))
+                            control = list(nUpdates = 3000))
         # need to ensure all stochastic nodes are monitored for WAIC calculation
         myConfig$addMonitors(c('Istar'))
         

@@ -250,10 +250,10 @@ SIHRD_full_undetected <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
-    gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
-    lambda ~ dgamma(0.5, 10) # IH (mean 0.05)
-    phi ~ dgamma(1, 10)    # HD (mean 0.1)
+    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
+    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
+    lambda ~ dgamma(lambdaShape, lambdaRate) # IH (mean 0.05)
+    phi ~ dgamma(phiShape, phiRate)    # HD (mean 0.1)
     
     # alarm functions
     
@@ -261,8 +261,8 @@ SIHRD_full_undetected <-  nimbleCode({
     Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
     delta[1:2] <- multiBeta(Z[1:2])
     
-    nuC ~ dinvgamma(7, 26)
-    nuD ~ dinvgamma(7, 26)
+    nuC ~ dinvgamma(11, 40)
+    nuD ~ dinvgamma(11, 40)
     x0C ~ dunif(minC, maxC)
     x0D ~ dunif(minD, maxD)
     
@@ -361,10 +361,10 @@ SIHRD_full_undetected_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
-    gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
-    lambda ~ dgamma(1, 10) # IH (mean 0.1)
-    phi ~ dgamma(1, 10)    # HD (mean 0.1)
+    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
+    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
+    lambda ~ dgamma(lambdaShape, lambdaRate) # IH (mean 0.1)
+    phi ~ dgamma(phiShape, phiRate)    # HD (mean 0.1)
     
     # alarm functions
     
@@ -372,8 +372,8 @@ SIHRD_full_undetected_sim <-  nimbleCode({
     Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
     delta[1:2] <- multiBeta(Z[1:2])
     
-    nuC ~ dinvgamma(7, 26)
-    nuD ~ dinvgamma(7, 26)
+    nuC ~ dinvgamma(11, 40)
+    nuD ~ dinvgamma(11, 40)
     x0C ~ dunif(minC, maxC)
     x0D ~ dunif(minD, maxD)
     
@@ -452,10 +452,10 @@ SIHRD_full_casesOnly <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
-    gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
-    lambda ~ dgamma(0.5, 10) # IH (mean 0.05)
-    phi ~ dgamma(1, 10)    # HD (mean 0.1)
+    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
+    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
+    lambda ~ dgamma(lambdaShape, lambdaRate) # IH (mean 0.05)
+    phi ~ dgamma(phiShape, phiRate)    # HD (mean 0.1)
     
     # alarm functions
     
@@ -463,8 +463,8 @@ SIHRD_full_casesOnly <-  nimbleCode({
     Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
     delta[1:2] <- multiBeta(Z[1:2])
     
-    nuC ~ dinvgamma(7, 26)
-    nuD ~ dinvgamma(7, 26)
+    nuC ~ dinvgamma(11, 40)
+    nuD ~ dinvgamma(11, 40)
     x0C ~ dunif(minC, maxC)
     x0D ~ dunif(minD, maxD)
     
@@ -556,10 +556,10 @@ SIHRD_full_casesOnly_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
-    gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
-    lambda ~ dgamma(1, 10) # IH (mean 0.1)
-    phi ~ dgamma(1, 10)    # HD (mean 0.1)
+    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
+    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
+    lambda ~ dgamma(lambdaShape, lambdaRate) # IH (mean 0.1)
+    phi ~ dgamma(phiShape, phiRate)    # HD (mean 0.1)
     
     # alarm functions
     
@@ -567,8 +567,8 @@ SIHRD_full_casesOnly_sim <-  nimbleCode({
     Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
     delta[1:2] <- multiBeta(Z[1:2])
     
-    nuC ~ dinvgamma(7, 26)
-    nuD ~ dinvgamma(7, 26)
+    nuC ~ dinvgamma(11, 40)
+    nuD ~ dinvgamma(11, 40)
     x0C ~ dunif(minC, maxC)
     x0D ~ dunif(minD, maxD)
     
@@ -638,10 +638,10 @@ SIHRD_noAlarm_undetected <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
-    gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
-    lambda ~ dgamma(0.5, 10) # IH (mean 0.05)
-    phi ~ dgamma(1, 10)    # HD (mean 0.1)
+    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
+    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
+    lambda ~ dgamma(lambdaShape, lambdaRate) # IH (mean 0.05)
+    phi ~ dgamma(phiShape, phiRate)    # HD (mean 0.1)
     
 })
 
@@ -701,10 +701,10 @@ SIHRD_noAlarm_casesOnly <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(2, 10) # IR (mean 0.2)
-    gamma2 ~ dgamma(2, 10) # HR (mean 0.2)
-    lambda ~ dgamma(0.5, 10) # IH (mean 0.05)
-    phi ~ dgamma(1, 10)    # HD (mean 0.1)
+    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
+    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
+    lambda ~ dgamma(lambdaShape, lambdaRate) # IH (mean 0.05)
+    phi ~ dgamma(phiShape, phiRate)    # HD (mean 0.1)
     
 })
 
@@ -775,8 +775,8 @@ SIR_full_undetected <-  nimbleCode({
     Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
     delta[1:2] <- multiBeta(Z[1:2])
     
-    nuC ~ dinvgamma(7, 26)
-    nuD ~ dinvgamma(7, 26)
+    nuC ~ dinvgamma(11, 40)
+    nuD ~ dinvgamma(11, 40)
     x0C ~ dunif(minC, maxC)
     x0D ~ dunif(minD, maxD)
     
@@ -851,8 +851,8 @@ SIR_full_casesOnly <-  nimbleCode({
     Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
     delta[1:2] <- multiBeta(Z[1:2])
     
-    nuC ~ dinvgamma(7, 26)
-    nuD ~ dinvgamma(7, 26)
+    nuC ~ dinvgamma(11, 40)
+    nuD ~ dinvgamma(11, 40)
     x0C ~ dunif(minC, maxC)
     x0D ~ dunif(minD, maxD)
     
@@ -1024,7 +1024,7 @@ SIR_inc_undetected <-  nimbleCode({
     
     # alarm functions
     deltaC ~ dunif(0, 1)
-    nuC ~ dinvgamma(7, 26)
+    nuC ~ dinvgamma(11, 40)
     x0C ~ dunif(minC, maxC)
     
     # IDD Curve
@@ -1097,7 +1097,7 @@ SIR_inc_undetected_sim <-  nimbleCode({
     
     # alarm functions
     deltaC ~ dunif(0, 1)
-    nuC ~ dinvgamma(7, 26)
+    nuC ~ dinvgamma(11, 40)
     x0C ~ dunif(minC, maxC)
     
     # IDD Curve
@@ -1160,7 +1160,7 @@ SIR_inc_casesOnly <-  nimbleCode({
     
     # alarm functions
     deltaC ~ dunif(0, 1)
-    nuC ~ dinvgamma(7, 26)
+    nuC ~ dinvgamma(11, 40)
     x0C ~ dunif(minC, maxC)
     
     # IDD Curve
@@ -1226,7 +1226,7 @@ SIR_inc_casesOnly_sim <-  nimbleCode({
     
     # alarm functions
     deltaC ~ dunif(0, 1)
-    nuC ~ dinvgamma(7, 26)
+    nuC ~ dinvgamma(11, 40)
     x0C ~ dunif(minC, maxC)
     
     # IDD Curve

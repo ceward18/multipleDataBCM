@@ -4,13 +4,13 @@
 
 # can only run if modelType == 'full' or 'fullThresh' or 'inc'
 
-postPredFit <- function(incData, modelType, assumeType,
+postPredFit <- function(incData, modelType, assumeType, prior, 
                         smoothC, smoothD, hospData, deathData, 
                         paramsSamples) {
     
     # model-specific constants, data, and inits
-    modelInputs <- getModelInput(incData, modelType, assumeType, smoothC, smoothD,
-                                 hospData, deathData)
+    modelInputs <- getModelInput(incData, modelType, assumeType, prior,
+                                 smoothC, smoothD, hospData, deathData)
     
     modelInputs$constantsList$bw <- 30
     

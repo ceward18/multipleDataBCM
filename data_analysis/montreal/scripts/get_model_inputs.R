@@ -65,32 +65,50 @@ getModelInput <- function(incData, modelType, assumeType, peak,
     # wave 2: Aug 23, 2020 - March 20, 2021  40% detection
     # wave 3: March 21 - July 17, 2021       
     # wave 4: July 18 - Dec 4, 2021          20% detection
+    
+    # prior for hospitalization and death rates also depends on peak
     if (peak == 1) {
+        probDetectMean <- 0.25
         detectA <- 250
         detectB <- 750
+        
+        # hospitalization rate (lambda = 0.45)
+        lambdaShape <- 45
+        lambdaScale <- 100
+        
+        # death rate (phi = 0.8)
+        phiShape <- 80
+        phiScale <- 100
+        
+        
     } else if (peak == 2) {
+        probDetectMean <- 0.4
         detectA <- 400
         detectB <- 600
+        
+        # hospitalization rate (lambda = 0.05)
+        lambdaShape <- 5
+        lambdaScale <- 100
+        
+        # death rate (phi = 0.2)
+        phiShape <- 20
+        phiScale <- 100
+        
     } else if (peak == 4) {
+        probDetectMean <- 0.2
         detectA <- 200
         detectB <- 800
+        
+        # hospitalization rate (lambda = 0.05)
+        lambdaShape <- 5
+        lambdaScale <- 100
+        
+        # death rate (phi = 0.1)
+        phiShape <- 10
+        phiScale <- 100
     } 
     
-    constantsList <- list(tau = tau,
-                          N = N,
-                          initProb = initProb,
-                          minC = minC,
-                          minD = minD,
-                          maxC = maxC,
-                          maxD = maxD,
-                          n = n,
-                          xC = xC,
-                          xD = xD,
-                          maxInf = maxInf,
-                          zeros = rep(0, 2),
-                          Sigma = Sigma,
-                          detectA = detectA,
-                          detectB = detectB)
+    
     
     ### data
     dataList <- list(detectIstar = incData,
@@ -99,6 +117,23 @@ getModelInput <- function(incData, modelType, assumeType, peak,
                      constrain_deltas = 1)
     
     if (modelType == 'SIR_full') {
+        
+        constantsList <- list(tau = tau,
+                              N = N,
+                              initProb = initProb,
+                              minC = minC,
+                              minD = minD,
+                              maxC = maxC,
+                              maxD = maxD,
+                              n = n,
+                              xC = xC,
+                              xD = xD,
+                              maxInf = maxInf,
+                              zeros = rep(0, 2),
+                              Sigma = Sigma,
+                              detectA = detectA,
+                              detectB = detectB)
+        
         
         repeat {
             ### inits 
@@ -113,7 +148,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
                               w0 = rnorm(1, 5, 0.5),
                               k = rgamma(1, 100, 100))
             
-            initsList$Istar <- round(incData / initsList$probDetect)
+            initsList$Istar <- round(incData / probDetectMean)
             
             delta <- multiBeta(initsList$Z)
             
@@ -123,6 +158,26 @@ getModelInput <- function(incData, modelType, assumeType, peak,
         # end modeltype == 'SIR_full'
         
     } else if (modelType == 'SIHRD_full') {
+        
+        constantsList <- list(tau = tau,
+                              N = N,
+                              initProb = initProb,
+                              minC = minC,
+                              minD = minD,
+                              maxC = maxC,
+                              maxD = maxD,
+                              n = n,
+                              xC = xC,
+                              xD = xD,
+                              maxInf = maxInf,
+                              zeros = rep(0, 2),
+                              Sigma = Sigma,
+                              detectA = detectA,
+                              detectB = detectB,
+                              lambdaShape = lambdaShape,
+                              lambdaScale = lambdaScale,
+                              phiShape = phiShape,
+                              phiScale = phiScale)
         
         dataList$Hstar <- hospData
         dataList$Dstar <- deathData
@@ -146,7 +201,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
                               RstarH = round(0.01 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
             
             
-            initsList$Istar <- round(incData / initsList$probDetect)
+            initsList$Istar <- round(incData / probDetectMean)
             
             probIH <- 1 - exp(-initsList$lambda)
             probIR <- 1 - exp(-initsList$gamma1)
@@ -194,7 +249,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
                           w0 = rnorm(1, 3, 0.5),
                           k = rgamma(1, 100, 100))
         
-        initsList$Istar <- round(incData / initsList$probDetect)
+        initsList$Istar <- round(incData / probDetectMean)
         
         
         # end modeltype == 'SIR_inc'
@@ -207,7 +262,11 @@ getModelInput <- function(incData, modelType, assumeType, peak,
                               initProb = initProb,
                               maxInf = maxInf,
                               detectA = detectA,
-                              detectB = detectB)
+                              detectB = detectB,
+                              lambdaShape = lambdaShape,
+                              lambdaScale = lambdaScale,
+                              phiShape = phiShape,
+                              phiScale = phiScale)
         
         ### data
         dataList <- list(detectIstar = incData,
@@ -227,7 +286,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
                               RstarI = round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)])),
                               RstarH = round(0.01 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
             
-            initsList$Istar <- round(incData / initsList$probDetect)
+            initsList$Istar <- round(incData / probDetectMean)
             
             probIH <- 1 - exp(-initsList$lambda)
             probIR <- 1 - exp(-initsList$gamma1)
@@ -260,7 +319,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
                           w0 = rnorm(1, 5, 0.5),
                           k = rgamma(1, 100, 100))
         
-        initsList$Istar <- round(incData / initsList$probDetect)
+        initsList$Istar <- round(incData / probDetectMean)
         
         # end modeltype == 'SIR_noAlarm'
         
@@ -281,8 +340,8 @@ getModelInput <- function(incData, modelType, assumeType, peak,
    
     
     ### MCMC specifications
-    niter <- 800000
-    nburn <- 400000
+    niter <- 400000
+    nburn <- 200000
     nthin <- 20
     
     list(constantsList = constantsList,

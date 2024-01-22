@@ -342,7 +342,7 @@ SIHRD_full_undetected <-  nimbleCode({
     # alarm functions
     
     # delta prior using Gaussian copula
-    Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
+    Z[1:2] ~ dmnorm(zMean[1:2], cov = Sigma[1:2, 1:2])
     delta[1:2] <- multiBeta(Z[1:2])
     
     nuC ~ dinvgamma(11, 40)
@@ -453,7 +453,7 @@ SIHRD_full_undetected_sim <-  nimbleCode({
     # alarm functions
     
     # delta prior using Gaussian copula
-    Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
+    Z[1:2] ~ dmnorm(zMean[1:2], cov = Sigma[1:2, 1:2])
     delta[1:2] <- multiBeta(Z[1:2])
     
     nuC ~ dinvgamma(11, 40)
@@ -544,7 +544,7 @@ SIHRD_full_casesOnly <-  nimbleCode({
     # alarm functions
     
     # delta prior using Gaussian copula
-    Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
+    Z[1:2] ~ dmnorm(zMean[1:2], cov = Sigma[1:2, 1:2])
     delta[1:2] <- multiBeta(Z[1:2])
     
     nuC ~ dinvgamma(11, 40)
@@ -648,7 +648,7 @@ SIHRD_full_casesOnly_sim <-  nimbleCode({
     # alarm functions
     
     # delta prior using Gaussian copula
-    Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
+    Z[1:2] ~ dmnorm(zMean[1:2], cov = Sigma[1:2, 1:2])
     delta[1:2] <- multiBeta(Z[1:2])
     
     nuC ~ dinvgamma(11, 40)
@@ -856,7 +856,7 @@ SIHRD_simple_undetected <-  nimbleCode({
     
     # alarm functions
     # delta prior using Gaussian copula
-    Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
+    Z[1:2] ~ dmnorm(zMean[1:2], cov = Sigma[1:2, 1:2])
     delta[1:2] <- multiBeta(Z[1:2])
     
     nuC ~ dinvgamma(11, 40)
@@ -932,7 +932,7 @@ SIHRD_simple_casesOnly <-  nimbleCode({
     
     # alarm functions
     # delta prior using Gaussian copula
-    Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
+    Z[1:2] ~ dmnorm(zMean[1:2], cov = Sigma[1:2, 1:2])
     delta[1:2] <- multiBeta(Z[1:2])
     
     nuC ~ dinvgamma(11, 40)

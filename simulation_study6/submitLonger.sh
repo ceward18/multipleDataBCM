@@ -1,12 +1,12 @@
 #!/bin/bash
 ####### Reserve computing resources #############
-#SBATCH --job-name=BCM_inc
+#SBATCH --job-name=BCM_longer
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=6
 #SBATCH --time=96:00:00
 #SBATCH --mem=64000M
-#SBATCH --array=61-90
+#SBATCH --array=271-540
 #SBATCH --output=./out/Array.%A_%a.out
 #SBATCH --error=./err/Array.%A_%a.error
 

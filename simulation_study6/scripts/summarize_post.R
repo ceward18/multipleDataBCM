@@ -16,7 +16,7 @@ source('./scripts/get_model_inputs.R')
 source('./scripts/get_WAIC.R')
 source('./scripts/post_pred_fit.R')
 
-summarizePost <- function(resThree, incData, modelType, assumeType,
+summarizePost <- function(resThree, incData, modelType, assumeType, prior,
                           smoothC, smoothD, hospData, deathData, trueInc) {
     
     if (modelType %in% c('full', 'fullNoAlarm')) {
@@ -59,8 +59,8 @@ summarizePost <- function(resThree, incData, modelType, assumeType,
     ### posterior distribution of alarm function over range observed
     
     # get xC and xD (range of observed incidence/deaths)
-    modelInputs <- getModelInput(incData, modelType, assumeType, smoothC, smoothD,
-                                 hospData, deathData)
+    modelInputs <- getModelInput(incData, modelType, assumeType, prior,
+                                 smoothC, smoothD, hospData, deathData)
     
     if (modelType %in% c('simple', 'full', 'inc')) {
         n <- length(modelInputs$xC)
@@ -203,7 +203,7 @@ summarizePost <- function(resThree, incData, modelType, assumeType,
     samples <- rbind(resThree[[1]], resThree[[2]], resThree[[3]])
     
     waic <- getWAIC(samples = samples, modelType = modelType, 
-                    assumeType = assumeType, incData = incData, 
+                    assumeType = assumeType, prior = prior, incData = incData, 
                     smoothC = smoothC, smoothD = smoothD,
                     hospData = hospData, deathData = deathData)
     
@@ -214,7 +214,7 @@ summarizePost <- function(resThree, incData, modelType, assumeType,
     if (modelType %in% c('full', 'fullNoAlarm', 'inc', 'simpleNoAlarm')) {
         
         postPred <- postPredFit(incData = incData, modelType = modelType,
-                                assumeType = assumeType,
+                                assumeType = assumeType,  prior = prior, 
                                 smoothC = smoothC, smoothD = smoothD, 
                                 hospData = hospData, deathData = deathData, 
                                 paramsSamples = samples)

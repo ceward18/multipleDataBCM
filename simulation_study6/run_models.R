@@ -19,16 +19,34 @@ modelType <- c('simple', 'full', 'inc', 'simpleNoAlarm', 'fullNoAlarm')
 # SIR inc+deaths, SIHRD inc+deaths, SIR inc, SIR no alarm, SIHRD no alarm
 assumeType <- c('undetected', 'casesOnly')
 
-# 1500
-allFits <- expand.grid(simNumber = 1:nSim,
+
+# 1500, 300 for each model (50 sims * 2 assumeTypes * 3 dataTypes)
+allFits1 <- expand.grid(simNumber = 1:nSim,
                        dataType = dataType,
                        modelType = modelType,
                        assumeType = assumeType,
+                       prior = 1,
                        stringsAsFactors = FALSE)
 
-# 300
+
+# for models with inc+deaths alarm, try two additional priors
+# 1200, 600 for each model (50 sims * 2 assumeTypes * 3 dataTypes * 2 priors)
+allFits2 <- expand.grid(simNumber = 1:nSim,
+                       dataType = dataType,
+                       modelType = modelType[1:2],
+                       assumeType = assumeType,
+                       prior = c(2,3),
+                       stringsAsFactors = FALSE)
+
+allFits <- rbind.data.frame(allFits1, allFits2)
+allFits <- allFits[order(allFits$assumeType, allFits$modelType, 
+                         allFits$dataType, allFits$prior),]
+rownames(allFits) <- NULL
+
+# 540
 tmp <- allFits[seq(1,nrow(allFits), 5),]
 rownames(tmp) <- NULL
+
 
 ################################################################################
 
@@ -41,11 +59,13 @@ for (i in batchIdx) {
     dataType_i <- allFits$dataType[i]
     modelType_i <- allFits$modelType[i]
     assumeType_i <- allFits$assumeType[i]
+    prior_i <- allFits$prior[i]
     simNumber_i <- allFits$simNumber[i]
     
     print(paste0('Data Gen: ', dataType_i,
                  ', model fit: ', modelType_i, 
                  ', assumption: ', assumeType_i, 
+                 ', prior: ', prior_i, 
                  ', simulation: ', simNumber_i))
     
     # load data
@@ -63,7 +83,7 @@ for (i in batchIdx) {
     
     # run three chains in parallel
     cl <- makeCluster(3)
-    clusterExport(cl, list('incData', 'modelType_i', 'assumeType_i', 
+    clusterExport(cl, list('incData', 'modelType_i', 'assumeType_i', 'prior_i',
                            'smoothC', 'smoothD',
                            'hospData', 'deathData'))
     
@@ -77,7 +97,7 @@ for (i in batchIdx) {
         # debugonce(fitAlarmModel), 
         
         fitAlarmModel(incData = incData, modelType = modelType_i, 
-                      assumeType = assumeType_i,
+                      assumeType = assumeType_i, prior = prior_i,
                       smoothC = smoothC,  smoothD = smoothD,
                       hospData = hospData, deathData = deathData, seed = x)
     })
@@ -91,6 +111,7 @@ for (i in batchIdx) {
     # debugonce(summarizePost)
     postSummaries <- summarizePost(resThree = resThree, incData = incData,
                                    modelType = modelType_i, assumeType = assumeType_i,
+                                   prior = prior_i,
                                    smoothC = smoothC, smoothD = smoothD,
                                    hospData = hospData, deathData = deathData,
                                    trueInc = trueInc)
@@ -105,7 +126,8 @@ for (i in batchIdx) {
         
         saveRDS(resThree,
                 paste0('./output/chains_', dataType_i, '_', modelType_i,
-                       '_', assumeType_i, '_',  sprintf("%03d", simNumber_i), '.rds'))
+                       '_', assumeType_i, '_', prior_i, 
+                       '_',  sprintf("%02d", simNumber_i), '.rds'))
     }
     
     
@@ -113,6 +135,7 @@ for (i in batchIdx) {
     modelInfo <- data.frame(dataType = dataType_i,
                             modelType = modelType_i,
                             assumeType = assumeType_i,
+                            prior = prior_i,
                             simNumber = simNumber_i)
     
     # posterior summaries
