@@ -1,0 +1,9 @@
+[1] "Data Gen: inc, model fit: fullNoAlarm, assumption: undetected, prior: 1, simulation: 41"
+Stochastic parents of data are:  probDetect beta gamma1 gamma2 lambda phi comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
+[1] "Data Gen: inc, model fit: fullNoAlarm, assumption: undetected, prior: 1, simulation: 42"
+Stochastic parents of data are:  probDetect beta gamma1 gamma2 lambda phi comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
+[1] "Data Gen: inc, model fit: fullNoAlarm, assumption: undetected, prior: 1, simulation: 43"
+Stochastic parents of data are:  probDetect beta gamma1 gamma2 lambda phi comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
+[1] "Data Gen: inc, model fit: fullNoAlarm, assumption: undetected, prior: 1, simulation: 44"
+Stochastic parents of data are:  probDetect beta gamma1 gamma2 lambda phi comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
+[1] "Data Gen: inc, model fit: fullNoAlarm, assumption: undetected, prior: 1, simulation: 45"
