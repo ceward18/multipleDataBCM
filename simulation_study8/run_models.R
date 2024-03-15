@@ -70,7 +70,7 @@ for (i in batchIdx) {
                            'smoothC', 'smoothD',
                            'hospData', 'deathData'))
     
-    resThree <- parLapply(cl, 1:3, function(x) {
+    resThree <- parLapplyLB(cl, 1:3, function(x) {
         
         library(nimble)
         
