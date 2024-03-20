@@ -45,7 +45,7 @@ postPredFit <- function(incData, modelType, assumeType,
     parentNodes <- myModelPred$getParents(dataNodes, stochOnly = TRUE)
     parentNodes <- parentNodes[-which(parentNodes %in% dataNodes)]
     parentNodes <- myModelPred$expandNodeNames(parentNodes, returnScalarComponents = TRUE)
-
+    
     nPost <- 10000
     postPredInc <- matrix(NA, nrow = tau, ncol = nPost)
     postPredCases <- matrix(NA, nrow = tau, ncol = nPost)

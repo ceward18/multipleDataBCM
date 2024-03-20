@@ -63,7 +63,7 @@ trueVals <- c(probDetect = probDetect,
               lambda = lambda,
               phi = phi,
               k = k,
-              alpha = 0.5)
+              alpha = 0.85)
 
 set.seed(1)
 system.time(epiSims <- sim_C$run(trueVals, 1000))
