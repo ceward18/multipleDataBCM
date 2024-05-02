@@ -785,7 +785,7 @@ SIR_full_undetected <-  nimbleCode({
     alpha ~ dbeta(1, 1)
     
     # IDD Curve
-    w0 ~ dnorm(5, sd = 0.5)
+    w0 ~ dnorm(5, sd = 0.25)
     nu ~ dgamma(100, 100)
     
 })
@@ -839,7 +839,7 @@ SIR_full_casesOnly <-  nimbleCode({
     alpha ~ dbeta(1, 1)
     
     # IDD Curve
-    w0 ~ dnorm(5, sd = 0.5)
+    w0 ~ dnorm(5, sd = 0.25)
     nu ~ dgamma(100, 100)
     
 })
@@ -892,7 +892,7 @@ SIR_noAlarm_undetected <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # IDD Curve
-    w0 ~ dnorm(5, sd = 0.5)
+    w0 ~ dnorm(5, sd = 0.25)
     nu ~ dgamma(100, 100)
     
     
@@ -940,7 +940,7 @@ SIR_noAlarm_casesOnly <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # IDD Curve
-    w0 ~ dnorm(5, sd = 0.5)
+    w0 ~ dnorm(5, sd = 0.25)
     nu ~ dgamma(100, 100)
     
     
@@ -998,7 +998,7 @@ SIR_inc_undetected <-  nimbleCode({
     k ~ dgamma(0.1, 0.1)
     
     # IDD Curve
-    w0 ~ dnorm(5, sd = 0.5)
+    w0 ~ dnorm(5, sd = 0.25)
     nu ~ dgamma(100, 100)
     
 })
@@ -1069,7 +1069,7 @@ SIR_inc_undetected_sim <-  nimbleCode({
     k ~ dgamma(0.1, 0.1)
     
     # IDD Curve
-    w0 ~ dnorm(5, sd = 0.5)
+    w0 ~ dnorm(5, sd = 0.25)
     nu ~ dgamma(100, 100)
     
 })
@@ -1121,7 +1121,7 @@ SIR_inc_casesOnly <-  nimbleCode({
     k ~ dgamma(0.1, 0.1)
     
     # IDD Curve
-    w0 ~ dnorm(5, sd = 0.5)
+    w0 ~ dnorm(5, sd = 0.25)
     nu ~ dgamma(100, 100)
     
 })
@@ -1185,7 +1185,7 @@ SIR_inc_casesOnly_sim <-  nimbleCode({
     k ~ dgamma(0.1, 0.1)
     
     # IDD Curve
-    w0 ~ dnorm(5, sd = 0.5)
+    w0 ~ dnorm(5, sd = 0.25)
     nu ~ dgamma(100, 100)
     
 })

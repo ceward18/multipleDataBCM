@@ -63,7 +63,7 @@ getModelInput <- function(incData, modelType, assumeType,
                               gamma2 = rgamma(1, 20, 100), # HR
                               lambda = rgamma(1, 3, 100), # IH
                               phi = rgamma(1, 10, 100) ,   # HD
-                              k = runif(1, 0, 1),
+                              k = runif(1, 0, 0.02),
                               alpha = rbeta(1, 1, 1),
                               RstarI = round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)])),
                               RstarH = round(0.3 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
@@ -89,11 +89,10 @@ getModelInput <- function(incData, modelType, assumeType,
         initsList <- list(comp_init = comp_init,
                           probDetect = rbeta(1, 250, 750),
                           beta = runif(1, 1/7, 1),
-                          k = runif(1, 0, 1),
+                          k = runif(1, 0, 0.02),
                           alpha = rbeta(1, 1, 1),
-                          w0 = rnorm(1, 5, 0.5),
+                          w0 = rnorm(1, 5, 0.25),
                           nu = rgamma(1, 100, 100))
-        
         
         # end modeltype == 'SIR_full'
         
@@ -106,9 +105,9 @@ getModelInput <- function(incData, modelType, assumeType,
         initsList <- list(comp_init = comp_init,
                           probDetect = rbeta(1, 250, 750),
                           beta = runif(1, 1/7, 1),
-                          k = runif(1, 0, 1),
+                          k = runif(1, 0, 0.02),
                           alpha = rbeta(1, 1, 1),
-                          w0 = rnorm(1, 3, 0.5),
+                          w0 = rnorm(1, 5, 0.25),
                           nu = rgamma(1, 100, 100))
         
         # end modeltype == 'SIR_inc'
@@ -155,7 +154,7 @@ getModelInput <- function(incData, modelType, assumeType,
         initsList <- list(comp_init = comp_init,
                           probDetect = rbeta(1, 250, 750),
                           beta = runif(1, 1/7, 1),
-                          w0 = rnorm(1, 5, 0.5),
+                          w0 = rnorm(1, 5, 0.25),
                           nu = rgamma(1, 100, 100))
     
         
@@ -175,7 +174,7 @@ getModelInput <- function(incData, modelType, assumeType,
     
     ### MCMC specifications
     niter <- 3e5
-    nburn <- 2e5
+    nburn <- 1e5
     nthin <- 10
     
     list(constantsList = constantsList,
