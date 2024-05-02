@@ -40,8 +40,8 @@ fitAlarmModel <- function(incData, modelType, assumeType, peak,
     
     if (modelType == 'SIHRD_full') {
         
-        # use slice sampling for hill parameters
-        paramsForSlice <- c('beta', 'Z', 'x0C', 'x0D', 'nuC', 'nuD')
+        # use slice sampling for transmission parameters
+        paramsForSlice <- c('beta', 'k')
         myConfig$removeSampler(paramsForSlice)
         myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
         
@@ -66,25 +66,17 @@ fitAlarmModel <- function(incData, modelType, assumeType, peak,
         
     } else if (modelType == 'SIR_full') {
         
-        # use slice sampling for hill parameters
-        paramsForSlice <- c('Z', 'x0C', 'x0D', 'nuC', 'nuD')
+        # use slice sampling for transmission parameters
+        paramsForSlice <- c('beta', 'k', 'w0')
         myConfig$removeSampler(paramsForSlice)
         myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
-        
-        # joint sampler for beta and w0
-        myConfig$removeSampler(c('beta', 'w0'))
-        myConfig$addSampler(target = c('beta', 'w0'), type = "AF_slice")
         
     } else if (modelType == 'SIR_inc') { 
         
-        # use slice sampling for hill parameters
-        paramsForSlice <- c('deltaC', 'x0C', 'nuC')
+        # use slice sampling for transmission parameters
+        paramsForSlice <- c('beta', 'k', 'w0')
         myConfig$removeSampler(paramsForSlice)
         myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
-        
-        # joint sampler for beta and w0
-        myConfig$removeSampler(c('beta', 'w0'))
-        myConfig$addSampler(target = c('beta', 'w0'), type = "AF_slice")
         
     } else if (modelType == 'SIHRD_noAlarm') {
         
@@ -116,25 +108,9 @@ fitAlarmModel <- function(incData, modelType, assumeType, peak,
     } 
    
     # monitor alarm functions when present
-    if (modelType %in% c('SIR_full', 'SIHRD_full')) {
-        myConfig$addMonitors(c('yAlarmC', 'yAlarmD', 'alarmC', 'alarmD', 'delta'))
-    } else if (modelType == 'SIR_inc') {
-        myConfig$addMonitors(c('yAlarmC', 'alarmC', 'deltaC'))
-    }
-    
-    if (assumeType == 'undetected') {
-        
-        # myConfig$removeSampler('probDetect')
-        # myConfig$addSampler(target = 'probDetect', type = "slice")
-        
-        myConfig$removeSamplers('Istar') # Nodes will be expanded
-        myConfig$addSampler(target = c('Istar'),
-                            type = "RstarUpdate",
-                            control = list(nUpdates = 3000))
-        # need to ensure all stochastic nodes are monitored for WAIC calculation
-        myConfig$addMonitors(c('Istar'))
-        
-    }
+    if (modelType %in% c('SIHRD_full', 'SIR_full', 'SIR_inc')) {
+        myConfig$addMonitors(c('alarm'))
+    } 
     
     print(myConfig)
     

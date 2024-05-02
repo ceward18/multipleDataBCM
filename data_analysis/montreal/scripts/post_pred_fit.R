@@ -22,7 +22,7 @@ postPredFit <- function(incData, modelType, assumeType, peak,
     modelInputs$constantsList$Istar0Length <- length(Istar0)
     
     if (modelType %in% c('SIHRD_full', 'SIHRD_noAlarm')) {
-        modelInputs$constantsList$smoothI0 <- smoothD[1]
+        modelInputs$constantsList$smoothD0 <- smoothD[1]
         modelInputs$constantsList$Dstar0 <- Dstar0
         modelInputs$constantsList$Dstar0Length <- length(Dstar0)
     }
@@ -75,6 +75,8 @@ postPredFit <- function(incData, modelType, assumeType, peak,
         
         postPredAll <- apply(sim_C$run(trueVals, 10), 2, median)
         
+        postPredInc[,j] <- postPredAll[grep('^Istar', dataNodes)]
+        
         if (modelType %in% c('SIHRD_full', 'SIHRD_noAlarm')) {
             postPredHosp[,j] <- postPredAll[grep('Hstar', dataNodes)]
             postPredDeath[,j] <- postPredAll[grep('Dstar', dataNodes)]
@@ -82,10 +84,7 @@ postPredFit <- function(incData, modelType, assumeType, peak,
         
         
         if (assumeType == 'undetected') {
-            postPredInc[,j] <- postPredAll[grep('^Istar', dataNodes)]
             postPredCases[,j] <- postPredAll[grep('detectIstar', dataNodes)]
-        } else if (assumeType == 'casesOnly') {
-            postPredCases[,j] <- postPredAll[grep('^Istar', dataNodes)]
         }
     }
     

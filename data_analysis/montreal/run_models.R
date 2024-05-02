@@ -175,10 +175,8 @@ for (i in batchIdx) {
         
         gr <- cbind.data.frame(postSummaries$gdiag, modelInfo)
         paramsPost <- cbind.data.frame(postSummaries$postParams, modelInfo)
-        alarmPost <- cbind.data.frame(postSummaries$postAlarm, modelInfo)
         alarmTimePost <- cbind.data.frame(postSummaries$postAlarmTime, modelInfo)
         R0Post <- cbind.data.frame(postSummaries$postR0, modelInfo)
-        IstarPost <- cbind.data.frame(postSummaries$postIstar, modelInfo)
         waicPost <- cbind.data.frame(postSummaries$waic, modelInfo)
         predFitPost <- cbind.data.frame(postSummaries$postPredictFit, modelInfo)
         
@@ -187,14 +185,10 @@ for (i in batchIdx) {
                                cbind.data.frame(postSummaries$gdiag, modelInfo))
         paramsPost <- rbind.data.frame(paramsPost, 
                                        cbind.data.frame(postSummaries$postParams, modelInfo))
-        alarmPost <- rbind.data.frame(alarmPost, 
-                                      cbind.data.frame(postSummaries$postAlarm, modelInfo))
         alarmTimePost <- rbind.data.frame(alarmTimePost, 
                                           cbind.data.frame(postSummaries$postAlarmTime, modelInfo))
         R0Post <- rbind.data.frame(R0Post, 
                                    cbind.data.frame(postSummaries$postR0, modelInfo))
-        IstarPost <- rbind.data.frame(IstarPost, 
-                                      cbind.data.frame(postSummaries$postIstar, modelInfo))
         waicPost <- rbind.data.frame(waicPost, 
                                      cbind.data.frame(postSummaries$waic, modelInfo))
         predFitPost <- rbind.data.frame(predFitPost, 
@@ -203,17 +197,13 @@ for (i in batchIdx) {
     
 } # end loop
 
-
-
 idxPrint <- sprintf("%02d",idx)
 
 # save output in RDS form
 saveRDS(gr, paste0('./output/gr_Batch', idxPrint, '.rds'))
 saveRDS(paramsPost, paste0('./output/paramsPost_Batch', idxPrint, '.rds'))
-saveRDS(alarmPost, paste0('./output/alarmPost_Batch', idxPrint, '.rds'))
 saveRDS(alarmTimePost, paste0('./output/alarmTimePost_Batch', idxPrint, '.rds'))
 saveRDS(R0Post, paste0('./output/R0Post_Batch', idxPrint, '.rds'))
-saveRDS(IstarPost, paste0('./output/IstarPost_Batch', idxPrint, '.rds'))
 saveRDS(waicPost, paste0('./output/waicPost_Batch', idxPrint, '.rds'))
 saveRDS(predFitPost, paste0('./output/predFitPostBatch', idxPrint, '.rds'))
 

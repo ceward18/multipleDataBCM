@@ -6,38 +6,25 @@
 
 # nimbleFunction for logistic decay IDD curve
 logitDecay <- nimbleFunction(     
-    run = function(x = double(1), w0 = double(0), k = double(0)) {
+    run = function(x = double(1), w0 = double(0), nu = double(0)) {
         returnType(double(1))
         
-        result <- 1 / (1 + exp(k * (x - w0)))
+        result <- 1 / (1 + exp(nu * (x - w0)))
         
         return(result)
     })
 assign('logitDecay', logitDecay, envir = .GlobalEnv)
 
-# Hill-Langmuir alarm function
-hillAlarm <- nimbleFunction(     
-    run = function(x = double(0), nu = double(0), 
-                   x0 = double(0), delta = double(0)) {
+# power alarm function
+powerAlarm <- nimbleFunction(     
+    run = function(x = double(0), N = double(0), k = double(0)) {
         returnType(double(0))
         
-        result <- delta / (1 + (x0 / x) ^ nu)
+        result <- 1 - (1 - x / N)^(1 / k)
         
         return(result)
     })
-assign('hillAlarm', hillAlarm, envir = .GlobalEnv)
-
-# nimbleFunction for Gaussian copula with beta distribution
-multiBeta <- nimbleFunction(     
-    run = function(Z = double(1)) {
-        returnType(double(1))
-        
-        fInv <- pnorm(Z)
-        result <- qbeta(fInv, 1, 1)
-        
-        return(result)
-    })
-assign('multiBeta', multiBeta, envir = .GlobalEnv)
+assign('powerAlarm', powerAlarm, envir = .GlobalEnv)
 
 # calculate moving average for smoothing
 movingAverage <- nimbleFunction(     
@@ -197,12 +184,10 @@ SIHRD_full_undetected <-  nimbleCode({
     ### loop over time
     for(t in 1:tau) {
         
-        # compute alarms for each component
-        alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, delta[1])
-        alarmD[t] <- hillAlarm(smoothD[t], nuD, x0D, delta[2])
-        
         # weighted sum of each component
-        alarm[t] <- alarmC[t] + alarmD[t]
+        alarm[t] <- powerAlarm(x = alpha * smoothC[t] + (1 - alpha) * smoothD[t],
+                                N = N, 
+                               k = k)
         
         probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * I[t] / N)
         
@@ -232,15 +217,6 @@ SIHRD_full_undetected <-  nimbleCode({
                                         N = N, gamma1 = gamma1, lambda = lambda,
                                         S = S[1:tau], maxInf = maxInf)
     
-    ### compute alarms for summaries
-    for (i in 1:n) {
-        
-        # compute alarms for each component
-        yAlarmC[i] <- hillAlarm(xC[i], nuC, x0C, delta[1])
-        yAlarmD[i] <- hillAlarm(xD[i], nuD, x0D, delta[2])
-        
-    }
-    
     ### Priors
     
     # detection probability (1/4 reported)
@@ -256,18 +232,8 @@ SIHRD_full_undetected <-  nimbleCode({
     phi ~ dgamma(phiShape, phiRate)    # HD (mean 0.1)
     
     # alarm functions
-    
-    # delta prior using Gaussian copula
-    Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
-    delta[1:2] <- multiBeta(Z[1:2])
-    
-    nuC ~ dinvgamma(11, 40)
-    nuD ~ dinvgamma(11, 40)
-    x0C ~ dunif(minC, maxC)
-    x0D ~ dunif(minD, maxD)
-    
-    # constrain deltas to sum to 1
-    constrain_deltas ~ dconstraint(delta[1] + delta[2] <= 1)
+    k ~ dgamma(0.1, 0.1)
+    alpha ~ dbeta(1, 1)
     
 })
 
@@ -291,7 +257,11 @@ SIHRD_full_undetected_sim <-  nimbleCode({
     probHD <- 1 - exp(-phi)
     
     ### first time point
-    alarm[1] <- 0
+    smoothC[1] <- smoothC0
+    smoothD[1] <- smoothD0
+    alarm[1] <- powerAlarm(x = alpha * smoothC[1] + (1 - alpha) * smoothD[1],
+                           N = N, 
+                           k = k)
     
     probSI[1] <- 1 - exp(- beta * (1 - alarm[1]) * I[1] / N)
     
@@ -319,15 +289,13 @@ SIHRD_full_undetected_sim <-  nimbleCode({
     for(t in 2:tau) {
         
         # compute moving average up to t-1
-        smoothC[t] <- movingAverage(detectIstar[1:(t-1)], bw)[t-1]
-        smoothD[t] <- movingAverage(Dstar[1:(t-1)], bw)[t-1]
-        
-        # compute alarms for each component
-        alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, delta[1])
-        alarmD[t] <- hillAlarm(smoothD[t], nuD, x0D, delta[2])
+        smoothC[t] <- get_smooth(detectIstar[1:(t-1)], t, Istar0[1:Istar0Length], Istar0Length, bw)
+        smoothD[t] <- get_smooth(Dstar[1:(t-1)], t, Dstar0[1:Dstar0Length], Dstar0Length, bw)
         
         # weighted sum of each component
-        alarm[t] <- alarmC[t] + alarmD[t]
+        alarm[t] <- powerAlarm(x = alpha * smoothC[t] + (1 - alpha) * smoothD[t],
+                               N = N, 
+                               k = k)
         
         probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * I[t] / N)
         
@@ -367,18 +335,8 @@ SIHRD_full_undetected_sim <-  nimbleCode({
     phi ~ dgamma(phiShape, phiRate)    # HD (mean 0.1)
     
     # alarm functions
-    
-    # delta prior using Gaussian copula
-    Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
-    delta[1:2] <- multiBeta(Z[1:2])
-    
-    nuC ~ dinvgamma(11, 40)
-    nuD ~ dinvgamma(11, 40)
-    x0C ~ dunif(minC, maxC)
-    x0D ~ dunif(minD, maxD)
-    
-    # constrain deltas to sum to 1
-    constrain_deltas ~ dconstraint(delta[1] + delta[2] <= 1)
+    k ~ dgamma(0.1, 0.1)
+    alpha ~ dbeta(1, 1)
     
 })
 
@@ -404,12 +362,10 @@ SIHRD_full_casesOnly <-  nimbleCode({
     ### loop over time
     for(t in 1:tau) {
         
-        # compute alarms for each component
-        alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, delta[1])
-        alarmD[t] <- hillAlarm(smoothD[t], nuD, x0D, delta[2])
-        
         # weighted sum of each component
-        alarm[t] <- alarmC[t] + alarmD[t]
+        alarm[t] <- powerAlarm(x = alpha * smoothC[t] + (1 - alpha) * smoothD[t],
+                               N = N, 
+                               k = k)
         
         probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * I[t] / N)
         
@@ -437,15 +393,6 @@ SIHRD_full_casesOnly <-  nimbleCode({
                                         N = N, gamma1 = gamma1, lambda = lambda,
                                         S = S[1:tau], maxInf = maxInf)
     
-    ### compute alarms for summaries
-    for (i in 1:n) {
-        
-        # compute alarms for each component
-        yAlarmC[i] <- hillAlarm(xC[i], nuC, x0C, delta[1])
-        yAlarmD[i] <- hillAlarm(xD[i], nuD, x0D, delta[2])
-        
-    }
-    
     ### Priors
     
     # transmission
@@ -458,18 +405,8 @@ SIHRD_full_casesOnly <-  nimbleCode({
     phi ~ dgamma(phiShape, phiRate)    # HD (mean 0.1)
     
     # alarm functions
-    
-    # delta prior using Gaussian copula
-    Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
-    delta[1:2] <- multiBeta(Z[1:2])
-    
-    nuC ~ dinvgamma(11, 40)
-    nuD ~ dinvgamma(11, 40)
-    x0C ~ dunif(minC, maxC)
-    x0D ~ dunif(minD, maxD)
-    
-    # constrain deltas to sum to 1
-    constrain_deltas ~ dconstraint(delta[1] + delta[2] <= 1)
+    k ~ dgamma(0.1, 0.1)
+    alpha ~ dbeta(1, 1)
     
 })
 
@@ -493,7 +430,11 @@ SIHRD_full_casesOnly_sim <-  nimbleCode({
     probHD <- 1 - exp(-phi)
     
     ### first time point
-    alarm[1] <- 0
+    smoothC[1] <- smoothC0
+    smoothD[1] <- smoothD0
+    alarm[1] <- powerAlarm(x = alpha * smoothC[1] + (1 - alpha) * smoothD[1],
+                           N = N, 
+                           k = k)
     
     probSI[1] <- 1 - exp(- beta * (1 - alarm[1]) * I[1] / N)
     
@@ -519,15 +460,13 @@ SIHRD_full_casesOnly_sim <-  nimbleCode({
     for(t in 2:tau) {
         
         # compute moving average up to t-1
-        smoothC[t] <- movingAverage(Istar[1:(t-1)], bw)[t-1]
-        smoothD[t] <- movingAverage(Dstar[1:(t-1)], bw)[t-1]
-        
-        # compute alarms for each component
-        alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, delta[1])
-        alarmD[t] <- hillAlarm(smoothD[t], nuD, x0D, delta[2])
+        smoothC[t] <- get_smooth(Istar[1:(t-1)], t, Istar0[1:Istar0Length], Istar0Length, bw)
+        smoothD[t] <- get_smooth(Dstar[1:(t-1)], t, Dstar0[1:Dstar0Length], Dstar0Length, bw)
         
         # weighted sum of each component
-        alarm[t] <- alarmC[t] + alarmD[t]
+        alarm[t] <- powerAlarm(x = alpha * smoothC[t] + (1 - alpha) * smoothD[t],
+                               N = N, 
+                               k = k)
         
         probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * I[t] / N)
         
@@ -562,18 +501,8 @@ SIHRD_full_casesOnly_sim <-  nimbleCode({
     phi ~ dgamma(phiShape, phiRate)    # HD (mean 0.1)
     
     # alarm functions
-    
-    # delta prior using Gaussian copula
-    Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
-    delta[1:2] <- multiBeta(Z[1:2])
-    
-    nuC ~ dinvgamma(11, 40)
-    nuD ~ dinvgamma(11, 40)
-    x0C ~ dunif(minC, maxC)
-    x0D ~ dunif(minD, maxD)
-    
-    # constrain deltas to sum to 1
-    constrain_deltas ~ dconstraint(delta[1] + delta[2] <= 1)
+    k ~ dgamma(0.1, 0.1)
+    alpha ~ dbeta(1, 1)
     
 })
 
@@ -720,17 +649,15 @@ SIR_full_undetected <-  nimbleCode({
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
     
-    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
+    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, nu)
     
     ### rest of time points
     for(t in 1:tau) {
         
-        # compute alarms for each component
-        alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, delta[1])
-        alarmD[t] <- hillAlarm(smoothD[t], nuD, x0D, delta[2])
-        
         # weighted sum of each component
-        alarm[t] <- alarmC[t] + alarmD[t]
+        alarm[t] <- powerAlarm(x = alpha * smoothC[t] + (1 - alpha) * smoothD[t],
+                               N = N, 
+                               k = k)
         
         probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * 
                                  sum(idd_curve[1:maxInf] * I[t, 1:maxInf]) / N)
@@ -753,15 +680,6 @@ SIR_full_undetected <-  nimbleCode({
                                  iddCurve = idd_curve[1:maxInf])
     
     
-    ### compute alarms for summaries
-    for (i in 1:n) {
-        
-        # compute alarms for each component
-        yAlarmC[i] <- hillAlarm(xC[i], nuC, x0C, delta[1])
-        yAlarmD[i] <- hillAlarm(xD[i], nuD, x0D, delta[2])
-        
-    }
-    
     ### Priors
     
     # detection probability (1/4 reported)
@@ -771,21 +689,14 @@ SIR_full_undetected <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # alarm functions
-    # delta prior using Gaussian copula
-    Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
-    delta[1:2] <- multiBeta(Z[1:2])
-    
-    nuC ~ dinvgamma(11, 40)
-    nuD ~ dinvgamma(11, 40)
-    x0C ~ dunif(minC, maxC)
-    x0D ~ dunif(minD, maxD)
+    k ~ dgamma(0.1, 0.1)
+    alpha ~ dbeta(1, 1)
     
     # IDD Curve
     w0 ~ dnorm(5, sd = 0.5)
-    k ~ dgamma(100, 100)
+    nu ~ dgamma(100, 100)
     
-    # constrain deltas to sum to 1
-    constrain_deltas ~ dconstraint(delta[1] + delta[2] <= 1)
+    
     
 })
 
@@ -801,17 +712,15 @@ SIR_full_casesOnly <-  nimbleCode({
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
     
-    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
+    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, nu)
     
     ### rest of time points
     for(t in 1:tau) {
         
-        # compute alarms for each component
-        alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, delta[1])
-        alarmD[t] <- hillAlarm(smoothD[t], nuD, x0D, delta[2])
-        
         # weighted sum of each component
-        alarm[t] <- alarmC[t] + alarmD[t]
+        alarm[t] <- powerAlarm(x = alpha * smoothC[t] + (1 - alpha) * smoothD[t],
+                               N = N, 
+                               k = k)
         
         probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * 
                                  sum(idd_curve[1:maxInf] * I[t, 1:maxInf]) / N)
@@ -831,37 +740,19 @@ SIR_full_casesOnly <-  nimbleCode({
                                  N = N, S = S[1:tau], maxInf = maxInf,
                                  iddCurve = idd_curve[1:maxInf])
     
-    
-    ### compute alarms for summaries
-    for (i in 1:n) {
-        
-        # compute alarms for each component
-        yAlarmC[i] <- hillAlarm(xC[i], nuC, x0C, delta[1])
-        yAlarmD[i] <- hillAlarm(xD[i], nuD, x0D, delta[2])
-        
-    }
-    
     ### Priors
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
     
     # alarm functions
-    # delta prior using Gaussian copula
-    Z[1:2] ~ dmnorm(zeros[1:2], cov = Sigma[1:2, 1:2])
-    delta[1:2] <- multiBeta(Z[1:2])
-    
-    nuC ~ dinvgamma(11, 40)
-    nuD ~ dinvgamma(11, 40)
-    x0C ~ dunif(minC, maxC)
-    x0D ~ dunif(minD, maxD)
+    k ~ dgamma(0.1, 0.1)
+    alpha ~ dbeta(1, 1)
     
     # IDD Curve
     w0 ~ dnorm(5, sd = 0.5)
-    k ~ dgamma(100, 100)
+    nu ~ dgamma(100, 100)
     
-    # constrain deltas to sum to 1
-    constrain_deltas ~ dconstraint(delta[1] + delta[2] <= 1)
     
 })
 
@@ -877,7 +768,7 @@ SIR_noAlarm_undetected <-  nimbleCode({
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
     
-    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
+    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, nu)
     
     ### rest of time points
     for(t in 1:tau) {
@@ -913,7 +804,7 @@ SIR_noAlarm_undetected <-  nimbleCode({
     
     # IDD Curve
     w0 ~ dnorm(5, sd = 0.5)
-    k ~ dgamma(100, 100)
+    nu ~ dgamma(100, 100)
     
     
 })
@@ -930,7 +821,7 @@ SIR_noAlarm_casesOnly <-  nimbleCode({
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
     
-    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
+    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, nu)
     
     ### rest of time points
     for(t in 1:tau) {
@@ -960,7 +851,7 @@ SIR_noAlarm_casesOnly <-  nimbleCode({
     
     # IDD Curve
     w0 ~ dnorm(5, sd = 0.5)
-    k ~ dgamma(100, 100)
+    nu ~ dgamma(100, 100)
     
     
 })
@@ -977,15 +868,15 @@ SIR_inc_undetected <-  nimbleCode({
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
     
-    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
+    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, nu)
     
     ### rest of time points
     for(t in 1:tau) {
         
         # alarm is function of incidence only
-        alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, deltaC)
+        alarm[t] <- powerAlarm(smoothC[t], N, k)
         
-        probSI[t] <- 1 - exp(- beta * (1 - alarmC[t]) * 
+        probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * 
                                  sum(idd_curve[1:maxInf] * I[t, 1:maxInf]) / N)
         
         # SIR model
@@ -1001,18 +892,9 @@ SIR_inc_undetected <-  nimbleCode({
     }
     
     # estimated effective R0
-    R0[1:(tau-maxInf)] <- get_R0(betat = beta * (1 - alarmC[1:tau]), 
+    R0[1:(tau-maxInf)] <- get_R0(betat = beta * (1 - alarm[1:tau]), 
                                  N = N, S = S[1:tau], maxInf = maxInf,
                                  iddCurve = idd_curve[1:maxInf])
-    
-    
-    ### compute alarms for summaries
-    for (i in 1:n) {
-        
-        # compute alarms for each component
-        yAlarmC[i] <- hillAlarm(xC[i], nuC, x0C, deltaC)
-        
-    }
     
     ### Priors
     
@@ -1023,13 +905,11 @@ SIR_inc_undetected <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # alarm functions
-    deltaC ~ dunif(0, 1)
-    nuC ~ dinvgamma(11, 40)
-    x0C ~ dunif(minC, maxC)
+    k ~ dgamma(0.1, 0.1)
     
     # IDD Curve
     w0 ~ dnorm(5, sd = 0.5)
-    k ~ dgamma(100, 100)
+    nu ~ dgamma(100, 100)
     
 })
 
@@ -1045,12 +925,13 @@ SIR_inc_undetected_sim <-  nimbleCode({
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
     
-    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
+    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, nu)
     
-    # time 1
-    alarmC[1] <- 0
+    ### first time point
+    smoothC[1] <- smoothC0
+    alarm[1] <- powerAlarm(smoothC[1], N, k)
     
-    probSI[1] <- 1 - exp(- beta * (1 - alarmC[1]) * 
+    probSI[1] <- 1 - exp(- beta * (1 - alarm[1]) * 
                              sum(idd_curve[1:maxInf] * I[1, 1:maxInf]) / N)
     
     # SIR model
@@ -1066,13 +947,13 @@ SIR_inc_undetected_sim <-  nimbleCode({
     ### rest of time points
     for(t in 2:tau) {
         
-        # moving average incidence
-        smoothC[t] <- movingAverage(detectIstar[1:(t-1)], bw)[t-1]
+        # compute moving average up to t-1
+        smoothC[t] <- get_smooth(detectIstar[1:(t-1)], t, Istar0[1:Istar0Length], Istar0Length, bw)
         
         # alarm is function of incidence only
-        alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, deltaC)
+        alarm[t] <- powerAlarm(smoothC[t], N, k)
         
-        probSI[t] <- 1 - exp(- beta * (1 - alarmC[t]) * 
+        probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * 
                                  sum(idd_curve[1:maxInf] * I[t, 1:maxInf]) / N)
         
         # SIR model
@@ -1096,13 +977,11 @@ SIR_inc_undetected_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # alarm functions
-    deltaC ~ dunif(0, 1)
-    nuC ~ dinvgamma(11, 40)
-    x0C ~ dunif(minC, maxC)
+    k ~ dgamma(0.1, 0.1)
     
     # IDD Curve
     w0 ~ dnorm(5, sd = 0.5)
-    k ~ dgamma(100, 100)
+    nu ~ dgamma(100, 100)
     
 })
 
@@ -1118,15 +997,15 @@ SIR_inc_casesOnly <-  nimbleCode({
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
     
-    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
+    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, nu)
     
     ### rest of time points
     for(t in 1:tau) {
         
         # alarm is function of incidence only
-        alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, deltaC)
+        alarm[t] <- powerAlarm(smoothC[t], N, k)
         
-        probSI[t] <- 1 - exp(- beta * (1 - alarmC[t]) * 
+        probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * 
                                  sum(idd_curve[1:maxInf] * I[t, 1:maxInf]) / N)
         
         # SIR model
@@ -1140,18 +1019,10 @@ SIR_inc_casesOnly <-  nimbleCode({
     }
     
     # estimated effective R0
-    R0[1:(tau-maxInf)] <- get_R0(betat = beta * (1 - alarmC[1:tau]), 
+    R0[1:(tau-maxInf)] <- get_R0(betat = beta * (1 - alarm[1:tau]), 
                                  N = N, S = S[1:tau], maxInf = maxInf,
                                  iddCurve = idd_curve[1:maxInf])
     
-    
-    ### compute alarms for summaries
-    for (i in 1:n) {
-        
-        # compute alarms for each component
-        yAlarmC[i] <- hillAlarm(xC[i], nuC, x0C, deltaC)
-        
-    }
     
     ### Priors
     
@@ -1159,13 +1030,11 @@ SIR_inc_casesOnly <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # alarm functions
-    deltaC ~ dunif(0, 1)
-    nuC ~ dinvgamma(11, 40)
-    x0C ~ dunif(minC, maxC)
+    k ~ dgamma(0.1, 0.1)
     
     # IDD Curve
     w0 ~ dnorm(5, sd = 0.5)
-    k ~ dgamma(100, 100)
+    nu ~ dgamma(100, 100)
     
 })
 
@@ -1181,12 +1050,13 @@ SIR_inc_casesOnly_sim <-  nimbleCode({
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
     
-    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, k)
+    idd_curve[1:maxInf] <- logitDecay(1:maxInf, w0, nu)
     
-    # time 1
-    alarmC[1] <- 0
+    ### first time point
+    smoothC[1] <- smoothC0
+    alarm[1] <- powerAlarm(smoothC[1], N, k)
     
-    probSI[1] <- 1 - exp(- beta * (1 - alarmC[1]) * 
+    probSI[1] <- 1 - exp(- beta * (1 - alarm[1]) * 
                              sum(idd_curve[1:maxInf] * I[1, 1:maxInf]) / N)
     
     # SIR model
@@ -1200,13 +1070,13 @@ SIR_inc_casesOnly_sim <-  nimbleCode({
     ### rest of time points
     for(t in 2:tau) {
         
-        # moving average incidence
-        smoothC[t] <- movingAverage(Istar[1:(t-1)], bw)[t-1]
+        # compute moving average up to t-1
+        smoothC[t] <- get_smooth(Istar[1:(t-1)], t, Istar0[1:Istar0Length], Istar0Length, bw)
         
         # alarm is function of incidence only
-        alarmC[t] <- hillAlarm(smoothC[t], nuC, x0C, deltaC)
+        alarm[t] <- powerAlarm(smoothC[t], N, k)
         
-        probSI[t] <- 1 - exp(- beta * (1 - alarmC[t]) * 
+        probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * 
                                  sum(idd_curve[1:maxInf] * I[t, 1:maxInf]) / N)
         
         # SIR model
@@ -1225,13 +1095,11 @@ SIR_inc_casesOnly_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # alarm functions
-    deltaC ~ dunif(0, 1)
-    nuC ~ dinvgamma(11, 40)
-    x0C ~ dunif(minC, maxC)
+    k ~ dgamma(0.1, 0.1)
     
     # IDD Curve
     w0 ~ dnorm(5, sd = 0.5)
-    k ~ dgamma(100, 100)
+    nu ~ dgamma(100, 100)
     
 })
 

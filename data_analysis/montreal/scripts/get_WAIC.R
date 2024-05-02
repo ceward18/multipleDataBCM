@@ -28,8 +28,16 @@ getWAIC <- function(samples, modelType, assumeType, peak,
     compiled <- compileNimble(myModel) 
     
     if (assumeType == 'casesOnly') {
+        
         incDataSamples <- matrix(rep(incData), NROW(samples),
                                  ncol = length(incData), byrow = T)
+        colnames(incDataSamples) <- paste0('Istar[', 1:ncol(incDataSamples), ']')
+        samples <- cbind(samples, incDataSamples)
+    } else if (assumeType == 'undetected') {
+        
+        Istar <- modelInputs$dataList$Istar
+        incDataSamples <- matrix(rep(Istar), NROW(samples),
+                                 ncol = length(Istar), byrow = T)
         colnames(incDataSamples) <- paste0('Istar[', 1:ncol(incDataSamples), ']')
         samples <- cbind(samples, incDataSamples)
     }

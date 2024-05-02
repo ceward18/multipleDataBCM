@@ -27,7 +27,7 @@ powerAlarm <- nimbleFunction(
     })
 assign('powerAlarm', powerAlarm, envir = .GlobalEnv)
 
-# power alarm function
+# power alarm function with multiple data sources
 powerAlarm2 <- nimbleFunction(     
     run = function(x1 = double(0), x2 = double(0), N = double(0), k = double(0)) {
         returnType(double(0))
