@@ -643,8 +643,8 @@ SIHRD_noAlarm_casesOnly <-  nimbleCode({
 SIR_full_undetected <-  nimbleCode({
     
     # compartment initial values
-    # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    # 1 = S0, 2 - 15 = I0, 16 = R0
+    comp_init[1:(maxInf + 2)] ~ dmulti(prob = initProb[1:(maxInf + 2)], size = N)
     S[1] <- comp_init[1] - 1
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
@@ -706,8 +706,8 @@ SIR_full_undetected <-  nimbleCode({
 SIR_full_casesOnly <-  nimbleCode({
     
     # compartment initial values
-    # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    # 1 = S0, 2 - 15 = I0, 16 = R0
+    comp_init[1:(maxInf + 2)] ~ dmulti(prob = initProb[1:(maxInf + 2)], size = N)
     S[1] <- comp_init[1] - 1
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
@@ -762,8 +762,8 @@ SIR_full_casesOnly <-  nimbleCode({
 SIR_noAlarm_undetected <-  nimbleCode({
     
     # compartment initial values
-    # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    # 1 = S0, 2 - 15 = I0, 16 = R0
+    comp_init[1:(maxInf + 2)] ~ dmulti(prob = initProb[1:(maxInf + 2)], size = N)
     S[1] <- comp_init[1] - 1
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
@@ -815,8 +815,8 @@ SIR_noAlarm_undetected <-  nimbleCode({
 SIR_noAlarm_casesOnly <-  nimbleCode({
     
     # compartment initial values
-    # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    # 1 = S0, 2 - 15 = I0, 16 = R0
+    comp_init[1:(maxInf + 2)] ~ dmulti(prob = initProb[1:(maxInf + 2)], size = N)
     S[1] <- comp_init[1] - 1
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
@@ -862,8 +862,8 @@ SIR_noAlarm_casesOnly <-  nimbleCode({
 SIR_inc_undetected <-  nimbleCode({
     
     # compartment initial values
-    # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    # 1 = S0, 2 - 15 = I0, 16 = R0
+    comp_init[1:(maxInf + 2)] ~ dmulti(prob = initProb[1:(maxInf + 2)], size = N)
     S[1] <- comp_init[1] - 1
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
@@ -919,8 +919,8 @@ SIR_inc_undetected <-  nimbleCode({
 SIR_inc_undetected_sim <-  nimbleCode({
     
     # compartment initial values
-    # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    # 1 = S0, 2 - 15 = I0, 16 = R0
+    comp_init[1:(maxInf + 2)] ~ dmulti(prob = initProb[1:(maxInf + 2)], size = N)
     S[1] <- comp_init[1] - 1
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
@@ -991,8 +991,8 @@ SIR_inc_undetected_sim <-  nimbleCode({
 SIR_inc_casesOnly <-  nimbleCode({
     
     # compartment initial values
-    # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    # 1 = S0, 2 - 15 = I0, 16 = R0
+    comp_init[1:(maxInf + 2)] ~ dmulti(prob = initProb[1:(maxInf + 2)], size = N)
     S[1] <- comp_init[1] - 1
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
@@ -1044,8 +1044,8 @@ SIR_inc_casesOnly <-  nimbleCode({
 SIR_inc_casesOnly_sim <-  nimbleCode({
     
     # compartment initial values
-    # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    # 1 = S0, 2 - 15 = I0, 16 = R0
+    comp_init[1:(maxInf + 2)] ~ dmulti(prob = initProb[1:(maxInf + 2)], size = N)
     S[1] <- comp_init[1] - 1
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
