@@ -15,7 +15,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
     tau <- length(incData)
     
     #### initial conditions probability
-    if (modelType %in% c('SIHRD_full', 'SIHRD_noAlarm')) {
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
         
         # SIHRD model
         initProb <- c(S0, I0, H0, R0, D0)/N
