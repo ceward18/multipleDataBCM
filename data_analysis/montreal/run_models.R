@@ -19,7 +19,8 @@ source('./scripts/model_code.R')
 
 peak <- c(1,2,4)
 smoothWindow <- 30
-modelType <- c('SIHRD_full', 'SIR_full', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')
+modelType <- c('SIHRD_full', 'SIHRD_inc',
+               'SIR_full', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')
 assumeType <- c('undetected', 'casesOnly')
 
 allModels <- expand.grid(modelType = modelType,
@@ -28,7 +29,7 @@ allModels <- expand.grid(modelType = modelType,
                          stringsAsFactors = FALSE)
 
 
-# 30 total - 10 per peak
+# 36 total - 12 per peak
 allModels <- allModels[order(allModels$modelType,
                              allModels$assumeType, 
                              allModels$peak),]

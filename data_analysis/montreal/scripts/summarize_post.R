@@ -20,7 +20,7 @@ summarizePost <- function(resThree, incData, modelType, assumeType, peak,
                           smoothC, smoothD, hospData, deathData,
                           N, S0, I0, H0, D0, R0, Istar0, Dstar0) {
     
-    if (modelType %in% c('SIHRD_full', 'SIHRD_noAlarm')) {
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
         paramSamples1 <- resThree[[1]][,-grep('alarm|R0|Rstar|
                                               |comp_init\\[3\\]|comp_init\\[4\\]|comp_init\\[5\\]', colnames(resThree[[1]]))]
         paramSamples2 <- resThree[[2]][,-grep('alarm|R0|Rstar|
@@ -61,7 +61,7 @@ summarizePost <- function(resThree, incData, modelType, assumeType, peak,
     
     tau <- length(incData)
     
-    if (modelType %in% c('SIHRD_full', 'SIR_full', 'SIR_inc')) {
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_full', 'SIR_inc')) {
         
         alarmSamples1 <- resThree[[1]][,grep('alarm', colnames(resThree[[1]]))]
         alarmSamples2 <- resThree[[2]][,grep('alarm', colnames(resThree[[2]]))]

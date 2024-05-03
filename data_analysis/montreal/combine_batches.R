@@ -24,26 +24,6 @@ for (i in 2:length(grFiles)) {
 saveRDS(grAll, paste0('./', resultsFolder, '/grAll.rds'))
 
 ################################################################################
-# posterior alarms - for models that estimate the alarm function separately
-
-alarmFiles <- outputFiles[grep('alarmPost', outputFiles)]
-
-alarmAll <- readRDS(paste0('./', outputFolder, '/', alarmFiles[1]))
-
-for (i in 2:length(alarmFiles)) {
-    alarm_i <- readRDS(paste0('./', outputFolder, '/', alarmFiles[i]))
-    alarmAll <-rbind.data.frame(alarmAll, alarm_i)
-}
-
-# remove NA (noAlarm models)
-alarmAll <- alarmAll[!is.na(alarmAll$xAlarm),]
-
-rownames(alarmAll) <- NULL
-
-saveRDS(alarmAll, paste0('./', resultsFolder, '/alarmPostAll.rds'))
-
-
-################################################################################
 # posterior alarms - for models that estimate all alarm functions
 
 alarmFiles <- outputFiles[grep('alarmTimePost', outputFiles)]
@@ -76,28 +56,6 @@ for (i in 2:length(paramsPostFiles)) {
 }
 
 saveRDS(paramsPostAll,  paste0('./', resultsFolder, '/paramsPostAll.rds'))
-
-################################################################################
-# posterior Istar 
-
-IstarPostFiles <- outputFiles[grep('IstarPost', outputFiles)]
-
-IstarPostAll <- readRDS(paste0('./', outputFolder, '/', IstarPostFiles[1]))
-IstarPostAll <- IstarPostAll[,-which(colnames(IstarPostAll) == 'truth')]
-
-for (i in 2:length(IstarPostFiles)) {
-    IstarPost_i <- readRDS(paste0('./', outputFolder, '/', IstarPostFiles[i]))
-    if ('truth' %in% colnames(IstarPost_i)) {
-        IstarPost_i <- IstarPost_i[,-which(colnames(IstarPost_i) == 'truth')]
-    }
-    IstarPostAll <- rbind.data.frame(IstarPostAll, IstarPost_i)
-}
-
-
-# remove NA (casesOnly models)
-IstarPostAll <- IstarPostAll[!is.na(IstarPostAll$time),]
-
-saveRDS(IstarPostAll,  paste0('./', resultsFolder, '/IstarPostAll.rds'))
 
 ################################################################################
 # posterior R0 
