@@ -1,9 +1,10 @@
 ################################################################################
 # Run multivariate alarm models 
-# London, NYC, Montreal
-# Peaks 1-5
+# NYC
+# Peaks 1, 4
 # SIR and SIHRD models based on incidence and deaths
 # SIR model based on incidence only
+# assuming all cases reported and only undetected cases
 ################################################################################
 
 
@@ -17,46 +18,43 @@ library(nimble)
 ### source scripts (for movingAverage function)
 source('./scripts/model_code.R')
 
-cities <- c('nyc')
-peak <- c('1', '2', '3', '4', '5')
+peak <- c('1', '2', '4')
 smoothWindow <- 30
-modelType <- c('simple', 'full', 'inc')
+modelType <- c('SIHRD_full', 'SIHRD_inc',
+               'SIR_full', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')
+assumeType <- c('undetected', 'casesOnly')
 
-allModels <- expand.grid(city = cities,
-                         modelType = modelType,
+allModels <- expand.grid(modelType = modelType,
                          peak = peak,
+                         assumeType = assumeType,
                          stringsAsFactors = FALSE)
 
 
-# 45 total - 15 per city
-allModels <- allModels[order(allModels$city, 
-                             allModels$modelType, 
+
+# 36 total - 12 per peak
+allModels <- allModels[order(allModels$modelType,
+                             allModels$assumeType, 
                              allModels$peak),]
 rownames(allModels) <- NULL
 
-tmp <- allModels[seq(1,nrow(allModels), 5),]
+tmp <- allModels[seq(1,nrow(allModels), 3),]
 
-if (idx < 6) {
-    batchIdx <- idx
-} else {
-    
-    batchSize <- 5
-    batchIdx <- batchSize * (idx - 5) + 1:batchSize
-}
-batchIdx
-
+batchSize <- 3
+batchIdx <- batchSize * (idx - 1) + 1:batchSize
 
 
 for (i in batchIdx) {
     
-    city_i <- allModels$city[i]
     modelType_i <- allModels$modelType[i]
+    assumeType_i <- allModels$assumeType[i]
     peak_i <- allModels$peak[i]
     
-    print(paste0('Running: ', city_i, ', ',  modelType_i, ', peak: ', peak_i))
+    print(paste0('Running: ', modelType_i, 
+                 ', assumption: ', assumeType_i, 
+                 ', peak: ', peak_i))
     
     ### read data
-    dat <- read.csv(paste0('./data/', city_i, 'Clean.csv'))
+    dat <- read.csv(paste0('./data/nycClean.csv'))
     dat$smoothedCases <- round(dat$dailyCases)
     dat$cumulativeCases <- cumsum(dat$smoothedCases)
     
@@ -86,7 +84,7 @@ for (i in batchIdx) {
         
         smoothC <- smoothC[-c(1:idxStart)]
         smoothD <- smoothD[-c(1:idxStart)]
-        idxStart <- min(which(dat$peak == peak_i)) + 10
+        idxStart <- min(which(dat$peak == peak_i)) + idxStart
     } else {
         idxStart <- min(which(dat$peak == peak_i))
     }
@@ -105,9 +103,13 @@ for (i in batchIdx) {
     I0 <- sum(dat$smoothedCases[max(1, (idxStart - lengthI)):(idxStart - 1)])
     H0 <- cumHosp
     if (peak_i == 1) {
-        # move H0 to I0
-        I0 <- I0 + H0 
-        H0 <- 0
+        # for model which assumes all cases observed, H0 > I0 doesn't work
+        if (assumeType_i == 'casesOnly') {
+            # move H0 to I0
+            I0 <- I0 + H0 
+            H0 <- 0
+        }
+        # if we assume undetected cases, this is fine
     }
     D0 <- round(cumsum(dat$dailyDeaths)[max(1, (idxStart - 1))])
     R0 <- N - S0 - I0 - H0 - D0 # should be > 0
@@ -120,7 +122,8 @@ for (i in batchIdx) {
     
     # run three chains in parallel
     cl <- makeCluster(3)
-    clusterExport(cl, list('incData', 'modelType_i', 'smoothC', 'smoothD', 
+    clusterExport(cl, list('incData', 'modelType_i', 'assumeType_i', 'peak_i',
+                           'smoothC', 'smoothD', 
                            'deathData', 'hospData',
                            'N', 'S0', 'I0', 'H0', 'D0', 'R0'))
     
@@ -133,20 +136,20 @@ for (i in batchIdx) {
         
         # debugonce(fitAlarmModel)
         fitAlarmModel(incData = incData, modelType = modelType_i,
+                      assumeType = assumeType_i, peak = peak_i, 
                       smoothC = smoothC, smoothD = smoothD, 
                       deathData = deathData, hospData = hospData,
-                      N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0, seed = x)
-        
-        
+                      N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0,
+                      seed = x)
         
     })
     stopCluster(cl)
     
-    
     source('./scripts/summarize_post.R')
     # debugonce(summarizePost)
     postSummaries <- summarizePost(resThree = resThree, incData = incData,
-                                   modelType = modelType_i, 
+                                   modelType = modelType_i, assumeType = assumeType_i,
+                                   peak = peak_i, 
                                    smoothC = smoothC, smoothD = smoothD,
                                    hospData = hospData, deathData = deathData,
                                    N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0,
@@ -155,26 +158,25 @@ for (i in batchIdx) {
     # if the model did not converge save the chains so these can be examined later
     if (!all(postSummaries$gdiag$gr < 1.1)) {
         
-        # create thinned version
+        # create thinned version to save memory
         resThree[[1]] <- resThree[[1]][seq(1,nrow(resThree[[1]]), 100),]
         resThree[[2]] <- resThree[[2]][seq(1,nrow(resThree[[2]]), 100),]
         resThree[[3]] <- resThree[[3]][seq(1,nrow(resThree[[3]]), 100),]
         
         saveRDS(resThree, 
-                paste0('./output/chains_', city_i, '_', modelType_i, 
+                paste0('./output/chains_', modelType_i, '_', assumeType_i, 
                        '_peak', peak_i, '.rds'))
     }
     
     # save results in separate files
-    modelInfo <- data.frame(city = city_i,
-                            modelType = modelType_i, 
-                            peak = peak_i)
+    modelInfo <- data.frame(modelType = modelType_i, 
+                            peak = peak_i,
+                            assumeType = assumeType_i)
     
     if (i == batchIdx[1]) {
         
         gr <- cbind.data.frame(postSummaries$gdiag, modelInfo)
         paramsPost <- cbind.data.frame(postSummaries$postParams, modelInfo)
-        alarmPost <- cbind.data.frame(postSummaries$postAlarm, modelInfo)
         alarmTimePost <- cbind.data.frame(postSummaries$postAlarmTime, modelInfo)
         R0Post <- cbind.data.frame(postSummaries$postR0, modelInfo)
         waicPost <- cbind.data.frame(postSummaries$waic, modelInfo)
@@ -185,8 +187,6 @@ for (i in batchIdx) {
                                cbind.data.frame(postSummaries$gdiag, modelInfo))
         paramsPost <- rbind.data.frame(paramsPost, 
                                        cbind.data.frame(postSummaries$postParams, modelInfo))
-        alarmPost <- rbind.data.frame(alarmPost, 
-                                      cbind.data.frame(postSummaries$postAlarm, modelInfo))
         alarmTimePost <- rbind.data.frame(alarmTimePost, 
                                           cbind.data.frame(postSummaries$postAlarmTime, modelInfo))
         R0Post <- rbind.data.frame(R0Post, 
@@ -199,17 +199,13 @@ for (i in batchIdx) {
     
 } # end loop
 
-
-
 idxPrint <- sprintf("%02d",idx)
 
 # save output in RDS form
 saveRDS(gr, paste0('./output/gr_Batch', idxPrint, '.rds'))
 saveRDS(paramsPost, paste0('./output/paramsPost_Batch', idxPrint, '.rds'))
-saveRDS(alarmPost, paste0('./output/alarmPost_Batch', idxPrint, '.rds'))
 saveRDS(alarmTimePost, paste0('./output/alarmTimePost_Batch', idxPrint, '.rds'))
 saveRDS(R0Post, paste0('./output/R0Post_Batch', idxPrint, '.rds'))
 saveRDS(waicPost, paste0('./output/waicPost_Batch', idxPrint, '.rds'))
 saveRDS(predFitPost, paste0('./output/predFitPostBatch', idxPrint, '.rds'))
-
 

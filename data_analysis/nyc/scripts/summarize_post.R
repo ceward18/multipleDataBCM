@@ -16,13 +16,22 @@ source('./scripts/get_model_inputs.R')
 source('./scripts/get_WAIC.R')
 source('./scripts/post_pred_fit.R')
 
-summarizePost <- function(resThree, incData, modelType,
+summarizePost <- function(resThree, incData, modelType, assumeType, peak,
                           smoothC, smoothD, hospData, deathData,
                           N, S0, I0, H0, D0, R0, Istar0, Dstar0) {
     
-    paramSamples1 <- resThree[[1]][,-grep('alarm|R0|yAlarm|Rstar', colnames(resThree[[1]]))]
-    paramSamples2 <- resThree[[2]][,-grep('alarm|R0|yAlarm|Rstar', colnames(resThree[[2]]))]
-    paramSamples3 <- resThree[[3]][,-grep('alarm|R0|yAlarm|Rstar', colnames(resThree[[3]]))]
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
+        paramSamples1 <- resThree[[1]][,-grep('alarm|R0|Rstar|
+                                              |comp_init\\[3\\]|comp_init\\[4\\]|comp_init\\[5\\]', colnames(resThree[[1]]))]
+        paramSamples2 <- resThree[[2]][,-grep('alarm|R0|Rstar|
+                                              |comp_init\\[3\\]|comp_init\\[4\\]|comp_init\\[5\\]', colnames(resThree[[2]]))]
+        paramSamples3 <- resThree[[3]][,-grep('alarm|R0|Rstar|
+                                              |comp_init\\[3\\]|comp_init\\[4\\]|comp_init\\[5\\]', colnames(resThree[[3]]))]
+    } else if (modelType %in% c('SIR_full', 'SIR_inc', 'SIR_noAlarm')) {
+        paramSamples1 <- resThree[[1]][,-grep('alarm|R0|comp_init\\[16\\]', colnames(resThree[[1]]))]
+        paramSamples2 <- resThree[[2]][,-grep('alarm|R0|comp_init\\[16\\]', colnames(resThree[[2]]))]
+        paramSamples3 <- resThree[[3]][,-grep('alarm|R0|comp_init\\[16\\]', colnames(resThree[[3]]))]
+    }
     
     ##############################################################################
     ### gelman-rubin
@@ -48,75 +57,34 @@ summarizePost <- function(resThree, incData, modelType,
     rownames(postParams) <- NULL
     
     ##############################################################################
-    ### posterior distribution of alarm function over range observed
-    
-    # get xC and xD (range of observed incidence/deaths)
-    modelInputs <- getModelInput(incData, modelType, smoothC, smoothD,
-                                 hospData, deathData,
-                                 N, S0, I0, H0, D0, R0)
-    n <- length(modelInputs$xC)
-    
-    alarmSamples1 <- resThree[[1]][,grep('yAlarm', colnames(resThree[[1]]))]
-    alarmSamples2 <- resThree[[2]][,grep('yAlarm', colnames(resThree[[2]]))]
-    alarmSamples3 <- resThree[[3]][,grep('yAlarm', colnames(resThree[[3]]))]
-    alarmSamples <- rbind(alarmSamples1, alarmSamples2, alarmSamples3)
-    if (modelType %in% c('simple', 'full')) {
-        alarmSamples <- alarmSamples[,c(paste0('yAlarmC[', 1:n, ']'),
-                                        paste0('yAlarmD[', 1:n, ']'))]
-    }
-    
-    postMeans <- colMeans(alarmSamples)
-    postCI <- apply(alarmSamples, 2, quantile, probs = c(0.025, 0.975))
-    
-    if (modelType %in% c('simple', 'full')) {
-        postAlarm <- data.frame(xAlarm = c(modelInputs$xC,  modelInputs$xD),
-                                marg = rep(c('inc', 'death'), each = n),
-                                mean = postMeans,
-                                lower = postCI[1,],
-                                upper = postCI[2,])
-    }  else if (modelType == 'inc') {
-        postAlarm <- data.frame(xAlarm = modelInputs$xC,
-                                marg = rep('inc', n),
-                                mean = postMeans,
-                                lower = postCI[1,],
-                                upper = postCI[2,])
-    }
-    
-    
-    rownames(postAlarm) <- NULL
-    
-    ##############################################################################
-    ### posterior distribution of individual alarm functions
+    ### posterior distribution of alarm function
     
     tau <- length(incData)
     
-    alarmSamples1 <- resThree[[1]][,grep('alarm[[:upper:]]', colnames(resThree[[1]]))]
-    alarmSamples2 <- resThree[[2]][,grep('alarm[[:upper:]]', colnames(resThree[[2]]))]
-    alarmSamples3 <- resThree[[3]][,grep('alarm[[:upper:]]', colnames(resThree[[3]]))]
-    alarmSamples <- rbind(alarmSamples1, alarmSamples2, alarmSamples3)
-    if (modelType %in% c('simple', 'full')) {
-        alarmSamples <- alarmSamples[,c(paste0('alarmC[', 1:tau, ']'),
-                                        paste0('alarmD[', 1:tau, ']'))]
-    }
-    
-    postMeans <- colMeans(alarmSamples)
-    postCI <- apply(alarmSamples, 2, quantile, probs = c(0.025, 0.975))
-    
-    if (modelType %in% c('simple', 'full')) {
-        postAlarmTime <- data.frame(time = rep(1:tau, 2),
-                                    marg = rep(c('inc', 'death'), each = tau),
-                                    mean = postMeans,
-                                    lower = postCI[1,],
-                                    upper = postCI[2,])
-    } else if (modelType == 'inc') {
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_full', 'SIR_inc')) {
+        
+        alarmSamples1 <- resThree[[1]][,grep('alarm', colnames(resThree[[1]]))]
+        alarmSamples2 <- resThree[[2]][,grep('alarm', colnames(resThree[[2]]))]
+        alarmSamples3 <- resThree[[3]][,grep('alarm', colnames(resThree[[3]]))]
+        alarmSamples <- rbind(alarmSamples1, alarmSamples2, alarmSamples3)
+        postMeans <- colMeans(alarmSamples)
+        postCI <- apply(alarmSamples, 2, quantile, probs = c(0.025, 0.975))
+        
         postAlarmTime <- data.frame(time = 1:tau,
-                                    marg = rep('inc', tau),
                                     mean = postMeans,
                                     lower = postCI[1,],
                                     upper = postCI[2,])
+        
+        
+        rownames(postAlarmTime) <- NULL
+        
+    } else if (modelType %in% c('SIHRD_noAlarm', 'SIR_noAlarm')) {
+        
+        postAlarmTime <- data.frame(time = NA,
+                                    mean = NA,
+                                    lower = NA,
+                                    upper = NA)
     }
-    
-    
     rownames(postAlarmTime) <- NULL
     
     ##############################################################################
@@ -134,6 +102,7 @@ summarizePost <- function(resThree, incData, modelType,
                          mean = postMeans,
                          lower = postCI[1,],
                          upper = postCI[2,])
+
     
     ##############################################################################
     ### WAIC values
@@ -142,22 +111,23 @@ summarizePost <- function(resThree, incData, modelType,
     samples <- rbind(resThree[[1]], resThree[[2]], resThree[[3]])
     
     waic <- getWAIC(samples = samples, modelType = modelType, 
+                    assumeType = assumeType, peak = peak,
                     smoothC = smoothC, smoothD = smoothD,
                     hospData = hospData, deathData = deathData,
                     N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0)
     
     
     ##############################################################################
-    ### Posterior predictive fit for full model
+    ### Posterior predictive fit for models where it makes sense
     
-    if (modelType %in% c('full', 'inc')) {
+    if (modelType %in% c('SIHRD_full', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')) {
         postPred <- postPredFit(incData = incData, modelType = modelType,
+                                assumeType = assumeType, peak = peak,
                                 smoothC = smoothC, smoothD = smoothD, 
                                 hospData = hospData, deathData = deathData, 
                                 paramsSamples = samples,
                                 N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0,
                                 Istar0 = Istar0, Dstar0 = Dstar0)
-        
         
         # remove NA rows (inc model only)
         postPred <- postPred[!is.na(postPred[,1]),]
@@ -165,20 +135,40 @@ summarizePost <- function(resThree, incData, modelType,
         postMeans <- rowMeans(postPred)
         postCI <- apply(postPred, 1, quantile, probs = c(0.025, 0.975))
         
-        if (modelType %in% c('full', 'fullThresh')) {
-            postPredictFit <- data.frame(time = rep(1:tau, 3),
-                                         marg = rep(c('inc', 'hosp', 'death'), each = tau),
-                                         mean = postMeans,
-                                         lower = postCI[1,],
-                                         upper = postCI[2,])
-        } else {
-            postPredictFit <- data.frame(time = 1:tau,
-                                         marg = rep('inc', tau),
-                                         mean = postMeans,
-                                         lower = postCI[1,],
-                                         upper = postCI[2,])
-        }
+        if (modelType %in% c('SIHRD_full', 'SIHRD_noAlarm')) {
+            
+            if (assumeType == 'undetected') {
+                postPredictFit <- data.frame(time = rep(1:tau, 4),
+                                             marg = rep(c('inc', 'cases', 'hosp', 'death'), each = tau),
+                                             mean = postMeans,
+                                             lower = postCI[1,],
+                                             upper = postCI[2,])
+                
+            } else if (assumeType == 'casesOnly') {
+                postPredictFit <- data.frame(time = rep(1:tau, 3),
+                                             marg = rep(c('inc', 'hosp', 'death'), each = tau),
+                                             mean = postMeans,
+                                             lower = postCI[1,],
+                                             upper = postCI[2,])
+            }
         
+        } else {
+            
+            if (assumeType == 'undetected') {
+                postPredictFit <- data.frame(time = rep(1:tau, 2),
+                                             marg = rep(c('inc', 'cases'), each = tau),
+                                             mean = postMeans,
+                                             lower = postCI[1,],
+                                             upper = postCI[2,])
+                
+            } else if (assumeType == 'casesOnly') {
+                postPredictFit <- data.frame(time = 1:tau,
+                                             marg = rep('inc', tau),
+                                             mean = postMeans,
+                                             lower = postCI[1,],
+                                             upper = postCI[2,])
+            }
+        }
         
         
     } else {
@@ -193,7 +183,6 @@ summarizePost <- function(resThree, incData, modelType,
     ### output
     list(gdiag = gdiag,
          postParams = postParams,
-         postAlarm = postAlarm,
          postAlarmTime = postAlarmTime,
          postR0 = postR0,
          waic = waic,

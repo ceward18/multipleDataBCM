@@ -2,7 +2,7 @@
 # function to fit models 
 ################################################################################
 
-fitAlarmModel <- function(incData, modelType,
+fitAlarmModel <- function(incData, modelType, assumeType, peak,
                           smoothC, smoothD, hospData, deathData, 
                           N, S0, I0, H0, D0, R0, seed) {
     
@@ -14,7 +14,8 @@ fitAlarmModel <- function(incData, modelType,
     set.seed(seed + 3)
     
     # model-specific constants, data, and inits
-    modelInputs <- getModelInput(incData, modelType, smoothC, smoothD,
+    modelInputs <- getModelInput(incData, modelType, assumeType, peak,
+                                 smoothC, smoothD,
                                  hospData, deathData,
                                  N, S0, I0, H0, D0, R0)
     
@@ -24,55 +25,25 @@ fitAlarmModel <- function(incData, modelType,
     nthin <- modelInputs$nthin
     
     ### get appropriate model code
-    modelCode <- get(paste0('SIHRD_', modelType))
+    modelCode <- get(paste0(modelType, '_', assumeType))
     
     ### create nimble model
     myModel <- nimbleModel(modelCode, 
                            data = modelInputs$dataList, 
                            constants = modelInputs$constantsList,
                            inits = modelInputs$initsList)
+    # browser()
     myConfig <- configureMCMC(myModel)
     
-    # need to ensure all stochastic nodes are monitored for WAIC calculation
-    if (modelType != 'inc') { # modelType == 'full' and 'simple'
+    # track reproductive number
+    myConfig$addMonitors('R0')
+    
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc')) {
         
-        myConfig$addMonitors(c('yAlarmC', 'yAlarmD', 'alarmC', 'alarmD', 
-                               'R0', 'delta'))
-        
-        paramsForSlice <- c('beta', 'Z', 'x0C', 'x0D', 'nuC', 'nuD')
-        myConfig$removeSampler(paramsForSlice)
-        myConfig$addSampler(target = paramsForSlice, 
-                            type = "RW_block",
-                            control = list(propCov = diag(c(0.2,
-                                                            0.7, 0.7, 
-                                                            100^2, 10^2, 
-                                                            3, 3))))
-        
-        # use slice sampling for hill parameters
-        paramsForSlice <- c('beta', 'Z', 'x0C', 'x0D', 'nuC', 'nuD')
+        # use slice sampling for transmission parameters
+        paramsForSlice <- c('beta', 'k')
         myConfig$removeSampler(paramsForSlice)
         myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
-        
-    } else { # if model == 'inc'
-        
-        myConfig$addMonitors(c('yAlarmC','alarmC', 'R0', 'deltaC'))
-        
-        # use slice sampling for hill parameters
-        paramsForSlice <- c('deltaC', 'x0C', 'nuC')
-        myConfig$removeSampler(paramsForSlice)
-        myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
-        
-    }
-    
-    if (modelType %in% c('simple', 'inc')) {
-        
-        # joint sampler for beta and w0
-        myConfig$removeSampler(c('beta', 'w0'))
-        myConfig$addSampler(target = c('beta', 'w0'), type = "AF_slice")
-        
-    }
-    
-    if (modelType == 'full') {
         
         # samplers for RstarI and RstarH
         myConfig$removeSamplers('RstarI') # Nodes will be expanded
@@ -83,8 +54,7 @@ fitAlarmModel <- function(incData, modelType,
         myConfig$addSampler(target = c('RstarH'),
                             type = "RstarUpdate")
         
-        
-        
+        # need to ensure all stochastic nodes are monitored for WAIC calculation
         myConfig$addMonitors(c('RstarI', 'RstarH'))
         
         # use slice sampling for rate parameters
@@ -93,9 +63,55 @@ fitAlarmModel <- function(incData, modelType,
         for (j in 1:length(paramsForSlice)) {
             myConfig$addSampler(target = paramsForSlice[j], type = "slice")
         }
-    
         
-    }
+    } else if (modelType == 'SIR_full') {
+        
+        # use slice sampling for transmission parameters
+        paramsForSlice <- c('beta', 'k', 'w0')
+        myConfig$removeSampler(paramsForSlice)
+        myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
+        
+    } else if (modelType == 'SIR_inc') { 
+        
+        # use slice sampling for transmission parameters
+        paramsForSlice <- c('beta', 'k', 'w0')
+        myConfig$removeSampler(paramsForSlice)
+        myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
+        
+    } else if (modelType == 'SIHRD_noAlarm') {
+        
+        # samplers for RstarI and RstarH
+        myConfig$removeSamplers('RstarI') # Nodes will be expanded
+        myConfig$addSampler(target = c('RstarI'),
+                            type = "RstarUpdate")
+        
+        myConfig$removeSamplers('RstarH') # Nodes will be expanded
+        myConfig$addSampler(target = c('RstarH'),
+                            type = "RstarUpdate")
+        
+        # need to ensure all stochastic nodes are monitored for WAIC calculation
+        myConfig$addMonitors(c('RstarI', 'RstarH'))
+        
+        # use slice sampling for rate parameters
+        paramsForSlice <- c('beta', 'gamma1', 'gamma2', 'lambda','phi')
+        myConfig$removeSampler(paramsForSlice)
+        for (j in 1:length(paramsForSlice)) {
+            myConfig$addSampler(target = paramsForSlice[j], type = "slice")
+        }
+        
+    } else if (modelType == 'SIR_noAlarm') {
+        
+        # joint sampler for beta and w0
+        myConfig$removeSampler(c('beta', 'w0'))
+        myConfig$addSampler(target = c('beta', 'w0'), type = "AF_slice")
+        
+    } 
+   
+    # monitor alarm functions when present
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_full', 'SIR_inc')) {
+        myConfig$addMonitors(c('alarm'))
+    } 
+    
     print(myConfig)
     
     # browser()
