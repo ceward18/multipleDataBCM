@@ -601,6 +601,145 @@ SIHRD_full_casesOnly_sim <-  nimbleCode({
 
 ################################################################################
 
+# SIHRD model with alarm based on incidence only
+SIHRD_inc_undetected <-  nimbleCode({
+    
+    # compartment initial values
+    comp_init[1:5] ~ dmulti(prob = initProb[1:5], size = N)
+    S[1] <- comp_init[1] - 1
+    I[1] <- comp_init[2] + 1 # add 1 to ensure I0 > 0
+    H[1] <- comp_init[3]
+    R[1] <- comp_init[4]
+    D[1] <- comp_init[5]
+    
+    probIH <- 1 - exp(-lambda)
+    probIR <- 1 - exp(-gamma1)
+    
+    probHR <- 1 - exp(-gamma2)
+    probHD <- 1 - exp(-phi)
+    
+    ### loop over time
+    for(t in 1:tau) {
+        
+        # alarm based on cases only
+        alarm[t] <- powerAlarm(smoothC[t], N, k)
+        
+        probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * I[t] / N)
+        
+        # SIHRD model
+        # S -> I
+        Istar[t] ~ dbin(probSI[t], S[t])
+        # Istar[t] <- detectIstar[t] + undetectIstar[t]
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
+        # I -> H or R using sequential binomial
+        Hstar[t] ~ dbin(probIH, I[t])
+        RstarI[t] ~ dbin(probIR / (1 - probIH), I[t] - Hstar[t])
+        # H -> R or D using sequential binomial
+        Dstar[t] ~ dbin(probHD, H[t])
+        RstarH[t] ~ dbin(probHR / (1 - probHD), H[t] - Dstar[t])
+        
+        # update S, I, H, R, D
+        S[t + 1] <- S[t] - Istar[t]
+        I[t + 1] <- I[t] + Istar[t] - Hstar[t] - RstarI[t]
+        H[t + 1] <- H[t] + Hstar[t] - RstarH[t] - Dstar[t] 
+        R[t + 1] <- R[t] + RstarI[t] + RstarH[t]
+        D[t + 1] <- D[t] + Dstar[t] 
+        
+    }
+    
+    # estimated effective R0
+    R0[1:(tau-maxInf-1)] <- get_R0_full(betat = beta * (1 - alarm[1:tau]), 
+                                        N = N, gamma1 = gamma1, lambda = lambda,
+                                        S = S[1:tau], maxInf = maxInf)
+    
+    ### Priors
+    
+    # detection probability (1/4 reported)
+    probDetect ~ dbeta(250, 750)
+    
+    # transmission
+    beta ~ dgamma(0.1, 0.1)
+    
+    # transitions
+    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
+    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
+    lambda ~ dgamma(3, 100) # IH (mean 0.03)
+    phi ~ dgamma(10, 100)    # HD (mean 0.1)
+    
+    # alarm functions
+    k ~ dgamma(0.1, 0.1)
+    
+})
+
+################################################################################
+
+# SIHRD model with alarm based on incidence only
+SIHRD_inc_casesOnly <-  nimbleCode({
+    
+    # compartment initial values
+    comp_init[1:5] ~ dmulti(prob = initProb[1:5], size = N)
+    S[1] <- comp_init[1] - 1
+    I[1] <- comp_init[2] + 1 # add 1 to ensure I0 > 0
+    H[1] <- comp_init[3]
+    R[1] <- comp_init[4]
+    D[1] <- comp_init[5]
+    
+    probIH <- 1 - exp(-lambda)
+    probIR <- 1 - exp(-gamma1)
+    
+    probHR <- 1 - exp(-gamma2)
+    probHD <- 1 - exp(-phi)
+    
+    ### loop over time
+    for(t in 1:tau) {
+        
+        # alarm based on cases only
+        alarm[t] <- powerAlarm(smoothC[t], N, k)
+        
+        probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * I[t] / N)
+        
+        # SIHRD model
+        # S -> I
+        Istar[t] ~ dbin(probSI[t], S[t])
+        # I -> H or R using sequential binomial
+        Hstar[t] ~ dbin(probIH, I[t])
+        RstarI[t] ~ dbin(probIR / (1 - probIH), I[t] - Hstar[t])
+        # H -> R or D using sequential binomial
+        Dstar[t] ~ dbin(probHD, H[t])
+        RstarH[t] ~ dbin(probHR / (1 - probHD), H[t] - Dstar[t])
+        
+        # update S, I, H, R, D
+        S[t + 1] <- S[t] - Istar[t]
+        I[t + 1] <- I[t] + Istar[t] - Hstar[t] - RstarI[t]
+        H[t + 1] <- H[t] + Hstar[t] - RstarH[t] - Dstar[t] 
+        R[t + 1] <- R[t] + RstarI[t] + RstarH[t]
+        D[t + 1] <- D[t] + Dstar[t] 
+        
+    }
+    
+    # estimated effective R0
+    R0[1:(tau-maxInf-1)] <- get_R0_full(betat = beta * (1 - alarm[1:tau]), 
+                                        N = N, gamma1 = gamma1, lambda = lambda,
+                                        S = S[1:tau], maxInf = maxInf)
+    
+    ### Priors
+    
+    # transmission
+    beta ~ dgamma(0.1, 0.1)
+    
+    # transitions
+    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
+    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
+    lambda ~ dgamma(3, 100) # IH (mean 0.03)
+    phi ~ dgamma(10, 100)    # HD (mean 0.1)
+    
+    # alarm functions
+    k ~ dgamma(0.1, 0.1)
+    
+})
+
+################################################################################
+
 # SIHRD model with no alarm
 SIHRD_noAlarm_undetected <-  nimbleCode({
     

@@ -15,11 +15,14 @@ source('./scripts/model_code.R')
 # set up grid of models to fit
 nSim <- 50
 dataType <- c('inc', 'death', 'equal')
-modelType <- c('SIHRD_full', 'SIR_full', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')
+modelType <- c('SIHRD_full', 'SIHRD_inc', 
+               'SIR_full', 'SIR_inc',
+               'SIHRD_noAlarm', 
+               'SIR_noAlarm')
 assumeType <- c('undetected', 'casesOnly')
 
 
-# 1500, 300 for each model (50 sims * 2 assumeTypes * 3 dataTypes)
+# 1800, 300 for each model (50 sims * 2 assumeTypes * 3 dataTypes)
 allFits <- expand.grid(simNumber = 1:nSim,
                        dataType = dataType,
                        modelType = modelType,
@@ -28,7 +31,7 @@ allFits <- expand.grid(simNumber = 1:nSim,
 
 rownames(allFits) <- NULL
 
-# 150
+# 180
 tmp <- allFits[seq(1,nrow(allFits), 10),]
 rownames(tmp) <- NULL
 

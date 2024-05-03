@@ -42,7 +42,7 @@ getWAIC <- function(samples, modelType, assumeType, peak,
         samples <- cbind(samples, incDataSamples)
     }
     
-    if (modelType %in% c('SIHRD_full', 'SIHRD_noAlarm')) {
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
         
         hospDataSamples <- matrix(rep(hospData), NROW(samples),
                                  ncol = length(hospData), byrow = T)

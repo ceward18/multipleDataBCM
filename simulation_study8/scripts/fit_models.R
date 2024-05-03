@@ -33,7 +33,7 @@ fitAlarmModel <- function(incData, modelType, assumeType,
 
     myConfig$addMonitors('R0')
     
-    if (modelType == 'SIHRD_full') {
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc')) {
         
         # use slice sampling for transmission parameters
         paramsForSlice <- c('beta', 'k')

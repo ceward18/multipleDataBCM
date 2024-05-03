@@ -18,7 +18,7 @@ getModelInput <- function(incData, modelType, assumeType,
     maxInf <- 10
     
     ### initial conditions probability
-    if (modelType %in% c('SIHRD_full', 'SIHRD_noAlarm')) {
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
         
         # SIHRD model - start of epidemic so no H, R, D
         initProb <- c(S0, I0, 0, 0, 0)/N
@@ -48,7 +48,7 @@ getModelInput <- function(incData, modelType, assumeType,
                      smoothC = smoothC,
                      smoothD = smoothD)
 
-    if (modelType == 'SIHRD_full') {
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
         
         dataList$Hstar <- hospData
         dataList$Dstar <- deathData
@@ -81,86 +81,46 @@ getModelInput <- function(incData, modelType, assumeType,
         names(initsList$RstarI) <- paste0('RstarI[', 1:tau, ']')
         names(initsList$RstarH) <- paste0('RstarH[', 1:tau, ']')
         
-        # end modeltype == 'SIHRD_full'
-        
-    } else if (modelType == 'SIR_full') {
-        
-        ### inits 
-        initsList <- list(comp_init = comp_init,
-                          probDetect = rbeta(1, 250, 750),
-                          beta = runif(1, 1/7, 1),
-                          k = runif(1, 0, 0.02),
-                          alpha = rbeta(1, 1, 1),
-                          w0 = rnorm(1, 5, 0.25),
-                          nu = rgamma(1, 100, 100))
-        
-        # end modeltype == 'SIR_full'
-        
-    } else if (modelType == 'SIR_inc') {
-
-        ### data (remove smoothD)
-        dataList$smoothD <- NULL
-        
-        ### inits 
-        initsList <- list(comp_init = comp_init,
-                          probDetect = rbeta(1, 250, 750),
-                          beta = runif(1, 1/7, 1),
-                          k = runif(1, 0, 0.02),
-                          alpha = rbeta(1, 1, 1),
-                          w0 = rnorm(1, 5, 0.25),
-                          nu = rgamma(1, 100, 100))
-        
-        # end modeltype == 'SIR_inc'
-        
-    } else if (modelType == 'SIHRD_noAlarm') {
-        
-        ### data
-        dataList$Hstar <- hospData
-        dataList$Dstar <- deathData
-        dataList$smoothC <- NULL
-        dataList$smoothD <- NULL
-        
-        repeat {
-            
-            ### inits 
-            initsList <- list(comp_init = comp_init,
-                              probDetect = rbeta(1, 250, 750),
-                              beta = runif(1, 1/7, 1),
-                              gamma1 = rgamma(1, 20, 100), # IR
-                              gamma2 = rgamma(1, 20, 100), # HR
-                              lambda = rgamma(1, 3, 100), # IH
-                              phi = rgamma(1, 10, 100) ,   # HD
-                              RstarI = round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)])),
-                              RstarH = round(0.3 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
-            
-            probIH <- 1 - exp(-initsList$lambda)
-            probIR <- 1 - exp(-initsList$gamma1)
-            
-            probHR <- 1 - exp(-initsList$gamma2)
-            probHD <- 1 - exp(-initsList$phi)
-            
-            if ((probIH + probIR < 1) & (probHR + probHD < 1)) break
+        if (modeltype == 'SIHRD_inc') {
+            dataList$smoothD <- NULL
+            initsList$alpha <- NULL
         }
         
-        # end modeltype == 'SIHRD_noAlarm'
+        # end modeltype %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')
         
-    } else if (modelType == 'SIR_noAlarm') {
-        
-        ### data
-        dataList$smoothC <- NULL
-        dataList$smoothD <- NULL
+    } else if (modelType %in% c('SIR_full', 'SIR_inc', 'SIR_noAlarm')) {
         
         ### inits 
         initsList <- list(comp_init = comp_init,
                           probDetect = rbeta(1, 250, 750),
                           beta = runif(1, 1/7, 1),
+                          k = runif(1, 0, 0.02),
+                          alpha = rbeta(1, 1, 1),
                           w0 = rnorm(1, 5, 0.25),
                           nu = rgamma(1, 100, 100))
-    
         
-        # end modeltype == 'SIR_noAlarm'
+        # end modelType %in% c('SIR_full', 'SIR_inc', 'SIR_noAlarm')
         
     }
+    
+    if (modelType %in% c('SIHRD_inc', 'SIR_inc')) {
+        dataList$smoothD <- NULL
+        initsList$alpha <- NULL
+    }
+    
+    if (modelType %in% c('SIHRD_noAlarm', 'SIR_noAlarm')) {
+        dataList$smoothC <- NULL
+        dataList$smoothD <- NULL
+        
+        initsList$alpha <- NULL
+        initsList$k <- NULL
+        
+        if (modelType == 'SIHRD_noAlarm') {
+            dataList$Hstar <- hospData
+            dataList$Dstar <- deathData
+        }
+    }
+    
     
     if (assumeType == 'casesOnly') {
         initsList$probDetect <- NULL
