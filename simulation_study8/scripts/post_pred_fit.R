@@ -60,16 +60,16 @@ postPredFit <- function(incData, modelType, assumeType,
         
         postPredAll <- apply(sim_C$run(trueVals, 10), 2, median)
         
-        
-        postPredInc[,j] <- postPredAll[grep('^Istar', dataNodes)]
-        
         if (modelType %in% c('SIHRD_full', 'SIHRD_noAlarm')) {
             postPredHosp[,j] <- postPredAll[grep('Hstar', dataNodes)]
             postPredDeath[,j] <- postPredAll[grep('Dstar', dataNodes)]
-        }
+        } 
         
         if (assumeType == 'undetected') {
+            postPredInc[,j] <- postPredAll[grep('^Istar', dataNodes)]
             postPredCases[,j] <- postPredAll[grep('detectIstar', dataNodes)]
+        } else {
+            postPredCases[,j] <- postPredAll[grep('^Istar', dataNodes)]
         }
     }
     

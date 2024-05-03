@@ -101,7 +101,7 @@ fitAlarmModel <- function(incData, modelType, assumeType,
     } 
     
     # monitor alarm functions when present
-    if (modelType %in% c('SIHRD_full', 'SIR_full', 'SIR_inc')) {
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_full', 'SIR_inc')) {
         myConfig$addMonitors(c('alarm'))
     } 
     

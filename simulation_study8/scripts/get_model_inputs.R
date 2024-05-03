@@ -81,12 +81,12 @@ getModelInput <- function(incData, modelType, assumeType,
         names(initsList$RstarI) <- paste0('RstarI[', 1:tau, ']')
         names(initsList$RstarH) <- paste0('RstarH[', 1:tau, ']')
         
-        if (modeltype == 'SIHRD_inc') {
+        if (modelType == 'SIHRD_inc') {
             dataList$smoothD <- NULL
             initsList$alpha <- NULL
         }
         
-        # end modeltype %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')
+        # end modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')
         
     } else if (modelType %in% c('SIR_full', 'SIR_inc', 'SIR_noAlarm')) {
         
