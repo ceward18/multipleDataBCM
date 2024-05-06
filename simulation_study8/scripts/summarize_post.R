@@ -118,7 +118,8 @@ summarizePost <- function(resThree, incData, modelType, assumeType,
     ##############################################################################
     ### Posterior predictive fit for full model
     
-    if (modelType %in% c('SIHRD_full', 'SIHRD_noAlarm', 'SIR_inc', 'SIR_noAlarm')) {
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_inc', 
+                         'SIHRD_noAlarm', 'SIR_noAlarm')) {
         
         postPred <- postPredFit(incData = incData, modelType = modelType,
                                 assumeType = assumeType,  
