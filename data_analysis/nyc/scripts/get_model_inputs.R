@@ -42,29 +42,22 @@ getModelInput <- function(incData, modelType, assumeType, peak,
     }
     
     # prior for probDetect depends on peak 
-    #   (https://www.healthdata.org/sites/default/files/covid_briefs/101_briefing_Canada.pdf)
-    # wave 1: Feb 25 - 11 July 2020          25% detection
-    # wave 2: Aug 23, 2020 - March 20, 2021  40% detection
+    #   (https://covid19.healthdata.org/united-states-of-america/new-york?view=infections-testing&tab=trend&test=infections)
+    # wave 1: Feb 25 - 11 July 2020          17% detection
+    # wave 2: Aug 23, 2020 - March 20, 2021  55% detection
     # wave 3: March 21 - July 17, 2021       
     # wave 4: July 18 - Dec 4, 2021          20% detection
     
-    # prior for case hospitalization rate
-    # https://health-infobase.canada.ca/covid-19/current-situation.html#figure6-header
-    # wave 1: Feb 25 - 11 July 2020          10 per 100,000
-    # wave 2: Aug 23, 2020 - March 20, 2021  15 per 100,000
-    # wave 3: March 21 - July 17, 2021       
-    # wave 4: July 18 - Dec 4, 2021          5 per 100,000
-    
     # prior for hospitalization and death rates also depends on peak
     if (peak == 1) {
-        probDetectMean <- 0.25
-        detectA <- 250
-        detectB <- 750
+        probDetectMean <- 0.17
+        detectA <- 170
+        detectB <- 930
         
     } else if (peak == 2) {
-        probDetectMean <- 0.4
-        detectA <- 400
-        detectB <- 600
+        probDetectMean <- 0.55
+        detectA <- 550
+        detectB <- 450
         
     } else if (peak == 4) {
         probDetectMean <- 0.2
@@ -265,10 +258,6 @@ getModelInput <- function(incData, modelType, assumeType, peak,
     niter <- 5e5
     nburn <- 3e5
     nthin <- 10
-    ### MCMC specifications
-    niter <- 50
-    nburn <- 1
-    nthin <- 1
     
     list(constantsList = constantsList,
          dataList = dataList,

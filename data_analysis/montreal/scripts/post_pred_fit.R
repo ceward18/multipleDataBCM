@@ -2,7 +2,7 @@
 # function to do posterior predictive distribution of observed epidemic curve 
 ################################################################################
 
-# can only run if modelType %in% 'SIHRD_full', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')
+# can only run if modelType %in% 'SIHRD_full', 'SIHRD_inc', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')
 
 postPredFit <- function(incData, modelType, assumeType, peak,
                         smoothC, smoothD, hospData, deathData, 
@@ -21,14 +21,14 @@ postPredFit <- function(incData, modelType, assumeType, peak,
     modelInputs$constantsList$Istar0 <- Istar0
     modelInputs$constantsList$Istar0Length <- length(Istar0)
     
-    if (modelType %in% c('SIHRD_full', 'SIHRD_noAlarm')) {
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
         modelInputs$constantsList$smoothD0 <- smoothD[1]
         modelInputs$constantsList$Dstar0 <- Dstar0
         modelInputs$constantsList$Dstar0Length <- length(Dstar0)
     }
    
     # get model code
-    if (modelType %in% c('SIHRD_full', 'SIR_inc')) {
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_inc')) {
         modelCode <- get(paste0(modelType, '_', assumeType, '_sim'))
     } else if (modelType %in% c('SIHRD_noAlarm', 'SIR_noAlarm')){
         # don't need separate code to simulate from these models, as they 
@@ -44,7 +44,7 @@ postPredFit <- function(incData, modelType, assumeType, peak,
     
     tau <- modelInputs$constantsList$tau
     
-    if (modelType %in% c('SIHRD_full', 'SIHRD_noAlarm')) {
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
         dataNodes <- c('Istar', 'Hstar', 'Dstar', 'RstarH', 'RstarI')
     } else {
         dataNodes <- 'Istar'
@@ -77,7 +77,7 @@ postPredFit <- function(incData, modelType, assumeType, peak,
         
         postPredInc[,j] <- postPredAll[grep('^Istar', dataNodes)]
         
-        if (modelType %in% c('SIHRD_full', 'SIHRD_noAlarm')) {
+        if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
             postPredHosp[,j] <- postPredAll[grep('Hstar', dataNodes)]
             postPredDeath[,j] <- postPredAll[grep('Dstar', dataNodes)]
         }

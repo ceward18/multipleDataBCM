@@ -80,7 +80,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
                           detectA = detectA,
                           detectB = detectB)
     
-    # conditional inference - fix unobserved Istar at 4 times what was observed
+    # conditional inference - fix unobserved Istar at 1/probDetectMean times what was observed
     # (for models that allow undetected infections)
     Istar <- round(incData / probDetectMean)
     
@@ -260,7 +260,6 @@ getModelInput <- function(incData, modelType, assumeType, peak,
         
     }
    
-    
     ### MCMC specifications
     niter <- 5e5
     nburn <- 3e5
