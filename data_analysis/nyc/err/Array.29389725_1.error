@@ -1,0 +1,441 @@
+nimble version 1.0.1 is loaded.
+For more information on NIMBLE and a User Manual,
+please visit https://R-nimble.org.
+
+Note for advanced users who have written their own MCMC samplers:
+  As of version 0.13.0, NIMBLE's protocol for handling posterior
+  predictive nodes has changed in a way that could affect user-defined
+  samplers in some situations. Please see Section 15.5.1 of the User Manual.
+
+Attaching package: ‘nimble’
+
+The following object is masked from ‘package:stats’:
+
+    simulate
+
+Defining model
+Building model
+Setting data and initial values
+Running calculate on model
+  [Note] Any error reports that follow may simply reflect missing values in model variables.
+Checking model sizes and dimensions
+Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.
+Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.
+Calculating WAIC.
+Defining model
+  [Note] 'maxInf' is provided in 'constants' but not used in the model code and is being ignored.
+Building model
+Setting data and initial values
+Running calculate on model
+  [Note] Any error reports that follow may simply reflect missing values in model variables.
+Checking model sizes and dimensions
+  [Note] This model is not fully initialized. This is not an error.
+         To see which variables are not initialized, use model$initializeInfo().
+         For more information on model initialization, see help(modelInitialization).
+Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.
+Compiling
+  [Note] This may take a minute.
+  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.
+*** Error in `/common/software/install/migrated/R/4.1.0/lib64/R/bin/exec/R': double free or corruption (out): 0x0000000022253900 ***
+======= Backtrace: =========
+/lib64/libc.so.6(+0x81329)[0x7fdcea652329]
+/tmp/Rtmp0JesRU/nimble_generatedCode/P_1_MCMC_05_06_22_15_35.so(_ZN5Rstar3runEv+0x866)[0x7fdcdd0c3886]
+/tmp/Rtmp0JesRU/nimble_generatedCode/P_1_MCMC_05_06_22_15_35.so(_ZN4MCMC3runEibbbbdddbi+0x913)[0x7fdcdd0c8ea3]
+/tmp/Rtmp0JesRU/nimble_generatedCode/P_1_MCMC_05_06_22_15_35.so(CALL_MCMC_run+0x10e)[0x7fdcdd0c980e]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0xf9bf6)[0x7fdceb110bf6]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0xfa246)[0x7fdceb111246]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_eval+0x7d8)[0x7fdceb15d178]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x14abe9)[0x7fdceb161be9]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_eval+0x59d)[0x7fdceb15cf3d]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x149614)[0x7fdceb160614]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_eval+0x59d)[0x7fdceb15cf3d]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x1478af)[0x7fdceb15e8af]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_applyClosure+0x1c7)[0x7fdceb15f7e7]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x13c4c6)[0x7fdceb1534c6]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7fdceb15cb00]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x1478af)[0x7fdceb15e8af]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_applyClosure+0x1c7)[0x7fdceb15f7e7]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x13c4c6)[0x7fdceb1534c6]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7fdceb15cb00]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x1478af)[0x7fdceb15e8af]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_applyClosure+0x1c7)[0x7fdceb15f7e7]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x13c4c6)[0x7fdceb1534c6]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7fdceb15cb00]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x1478af)[0x7fdceb15e8af]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_applyClosure+0x1c7)[0x7fdceb15f7e7]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(R_forceAndCall+0x16d)[0x7fdceb16218d]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x817b2)[0x7fdceb0987b2]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x188886)[0x7fdceb19f886]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x1328af)[0x7fdceb1498af]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7fdceb15cb00]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x1478af)[0x7fdceb15e8af]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_applyClosure+0x1c7)[0x7fdceb15f7e7]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_eval+0x320)[0x7fdceb15ccc0]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0xc7195)[0x7fdceb0de195]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x136d15)[0x7fdceb14dd15]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7fdceb15cb00]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x1478af)[0x7fdceb15e8af]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_applyClosure+0x1c7)[0x7fdceb15f7e7]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x13c4c6)[0x7fdceb1534c6]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7fdceb15cb00]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x1464c2)[0x7fdceb15d4c2]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x146948)[0x7fdceb15d948]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x13a22d)[0x7fdceb15122d]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7fdceb15cb00]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x1464c2)[0x7fdceb15d4c2]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x146948)[0x7fdceb15d948]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x13a22d)[0x7fdceb15122d]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7fdceb15cb00]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x1464c2)[0x7fdceb15d4c2]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x146948)[0x7fdceb15d948]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x13a22d)[0x7fdceb15122d]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7fdceb15cb00]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x1464c2)[0x7fdceb15d4c2]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x146948)[0x7fdceb15d948]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x13a22d)[0x7fdceb15122d]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7fdceb15cb00]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x1478af)[0x7fdceb15e8af]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_applyClosure+0x1c7)[0x7fdceb15f7e7]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x13c4c6)[0x7fdceb1534c6]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_eval+0x160)[0x7fdceb15cb00]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x1478af)[0x7fdceb15e8af]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(Rf_applyClosure+0x1c7)[0x7fdceb15f7e7]
+/common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so(+0x13c4c6)[0x7fdceb1534c6]
+======= Memory map: ========
+00400000-00401000 r-xp 00000000 00:44 16397931164047342724               /common/software/install/migrated/R/4.1.0/lib64/R/bin/exec/R
+00601000-00602000 r--p 00001000 00:44 16397931164047342724               /common/software/install/migrated/R/4.1.0/lib64/R/bin/exec/R
+00602000-00603000 rw-p 00002000 00:44 16397931164047342724               /common/software/install/migrated/R/4.1.0/lib64/R/bin/exec/R
+02496000-22275000 rw-p 00000000 00:00 0                                  [heap]
+7fdcd4000000-7fdcd4021000 rw-p 00000000 00:00 0 
+7fdcd4021000-7fdcd8000000 ---p 00000000 00:00 0 
+7fdcdb8d8000-7fdcdd0a8000 rw-p 00000000 00:00 0 
+7fdcdd0a8000-7fdcdd0fb000 r-xp 00000000 00:46 4165853                    /tmp/Rtmp0JesRU/nimble_generatedCode/P_1_MCMC_05_06_22_15_35.so
+7fdcdd0fb000-7fdcdd2fb000 ---p 00053000 00:46 4165853                    /tmp/Rtmp0JesRU/nimble_generatedCode/P_1_MCMC_05_06_22_15_35.so
+7fdcdd2fb000-7fdcdd2fc000 r--p 00053000 00:46 4165853                    /tmp/Rtmp0JesRU/nimble_generatedCode/P_1_MCMC_05_06_22_15_35.so
+7fdcdd2fc000-7fdcdd2fd000 rw-p 00054000 00:46 4165853                    /tmp/Rtmp0JesRU/nimble_generatedCode/P_1_MCMC_05_06_22_15_35.so
+7fdcdd2fd000-7fdcdd34e000 r-xp 00000000 00:46 3453500                    /tmp/Rtmp0JesRU/nimble_generatedCode/P_1_modelCode_MID_1_05_06_22_15_15.so
+7fdcdd34e000-7fdcdd54e000 ---p 00051000 00:46 3453500                    /tmp/Rtmp0JesRU/nimble_generatedCode/P_1_modelCode_MID_1_05_06_22_15_15.so
+7fdcdd54e000-7fdcdd551000 r--p 00051000 00:46 3453500                    /tmp/Rtmp0JesRU/nimble_generatedCode/P_1_modelCode_MID_1_05_06_22_15_15.so
+7fdcdd551000-7fdcdd552000 rw-p 00054000 00:46 3453500                    /tmp/Rtmp0JesRU/nimble_generatedCode/P_1_modelCode_MID_1_05_06_22_15_15.so
+7fdcdd552000-7fdcdd6d3000 r-xp 00000000 00:47 3463110512                 /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.1/nimble/CppCode/libnimble.so
+7fdcdd6d3000-7fdcdd8d2000 ---p 00181000 00:47 3463110512                 /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.1/nimble/CppCode/libnimble.so
+7fdcdd8d2000-7fdcdd8d6000 r--p 00180000 00:47 3463110512                 /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.1/nimble/CppCode/libnimble.so
+7fdcdd8d6000-7fdcdd8d8000 rw-p 00184000 00:47 3463110512                 /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.1/nimble/CppCode/libnimble.so
+7fdcdd8d8000-7fdcdd8db000 rw-p 00000000 00:00 0 
+7fdcdd8db000-7fdcdd8df000 r-xp 00000000 00:46 4165793                    /tmp/Rtmp0JesRU/nimble_generatedCode/dynamicRegistrations_05_06_22_15_15.so
+7fdcdd8df000-7fdcddade000 ---p 00004000 00:46 4165793                    /tmp/Rtmp0JesRU/nimble_generatedCode/dynamicRegistrations_05_06_22_15_15.so
+7fdcddade000-7fdcddadf000 r--p 00003000 00:46 4165793                    /tmp/Rtmp0JesRU/nimble_generatedCode/dynamicRegistrations_05_06_22_15_15.so
+7fdcddadf000-7fdcddae0000 rw-p 00004000 00:46 4165793                    /tmp/Rtmp0JesRU/nimble_generatedCode/dynamicRegistrations_05_06_22_15_15.so
+7fdcddae0000-7fdcddae3000 r-xp 00000000 00:44 13739986205399781119       /common/software/install/migrated/R/4.1.0/lib64/R/library/glue/libs/glue.so
+7fdcddae3000-7fdcddce2000 ---p 00003000 00:44 13739986205399781119       /common/software/install/migrated/R/4.1.0/lib64/R/library/glue/libs/glue.so
+7fdcddce2000-7fdcddce3000 r--p 00002000 00:44 13739986205399781119       /common/software/install/migrated/R/4.1.0/lib64/R/library/glue/libs/glue.so
+7fdcddce3000-7fdcddce4000 rw-p 00003000 00:44 13739986205399781119       /common/software/install/migrated/R/4.1.0/lib64/R/library/glue/libs/glue.so
+7fdcddce4000-7fdcde43e000 rw-p 00000000 00:00 0 
+7fdcde43e000-7fdcde487000 r-xp 00000000 00:47 380188100                  /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.1/nimble/libs/nimble.so
+7fdcde487000-7fdcde687000 ---p 00049000 00:47 380188100                  /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.1/nimble/libs/nimble.so
+7fdcde687000-7fdcde688000 r--p 00049000 00:47 380188100                  /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.1/nimble/libs/nimble.so
+7fdcde688000-7fdcde689000 rw-p 0004a000 00:47 380188100                  /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.1/nimble/libs/nimble.so
+7fdcde689000-7fdcde68a000 rw-p 00000000 00:00 0 
+7fdcde68a000-7fdcde68d000 r-xp 00000000 00:44 18291938846804369243       /common/software/install/migrated/R/4.1.0/lib64/R/library/lattice/libs/lattice.so
+7fdcde68d000-7fdcde88c000 ---p 00003000 00:44 18291938846804369243       /common/software/install/migrated/R/4.1.0/lib64/R/library/lattice/libs/lattice.so
+7fdcde88c000-7fdcde88d000 r--p 00002000 00:44 18291938846804369243       /common/software/install/migrated/R/4.1.0/lib64/R/library/lattice/libs/lattice.so
+7fdcde88d000-7fdcde88e000 rw-p 00003000 00:44 18291938846804369243       /common/software/install/migrated/R/4.1.0/lib64/R/library/lattice/libs/lattice.so
+7fdcde88e000-7fdcde8af000 r-xp 00000000 00:44 2680375480824311282        /common/software/install/migrated/R/4.1.0/lib64/R/library/grid/libs/grid.so
+7fdcde8af000-7fdcdeaaf000 ---p 00021000 00:44 2680375480824311282        /common/software/install/migrated/R/4.1.0/lib64/R/library/grid/libs/grid.so
+7fdcdeaaf000-7fdcdeab0000 r--p 00021000 00:44 2680375480824311282        /common/software/install/migrated/R/4.1.0/lib64/R/library/grid/libs/grid.so
+7fdcdeab0000-7fdcdeab1000 rw-p 00022000 00:44 2680375480824311282        /common/software/install/migrated/R/4.1.0/lib64/R/library/grid/libs/grid.so
+7fdcdeab1000-7fdcdec0f000 r-xp 00000000 fd:01 439893                     /usr/lib64/libxml2.so.2.9.1
+7fdcdec0f000-7fdcdee0f000 ---p 0015e000 fd:01 439893                     /usr/lib64/libxml2.so.2.9.1
+7fdcdee0f000-7fdcdee17000 r--p 0015e000 fd:01 439893                     /usr/lib64/libxml2.so.2.9.1
+7fdcdee17000-7fdcdee19000 rw-p 00166000 fd:01 439893                     /usr/lib64/libxml2.so.2.9.1
+7fdcdee19000-7fdcdee1b000 rw-p 00000000 00:00 0 
+7fdcdee1b000-7fdcdef04000 r-xp 00000000 00:44 18035638477812978405       /common/software/install/spack/linux-centos7-ivybridge/gcc-13.1.0/glpk-5.0-hehczdzwbdt5f3nalx32n7apq2dovy4j/lib/libglpk.so.40.3.1
+7fdcdef04000-7fdcdf104000 ---p 000e9000 00:44 18035638477812978405       /common/software/install/spack/linux-centos7-ivybridge/gcc-13.1.0/glpk-5.0-hehczdzwbdt5f3nalx32n7apq2dovy4j/lib/libglpk.so.40.3.1
+7fdcdf104000-7fdcdf105000 r--p 000e9000 00:44 18035638477812978405       /common/software/install/spack/linux-centos7-ivybridge/gcc-13.1.0/glpk-5.0-hehczdzwbdt5f3nalx32n7apq2dovy4j/lib/libglpk.so.40.3.1
+7fdcdf105000-7fdcdf106000 rw-p 000ea000 00:44 18035638477812978405       /common/software/install/spack/linux-centos7-ivybridge/gcc-13.1.0/glpk-5.0-hehczdzwbdt5f3nalx32n7apq2dovy4j/lib/libglpk.so.40.3.1
+7fdcdf106000-7fdcdf3f6000 r-xp 00000000 00:47 282879706                  /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.1/igraph/libs/igraph.so
+7fdcdf3f6000-7fdcdf5f5000 ---p 002f0000 00:47 282879706                  /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.1/igraph/libs/igraph.so
+7fdcdf5f5000-7fdcdf5fa000 r--p 002ef000 00:47 282879706                  /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.1/igraph/libs/igraph.so
+7fdcdf5fa000-7fdcdf5fc000 rw-p 002f4000 00:47 282879706                  /panfs/jay/groups/7/ward-c/ward-c/R/x86_64-pc-linux-gnu-library/4.1/igraph/libs/igraph.so
+7fdcdf5fc000-7fdcdf600000 rw-p 00000000 00:00 0 
+7fdcdf600000-7fdcdf603000 r-xp 00000000 00:44 5076470709390767987        /common/software/install/migrated/R/4.1.0/lib64/R/library/magrittr/libs/magrittr.so
+7fdcdf603000-7fdcdf802000 ---p 00003000 00:44 5076470709390767987        /common/software/install/migrated/R/4.1.0/lib64/R/library/magrittr/libs/magrittr.so
+7fdcdf802000-7fdcdf803000 r--p 00002000 00:44 5076470709390767987        /common/software/install/migrated/R/4.1.0/lib64/R/library/magrittr/libs/magrittr.so
+7fdcdf803000-7fdcdf804000 rw-p 00003000 00:44 5076470709390767987        /common/software/install/migrated/R/4.1.0/lib64/R/library/magrittr/libs/magrittr.so
+7fdcdf804000-7fdcdf805000 ---p 00000000 00:00 0 
+7fdcdf805000-7fdce0005000 rw-p 00000000 00:00 0 
+7fdce0005000-7fdce002c000 r-xp 00000000 00:44 3527377058392944571        /common/software/install/migrated/R/4.1.0/lib64/R/library/cli/libs/cli.so
+7fdce002c000-7fdce022b000 ---p 00027000 00:44 3527377058392944571        /common/software/install/migrated/R/4.1.0/lib64/R/library/cli/libs/cli.so
+7fdce022b000-7fdce022c000 r--p 00026000 00:44 3527377058392944571        /common/software/install/migrated/R/4.1.0/lib64/R/library/cli/libs/cli.so
+7fdce022c000-7fdce022e000 rw-p 00027000 00:44 3527377058392944571        /common/software/install/migrated/R/4.1.0/lib64/R/library/cli/libs/cli.so
+7fdce022e000-7fdce0230000 rw-p 00000000 00:00 0 
+7fdce0230000-7fdce0267000 r-xp 00000000 00:44 15937483423103427553       /common/software/install/migrated/R/4.1.0/lib64/R/library/rlang/libs/rlang.so
+7fdce0267000-7fdce0466000 ---p 00037000 00:44 15937483423103427553       /common/software/install/migrated/R/4.1.0/lib64/R/library/rlang/libs/rlang.so
+7fdce0466000-7fdce0468000 r--p 00036000 00:44 15937483423103427553       /common/software/install/migrated/R/4.1.0/lib64/R/library/rlang/libs/rlang.so
+7fdce0468000-7fdce0469000 rw-p 00038000 00:44 15937483423103427553       /common/software/install/migrated/R/4.1.0/lib64/R/library/rlang/libs/rlang.so
+7fdce0469000-7fdce046a000 rw-p 00000000 00:00 0 
+7fdce046a000-7fdce04ca000 r-xp 00000000 fd:01 436676                     /usr/lib64/libpcre.so.1.2.0
+7fdce04ca000-7fdce06ca000 ---p 00060000 fd:01 436676                     /usr/lib64/libpcre.so.1.2.0
+7fdce06ca000-7fdce06cb000 r--p 00060000 fd:01 436676                     /usr/lib64/libpcre.so.1.2.0
+7fdce06cb000-7fdce06cc000 rw-p 00061000 fd:01 436676                     /usr/lib64/libpcre.so.1.2.0
+7fdce06cc000-7fdce06ce000 r-xp 00000000 fd:01 436437                     /usr/lib64/libfreebl3.so
+7fdce06ce000-7fdce08cd000 ---p 00002000 fd:01 436437                     /usr/lib64/libfreebl3.so
+7fdce08cd000-7fdce08ce000 r--p 00001000 fd:01 436437                     /usr/lib64/libfreebl3.so
+7fdce08ce000-7fdce08cf000 rw-p 00002000 fd:01 436437                     /usr/lib64/libfreebl3.so
+7fdce08cf000-7fdce08f3000 r-xp 00000000 fd:01 439884                     /usr/lib64/libselinux.so.1
+7fdce08f3000-7fdce0af2000 ---p 00024000 fd:01 439884                     /usr/lib64/libselinux.so.1
+7fdce0af2000-7fdce0af3000 r--p 00023000 fd:01 439884                     /usr/lib64/libselinux.so.1
+7fdce0af3000-7fdce0af4000 rw-p 00024000 fd:01 439884                     /usr/lib64/libselinux.so.1
+7fdce0af4000-7fdce0af6000 rw-p 00000000 00:00 0 
+7fdce0af6000-7fdce0afe000 r-xp 00000000 fd:01 436537                     /usr/lib64/libcrypt-2.17.so
+7fdce0afe000-7fdce0cfd000 ---p 00008000 fd:01 436537                     /usr/lib64/libcrypt-2.17.so
+7fdce0cfd000-7fdce0cfe000 r--p 00007000 fd:01 436537                     /usr/lib64/libcrypt-2.17.so
+7fdce0cfe000-7fdce0cff000 rw-p 00008000 fd:01 436537                     /usr/lib64/libcrypt-2.17.so
+7fdce0cff000-7fdce0d2d000 rw-p 00000000 00:00 0 
+7fdce0d2d000-7fdce0d30000 r-xp 00000000 fd:01 439812                     /usr/lib64/libkeyutils.so.1.5
+7fdce0d30000-7fdce0f2f000 ---p 00003000 fd:01 439812                     /usr/lib64/libkeyutils.so.1.5
+7fdce0f2f000-7fdce0f30000 r--p 00002000 fd:01 439812                     /usr/lib64/libkeyutils.so.1.5
+7fdce0f30000-7fdce0f31000 rw-p 00003000 fd:01 439812                     /usr/lib64/libkeyutils.so.1.5
+7fdce0f31000-7fdce0f3f000 r-xp 00000000 fd:01 436710                     /usr/lib64/libkrb5support.so.0.1
+7fdce0f3f000-7fdce113f000 ---p 0000e000 fd:01 436710                     /usr/lib64/libkrb5support.so.0.1
+7fdce113f000-7fdce1140000 r--p 0000e000 fd:01 436710                     /usr/lib64/libkrb5support.so.0.1
+7fdce1140000-7fdce1141000 rw-p 0000f000 fd:01 436710                     /usr/lib64/libkrb5support.so.0.1
+7fdce1141000-7fdce117b000 r-xp 00000000 fd:01 436677                     /usr/lib64/libnspr4.so
+7fdce117b000-7fdce137b000 ---p 0003a000 fd:01 436677                     /usr/lib64/libnspr4.so
+7fdce137b000-7fdce137c000 r--p 0003a000 fd:01 436677                     /usr/lib64/libnspr4.so
+7fdce137c000-7fdce137e000 rw-p 0003b000 fd:01 436677                     /usr/lib64/libnspr4.so
+7fdce137e000-7fdce1380000 rw-p 00000000 00:00 0 
+7fdce1380000-7fdce1384000 r-xp 00000000 fd:01 437237                     /usr/lib64/libplc4.so
+7fdce1384000-7fdce1583000 ---p 00004000 fd:01 437237                     /usr/lib64/libplc4.so
+7fdce1583000-7fdce1584000 r--p 00003000 fd:01 437237                     /usr/lib64/libplc4.so
+7fdce1584000-7fdce1585000 rw-p 00004000 fd:01 437237                     /usr/lib64/libplc4.so
+7fdce1585000-7fdce1588000 r-xp 00000000 fd:01 436527                     /usr/lib64/libplds4.so
+7fdce1588000-7fdce1787000 ---p 00003000 fd:01 436527                     /usr/lib64/libplds4.so
+7fdce1787000-7fdce1788000 r--p 00002000 fd:01 436527                     /usr/lib64/libplds4.so
+7fdce1788000-7fdce1789000 rw-p 00003000 fd:01 436527                     /usr/lib64/libplds4.so
+7fdce1789000-7fdce17b2000 r-xp 00000000 fd:01 436689                     /usr/lib64/libnssutil3.so
+7fdce17b2000-7fdce19b2000 ---p 00029000 fd:01 436689                     /usr/lib64/libnssutil3.so
+7fdce19b2000-7fdce19b9000 r--p 00029000 fd:01 436689                     /usr/lib64/libnssutil3.so
+7fdce19b9000-7fdce19ba000 rw-p 00030000 fd:01 436689                     /usr/lib64/libnssutil3.so
+7fdce19ba000-7fdce1aeb000 r-xp 00000000 fd:01 437251                     /usr/lib64/libnss3.so
+7fdce1aeb000-7fdce1ceb000 ---p 00131000 fd:01 437251                     /usr/lib64/libnss3.so
+7fdce1ceb000-7fdce1cf0000 r--p 00131000 fd:01 437251                     /usr/lib64/libnss3.so
+7fdce1cf0000-7fdce1cf3000 rw-p 00136000 fd:01 437251                     /usr/lib64/libnss3.so
+7fdce1cf3000-7fdce1cf4000 rw-p 00000000 00:00 0 
+7fdce1cf4000-7fdce1d19000 r-xp 00000000 fd:01 436643                     /usr/lib64/libsmime3.so
+7fdce1d19000-7fdce1f18000 ---p 00025000 fd:01 436643                     /usr/lib64/libsmime3.so
+7fdce1f18000-7fdce1f1b000 r--p 00024000 fd:01 436643                     /usr/lib64/libsmime3.so
+7fdce1f1b000-7fdce1f1c000 rw-p 00027000 fd:01 436643                     /usr/lib64/libsmime3.so
+7fdce1f1c000-7fdce1f7c000 r-xp 00000000 fd:01 436669                     /usr/lib64/libssl3.so
+7fdce1f7c000-7fdce217b000 ---p 00060000 fd:01 436669                     /usr/lib64/libssl3.so
+7fdce217b000-7fdce217f000 r--p 0005f000 fd:01 436669                     /usr/lib64/libssl3.so
+7fdce217f000-7fdce2180000 rw-p 00063000 fd:01 436669                     /usr/lib64/libssl3.so
+7fdce2180000-7fdce2181000 rw-p 00000000 00:00 0 
+7fdce2181000-7fdce219d000 r-xp 00000000 fd:01 436646                     /usr/lib64/libsasl2.so.3.0.0
+7fdce219d000-7fdce239c000 ---p 0001c000 fd:01 436646                     /usr/lib64/libsasl2.so.3.0.0
+7fdce239c000-7fdce239d000 r--p 0001b000 fd:01 436646                     /usr/lib64/libsasl2.so.3.0.0
+7fdce239d000-7fdce239e000 rw-p 0001c000 fd:01 436646                     /usr/lib64/libsasl2.so.3.0.0
+7fdce239e000-7fdce23b4000 r-xp 00000000 fd:01 436719                     /usr/lib64/libresolv-2.17.so
+7fdce23b4000-7fdce25b4000 ---p 00016000 fd:01 436719                     /usr/lib64/libresolv-2.17.so
+7fdce25b4000-7fdce25b5000 r--p 00016000 fd:01 436719                     /usr/lib64/libresolv-2.17.so
+7fdce25b5000-7fdce25b6000 rw-p 00017000 fd:01 436719                     /usr/lib64/libresolv-2.17.so
+7fdce25b6000-7fdce25b8000 rw-p 00000000 00:00 0 
+7fdce25b8000-7fdce25c6000 r-xp 00000000 fd:01 439801                     /usr/lib64/liblber-2.4.so.2.10.7
+7fdce25c6000-7fdce27c5000 ---p 0000e000 fd:01 439801                     /usr/lib64/liblber-2.4.so.2.10.7
+7fdce27c5000-7fdce27c6000 r--p 0000d000 fd:01 439801                     /usr/lib64/liblber-2.4.so.2.10.7
+7fdce27c6000-7fdce27c7000 rw-p 0000e000 fd:01 439801                     /usr/lib64/liblber-2.4.so.2.10.7
+7fdce27c7000-7fdce27f8000 r-xp 00000000 fd:01 436517                     /usr/lib64/libk5crypto.so.3.1
+7fdce27f8000-7fdce29f7000 ---p 00031000 fd:01 436517                     /usr/lib64/libk5crypto.so.3.1
+7fdce29f7000-7fdce29f9000 r--p 00030000 fd:01 436517                     /usr/lib64/libk5crypto.so.3.1
+7fdce29f9000-7fdce29fa000 rw-p 00032000 fd:01 436517                     /usr/lib64/libk5crypto.so.3.1
+7fdce29fa000-7fdce29fd000 r-xp 00000000 fd:01 437276                     /usr/lib64/libcom_err.so.2.1
+7fdce29fd000-7fdce2bfc000 ---p 00003000 fd:01 437276                     /usr/lib64/libcom_err.so.2.1
+7fdce2bfc000-7fdce2bfd000 r--p 00002000 fd:01 437276                     /usr/lib64/libcom_err.so.2.1
+7fdce2bfd000-7fdce2bfe000 rw-p 00003000 fd:01 437276                     /usr/lib64/libcom_err.so.2.1
+7fdce2bfe000-7fdce2cd7000 r-xp 00000000 fd:01 436656                     /usr/lib64/libkrb5.so.3.3
+7fdce2cd7000-7fdce2ed6000 ---p 000d9000 fd:01 436656                     /usr/lib64/libkrb5.so.3.3
+7fdce2ed6000-7fdce2ee4000 r--p 000d8000 fd:01 436656                     /usr/lib64/libkrb5.so.3.3
+7fdce2ee4000-7fdce2ee7000 rw-p 000e6000 fd:01 436656                     /usr/lib64/libkrb5.so.3.3
+7fdce2ee7000-7fdce2f31000 r-xp 00000000 fd:01 436528                     /usr/lib64/libgssapi_krb5.so.2.2
+7fdce2f31000-7fdce3131000 ---p 0004a000 fd:01 436528                     /usr/lib64/libgssapi_krb5.so.2.2
+7fdce3131000-7fdce3132000 r--p 0004a000 fd:01 436528                     /usr/lib64/libgssapi_krb5.so.2.2
+7fdce3132000-7fdce3134000 rw-p 0004b000 fd:01 436528                     /usr/lib64/libgssapi_krb5.so.2.2
+7fdce3134000-7fdce3186000 r-xp 00000000 fd:01 436674                     /usr/lib64/libldap-2.4.so.2.10.7
+7fdce3186000-7fdce3386000 ---p 00052000 fd:01 436674                     /usr/lib64/libldap-2.4.so.2.10.7
+7fdce3386000-7fdce3388000 r--p 00052000 fd:01 436674                     /usr/lib64/libldap-2.4.so.2.10.7
+7fdce3388000-7fdce3389000 rw-p 00054000 fd:01 436674                     /usr/lib64/libldap-2.4.so.2.10.7
+7fdce3389000-7fdce35c0000 r-xp 00000000 fd:01 436673                     /usr/lib64/libcrypto.so.1.0.2k
+7fdce35c0000-7fdce37bf000 ---p 00237000 fd:01 436673                     /usr/lib64/libcrypto.so.1.0.2k
+7fdce37bf000-7fdce37db000 r--p 00236000 fd:01 436673                     /usr/lib64/libcrypto.so.1.0.2k
+7fdce37db000-7fdce37e8000 rw-p 00252000 fd:01 436673                     /usr/lib64/libcrypto.so.1.0.2k
+7fdce37e8000-7fdce37ec000 rw-p 00000000 00:00 0 
+7fdce37ec000-7fdce3853000 r-xp 00000000 fd:01 436645                     /usr/lib64/libssl.so.1.0.2k
+7fdce3853000-7fdce3a53000 ---p 00067000 fd:01 436645                     /usr/lib64/libssl.so.1.0.2k
+7fdce3a53000-7fdce3a57000 r--p 00067000 fd:01 436645                     /usr/lib64/libssl.so.1.0.2k
+7fdce3a57000-7fdce3a5e000 rw-p 0006b000 fd:01 436645                     /usr/lib64/libssl.so.1.0.2k
+7fdce3a5e000-7fdce3acf000 r-xp 00000000 00:44 18273882033464649197       /common/software/install/migrated/curl/7.59.0_gcc7.2.0/lib/libcurl.so.4.5.0
+7fdce3acf000-7fdce3ccf000 ---p 00071000 00:44 18273882033464649197       /common/software/install/migrated/curl/7.59.0_gcc7.2.0/lib/libcurl.so.4.5.0
+7fdce3ccf000-7fdce3cd2000 rw-p 00071000 00:44 18273882033464649197       /common/software/install/migrated/curl/7.59.0_gcc7.2.0/lib/libcurl.so.4.5.0
+7fdce3cd2000-7fdce3cd5000 rw-p 00084000 00:44 18273882033464649197       /common/software/install/migrated/curl/7.59.0_gcc7.2.0/lib/libcurl.so.4.5.0
+7fdce3cd5000-7fdce3cea000 r-xp 00000000 00:44 10706998017599921712       /common/software/install/migrated/R/4.1.0/lib64/R/modules/internet.so
+7fdce3cea000-7fdce3ee9000 ---p 00015000 00:44 10706998017599921712       /common/software/install/migrated/R/4.1.0/lib64/R/modules/internet.so
+7fdce3ee9000-7fdce3eea000 r--p 00014000 00:44 10706998017599921712       /common/software/install/migrated/R/4.1.0/lib64/R/modules/internet.so
+7fdce3eea000-7fdce3eeb000 rw-p 00015000 00:44 10706998017599921712       /common/software/install/migrated/R/4.1.0/lib64/R/modules/internet.so
+7fdce3eeb000-7fdce3ff5000 rw-p 00000000 00:00 0 
+7fdce3ff5000-7fdce4860000 r--s 00000000 fd:03 2621972                    /var/lib/sss/mc/passwd
+7fdce4860000-7fdce4868000 r-xp 00000000 fd:01 466049                     /usr/lib64/libnss_sss.so.2
+7fdce4868000-7fdce4a67000 ---p 00008000 fd:01 466049                     /usr/lib64/libnss_sss.so.2
+7fdce4a67000-7fdce4a68000 r--p 00007000 fd:01 466049                     /usr/lib64/libnss_sss.so.2
+7fdce4a68000-7fdce4a69000 rw-p 00008000 fd:01 466049                     /usr/lib64/libnss_sss.so.2
+7fdce4a69000-7fdce4a75000 r-xp 00000000 fd:01 436706                     /usr/lib64/libnss_files-2.17.so
+7fdce4a75000-7fdce4c74000 ---p 0000c000 fd:01 436706                     /usr/lib64/libnss_files-2.17.so
+7fdce4c74000-7fdce4c75000 r--p 0000b000 fd:01 436706                     /usr/lib64/libnss_files-2.17.so
+7fdce4c75000-7fdce4c76000 rw-p 0000c000 fd:01 436706                     /usr/lib64/libnss_files-2.17.so
+7fdce4c76000-7fdce4c7c000 rw-p 00000000 00:00 0 
+7fdce4c7c000-7fdce4c82000 r-xp 00000000 00:44 268925224316757644         /common/software/install/migrated/R/4.1.0/lib64/R/library/parallel/libs/parallel.so
+7fdce4c82000-7fdce4e81000 ---p 00006000 00:44 268925224316757644         /common/software/install/migrated/R/4.1.0/lib64/R/library/parallel/libs/parallel.so
+7fdce4e81000-7fdce4e82000 r--p 00005000 00:44 268925224316757644         /common/software/install/migrated/R/4.1.0/lib64/R/library/parallel/libs/parallel.so
+7fdce4e82000-7fdce4e83000 rw-p 00006000 00:44 268925224316757644         /common/software/install/migrated/R/4.1.0/lib64/R/library/parallel/libs/parallel.so
+7fdce4e83000-7fdce505d000 r-xp 00000000 00:44 13256071890372566831       /common/software/install/migrated/R/4.1.0/lib64/R/lib/libRlapack.so
+7fdce505d000-7fdce525c000 ---p 001da000 00:44 13256071890372566831       /common/software/install/migrated/R/4.1.0/lib64/R/lib/libRlapack.so
+7fdce525c000-7fdce525d000 r--p 001d9000 00:44 13256071890372566831       /common/software/install/migrated/R/4.1.0/lib64/R/lib/libRlapack.so
+7fdce525d000-7fdce525e000 rw-p 001da000 00:44 13256071890372566831       /common/software/install/migrated/R/4.1.0/lib64/R/lib/libRlapack.so
+7fdce525e000-7fdce5278000 rw-p 00000000 00:00 0 
+7fdce5278000-7fdce531d000 r-xp 00000000 00:44 13577436375735991902       /common/software/install/migrated/R/4.1.0/lib64/R/library/stats/libs/stats.so
+7fdce531d000-7fdce551d000 ---p 000a5000 00:44 13577436375735991902       /common/software/install/migrated/R/4.1.0/lib64/R/library/stats/libs/stats.so
+7fdce551d000-7fdce551f000 r--p 000a5000 00:44 13577436375735991902       /common/software/install/migrated/R/4.1.0/lib64/R/library/stats/libs/stats.so
+7fdce551f000-7fdce5521000 rw-p 000a7000 00:44 13577436375735991902       /common/software/install/migrated/R/4.1.0/lib64/R/library/stats/libs/stats.so
+7fdce5521000-7fdce556a000 r-xp 00000000 00:44 7657514076799104514        /common/software/install/migrated/R/4.1.0/lib64/R/library/graphics/libs/graphics.so
+7fdce556a000-7fdce576a000 ---p 00049000 00:44 7657514076799104514        /common/software/install/migrated/R/4.1.0/lib64/R/library/graphics/libs/graphics.so
+7fdce576a000-7fdce576b000 r--p 00049000 00:44 7657514076799104514        /common/software/install/migrated/R/4.1.0/lib64/R/library/graphics/libs/graphics.so
+7fdce576b000-7fdce576c000 rw-p 0004a000 00:44 7657514076799104514        /common/software/install/migrated/R/4.1.0/lib64/R/library/graphics/libs/graphics.so
+7fdce576c000-7fdce5779000 r-xp 00000000 00:44 17158429577982830704       /common/software/install/migrated/R/4.1.0/lib64/R/library/utils/libs/utils.so
+7fdce5779000-7fdce5978000 ---p 0000d000 00:44 17158429577982830704       /common/software/install/migrated/R/4.1.0/lib64/R/library/utils/libs/utils.so
+7fdce5978000-7fdce5979000 r--p 0000c000 00:44 17158429577982830704       /common/software/install/migrated/R/4.1.0/lib64/R/library/utils/libs/utils.so
+7fdce5979000-7fdce597a000 rw-p 0000d000 00:44 17158429577982830704       /common/software/install/migrated/R/4.1.0/lib64/R/library/utils/libs/utils.so
+7fdce597a000-7fdce597b000 rw-p 00000000 00:00 0 
+7fdce5b0e000-7fdce5b4a000 r-xp 00000000 00:44 12750736072949974040       /common/software/install/migrated/R/4.1.0/lib64/R/library/grDevices/libs/grDevices.so
+7fdce5b4a000-7fdce5d49000 ---p 0003c000 00:44 12750736072949974040       /common/software/install/migrated/R/4.1.0/lib64/R/library/grDevices/libs/grDevices.so
+7fdce5d49000-7fdce5d4e000 r--p 0003b000 00:44 12750736072949974040       /common/software/install/migrated/R/4.1.0/lib64/R/library/grDevices/libs/grDevices.so
+7fdce5d4e000-7fdce5d50000 rw-p 00040000 00:44 12750736072949974040       /common/software/install/migrated/R/4.1.0/lib64/R/library/grDevices/libs/grDevices.so
+7fdce5d50000-7fdce5e38000 rw-p 00000000 00:00 0 
+7fdce5f04000-7fdce6046000 rw-p 00000000 00:00 0 
+7fdce6046000-7fdce604f000 r-xp 00000000 00:44 2217689862668603656        /common/software/install/migrated/R/4.1.0/lib64/R/library/methods/libs/methods.so
+7fdce604f000-7fdce624e000 ---p 00009000 00:44 2217689862668603656        /common/software/install/migrated/R/4.1.0/lib64/R/library/methods/libs/methods.so
+7fdce624e000-7fdce624f000 r--p 00008000 00:44 2217689862668603656        /common/software/install/migrated/R/4.1.0/lib64/R/library/methods/libs/methods.so
+7fdce624f000-7fdce6250000 rw-p 00009000 00:44 2217689862668603656        /common/software/install/migrated/R/4.1.0/lib64/R/library/methods/libs/methods.so
+7fdce62b6000-7fdce680e000 rw-p 00000000 00:00 0 
+7fdce680e000-7fdce6996000 r-xp 00000000 00:44 7673885836288020970        /common/software/install/migrated/gcc/8.1.0/lib64/libstdc++.so.6.0.25
+7fdce6996000-7fdce6b95000 ---p 00188000 00:44 7673885836288020970        /common/software/install/migrated/gcc/8.1.0/lib64/libstdc++.so.6.0.25
+7fdce6b95000-7fdce6ba0000 r--p 00187000 00:44 7673885836288020970        /common/software/install/migrated/gcc/8.1.0/lib64/libstdc++.so.6.0.25
+7fdce6ba0000-7fdce6ba2000 rw-p 00192000 00:44 7673885836288020970        /common/software/install/migrated/gcc/8.1.0/lib64/libstdc++.so.6.0.25
+7fdce6ba2000-7fdce6ba6000 rw-p 00000000 00:00 0 
+7fdce6ba6000-7fdce6bef000 rw-p 00bb2000 00:44 7673885836288020970        /common/software/install/migrated/gcc/8.1.0/lib64/libstdc++.so.6.0.25
+7fdce6bef000-7fdce7fc1000 r-xp 00000000 fd:01 466089                     /usr/lib64/libicudata.so.50.2
+7fdce7fc1000-7fdce81c0000 ---p 013d2000 fd:01 466089                     /usr/lib64/libicudata.so.50.2
+7fdce81c0000-7fdce81c1000 r--p 013d1000 fd:01 466089                     /usr/lib64/libicudata.so.50.2
+7fdce81c1000-7fdce81c2000 rw-p 013d2000 fd:01 466089                     /usr/lib64/libicudata.so.50.2
+7fdce81c2000-7fdce81e7000 r-xp 00000000 fd:01 439896                     /usr/lib64/libtinfo.so.5.9
+7fdce81e7000-7fdce83e7000 ---p 00025000 fd:01 439896                     /usr/lib64/libtinfo.so.5.9
+7fdce83e7000-7fdce83eb000 r--p 00025000 fd:01 439896                     /usr/lib64/libtinfo.so.5.9
+7fdce83eb000-7fdce83ec000 rw-p 00029000 fd:01 439896                     /usr/lib64/libtinfo.so.5.9
+7fdce83ec000-7fdce8403000 r-xp 00000000 00:44 17032837101919202698       /common/software/install/migrated/gcc/8.1.0/lib64/libgcc_s.so.1
+7fdce8403000-7fdce8602000 ---p 00017000 00:44 17032837101919202698       /common/software/install/migrated/gcc/8.1.0/lib64/libgcc_s.so.1
+7fdce8602000-7fdce8603000 rw-p 00016000 00:44 17032837101919202698       /common/software/install/migrated/gcc/8.1.0/lib64/libgcc_s.so.1
+7fdce8603000-7fdce87f3000 r-xp 00000000 fd:01 462891                     /usr/lib64/libicui18n.so.50.2
+7fdce87f3000-7fdce89f3000 ---p 001f0000 fd:01 462891                     /usr/lib64/libicui18n.so.50.2
+7fdce89f3000-7fdce89ff000 r--p 001f0000 fd:01 462891                     /usr/lib64/libicui18n.so.50.2
+7fdce89ff000-7fdce8a01000 rw-p 001fc000 fd:01 462891                     /usr/lib64/libicui18n.so.50.2
+7fdce8a01000-7fdce8a02000 rw-p 00000000 00:00 0 
+7fdce8a02000-7fdce8b66000 r-xp 00000000 fd:01 465756                     /usr/lib64/libicuuc.so.50.2
+7fdce8b66000-7fdce8d66000 ---p 00164000 fd:01 465756                     /usr/lib64/libicuuc.so.50.2
+7fdce8d66000-7fdce8d76000 r--p 00164000 fd:01 465756                     /usr/lib64/libicuuc.so.50.2
+7fdce8d76000-7fdce8d77000 rw-p 00174000 fd:01 465756                     /usr/lib64/libicuuc.so.50.2
+7fdce8d77000-7fdce8d7b000 rw-p 00000000 00:00 0 
+7fdce8d7b000-7fdce8d7d000 r-xp 00000000 fd:01 437272                     /usr/lib64/libdl-2.17.so
+7fdce8d7d000-7fdce8f7d000 ---p 00002000 fd:01 437272                     /usr/lib64/libdl-2.17.so
+7fdce8f7d000-7fdce8f7e000 r--p 00002000 fd:01 437272                     /usr/lib64/libdl-2.17.so
+7fdce8f7e000-7fdce8f7f000 rw-p 00003000 fd:01 437272                     /usr/lib64/libdl-2.17.so
+7fdce8f7f000-7fdce8f86000 r-xp 00000000 fd:01 439851                     /usr/lib64/librt-2.17.so
+7fdce8f86000-7fdce9185000 ---p 00007000 fd:01 439851                     /usr/lib64/librt-2.17.so
+7fdce9185000-7fdce9186000 r--p 00006000 fd:01 439851                     /usr/lib64/librt-2.17.so
+7fdce9186000-7fdce9187000 rw-p 00007000 fd:01 439851                     /usr/lib64/librt-2.17.so
+7fdce9187000-7fdce91a1000 r-xp 00000000 00:44 16547328935319041301       /common/software/install/manual/zlib/1.2.13/lib/libz.so.1.2.13
+7fdce91a1000-7fdce93a0000 ---p 0001a000 00:44 16547328935319041301       /common/software/install/manual/zlib/1.2.13/lib/libz.so.1.2.13
+7fdce93a0000-7fdce93a1000 r--p 00019000 00:44 16547328935319041301       /common/software/install/manual/zlib/1.2.13/lib/libz.so.1.2.13
+7fdce93a1000-7fdce93a2000 rw-p 0001a000 00:44 16547328935319041301       /common/software/install/manual/zlib/1.2.13/lib/libz.so.1.2.13
+7fdce93a2000-7fdce93b1000 r-xp 00000000 fd:01 436530                     /usr/lib64/libbz2.so.1.0.6
+7fdce93b1000-7fdce95b0000 ---p 0000f000 fd:01 436530                     /usr/lib64/libbz2.so.1.0.6
+7fdce95b0000-7fdce95b1000 r--p 0000e000 fd:01 436530                     /usr/lib64/libbz2.so.1.0.6
+7fdce95b1000-7fdce95b2000 rw-p 0000f000 fd:01 436530                     /usr/lib64/libbz2.so.1.0.6
+7fdce95b2000-7fdce95d7000 r-xp 00000000 00:44 7265177892607922056        /common/software/install/migrated/xz-utils/5.2.3_gcc7.2.0/lib/liblzma.so.5.2.3
+7fdce95d7000-7fdce97d6000 ---p 00025000 00:44 7265177892607922056        /common/software/install/migrated/xz-utils/5.2.3_gcc7.2.0/lib/liblzma.so.5.2.3
+7fdce97d6000-7fdce97d7000 rw-p 00024000 00:44 7265177892607922056        /common/software/install/migrated/xz-utils/5.2.3_gcc7.2.0/lib/liblzma.so.5.2.3
+7fdce97d7000-7fdce97d9000 rw-p 000c5000 00:44 7265177892607922056        /common/software/install/migrated/xz-utils/5.2.3_gcc7.2.0/lib/liblzma.so.5.2.3
+7fdce97d9000-7fdce9832000 r-xp 00000000 00:44 8369260220000051515        /common/software/install/migrated/pcre2/10.34/lib/libpcre2-8.so.0.9.0
+7fdce9832000-7fdce9a31000 ---p 00059000 00:44 8369260220000051515        /common/software/install/migrated/pcre2/10.34/lib/libpcre2-8.so.0.9.0
+7fdce9a31000-7fdce9a32000 r--p 00058000 00:44 8369260220000051515        /common/software/install/migrated/pcre2/10.34/lib/libpcre2-8.so.0.9.0
+7fdce9a32000-7fdce9a33000 rw-p 00059000 00:44 8369260220000051515        /common/software/install/migrated/pcre2/10.34/lib/libpcre2-8.so.0.9.0
+7fdce9a33000-7fdce9a34000 rw-p 0005d000 00:44 8369260220000051515        /common/software/install/migrated/pcre2/10.34/lib/libpcre2-8.so.0.9.0
+7fdce9a34000-7fdce9a70000 r-xp 00000000 fd:01 436662                     /usr/lib64/libreadline.so.6.2
+7fdce9a70000-7fdce9c70000 ---p 0003c000 fd:01 436662                     /usr/lib64/libreadline.so.6.2
+7fdce9c70000-7fdce9c72000 r--p 0003c000 fd:01 436662                     /usr/lib64/libreadline.so.6.2
+7fdce9c72000-7fdce9c78000 rw-p 0003e000 fd:01 436662                     /usr/lib64/libreadline.so.6.2
+7fdce9c78000-7fdce9c7a000 rw-p 00000000 00:00 0 
+7fdce9c7a000-7fdce9cb9000 r-xp 00000000 00:44 7193318664346446348        /common/software/install/migrated/gcc/8.1.0/lib64/libquadmath.so.0.0.0
+7fdce9cb9000-7fdce9eb8000 ---p 0003f000 00:44 7193318664346446348        /common/software/install/migrated/gcc/8.1.0/lib64/libquadmath.so.0.0.0
+7fdce9eb8000-7fdce9eb9000 rw-p 0003e000 00:44 7193318664346446348        /common/software/install/migrated/gcc/8.1.0/lib64/libquadmath.so.0.0.0
+7fdce9eb9000-7fdce9eba000 rw-p 000fa000 00:44 7193318664346446348        /common/software/install/migrated/gcc/8.1.0/lib64/libquadmath.so.0.0.0
+7fdce9eba000-7fdce9fbb000 r-xp 00000000 fd:01 437290                     /usr/lib64/libm-2.17.so
+7fdce9fbb000-7fdcea1ba000 ---p 00101000 fd:01 437290                     /usr/lib64/libm-2.17.so
+7fdcea1ba000-7fdcea1bb000 r--p 00100000 fd:01 437290                     /usr/lib64/libm-2.17.so
+7fdcea1bb000-7fdcea1bc000 rw-p 00101000 fd:01 437290                     /usr/lib64/libm-2.17.so
+7fdcea1bc000-7fdcea3c3000 r-xp 00000000 00:44 12616737136356084898       /common/software/install/migrated/gcc/8.1.0/lib64/libgfortran.so.5.0.0
+7fdcea3c3000-7fdcea5c2000 ---p 00207000 00:44 12616737136356084898       /common/software/install/migrated/gcc/8.1.0/lib64/libgfortran.so.5.0.0
+7fdcea5c2000-7fdcea5c5000 rw-p 00206000 00:44 12616737136356084898       /common/software/install/migrated/gcc/8.1.0/lib64/libgfortran.so.5.0.0
+7fdcea5c5000-7fdcea5d1000 rw-p 008e3000 00:44 12616737136356084898       /common/software/install/migrated/gcc/8.1.0/lib64/libgfortran.so.5.0.0
+7fdcea5d1000-7fdcea795000 r-xp 00000000 fd:01 439849                     /usr/lib64/libc-2.17.so
+7fdcea795000-7fdcea994000 ---p 001c4000 fd:01 439849                     /usr/lib64/libc-2.17.so
+7fdcea994000-7fdcea998000 r--p 001c3000 fd:01 439849                     /usr/lib64/libc-2.17.so
+7fdcea998000-7fdcea99a000 rw-p 001c7000 fd:01 439849                     /usr/lib64/libc-2.17.so
+7fdcea99a000-7fdcea99f000 rw-p 00000000 00:00 0 
+7fdcea99f000-7fdcea9b6000 r-xp 00000000 fd:01 439867                     /usr/lib64/libpthread-2.17.so
+7fdcea9b6000-7fdceabb5000 ---p 00017000 fd:01 439867                     /usr/lib64/libpthread-2.17.so
+7fdceabb5000-7fdceabb6000 r--p 00016000 fd:01 439867                     /usr/lib64/libpthread-2.17.so
+7fdceabb6000-7fdceabb7000 rw-p 00017000 fd:01 439867                     /usr/lib64/libpthread-2.17.so
+7fdceabb7000-7fdceabbb000 rw-p 00000000 00:00 0 
+7fdceabbb000-7fdceabe8000 r-xp 00000000 00:44 961159898711670854         /common/software/install/migrated/gcc/8.1.0/lib64/libgomp.so.1.0.0
+7fdceabe8000-7fdceade7000 ---p 0002d000 00:44 961159898711670854         /common/software/install/migrated/gcc/8.1.0/lib64/libgomp.so.1.0.0
+7fdceade7000-7fdceade8000 rw-p 0002c000 00:44 961159898711670854         /common/software/install/migrated/gcc/8.1.0/lib64/libgomp.so.1.0.0
+7fdceade8000-7fdceadec000 rw-p 0012e000 00:44 961159898711670854         /common/software/install/migrated/gcc/8.1.0/lib64/libgomp.so.1.0.0
+7fdceadec000-7fdceae15000 r-xp 00000000 00:44 11687841975260412934       /common/software/install/migrated/R/4.1.0/lib64/R/lib/libRblas.so
+7fdceae15000-7fdceb015000 ---p 00029000 00:44 11687841975260412934       /common/software/install/migrated/R/4.1.0/lib64/R/lib/libRblas.so
+7fdceb015000-7fdceb016000 r--p 00029000 00:44 11687841975260412934       /common/software/install/migrated/R/4.1.0/lib64/R/lib/libRblas.so
+7fdceb016000-7fdceb017000 rw-p 0002a000 00:44 11687841975260412934       /common/software/install/migrated/R/4.1.0/lib64/R/lib/libRblas.so
+7fdceb017000-7fdceb341000 r-xp 00000000 00:44 5403298160376725564        /common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so
+7fdceb341000-7fdceb541000 ---p 0032a000 00:44 5403298160376725564        /common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so
+7fdceb541000-7fdceb55f000 r--p 0032a000 00:44 5403298160376725564        /common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so
+7fdceb55f000-7fdceb56e000 rw-p 00348000 00:44 5403298160376725564        /common/software/install/migrated/R/4.1.0/lib64/R/lib/libR.so
+7fdceb56e000-7fdceb6d3000 rw-p 00000000 00:00 0 
+7fdceb6d3000-7fdceb6f5000 r-xp 00000000 fd:01 439901                     /usr/lib64/ld-2.17.so
+7fdceb742000-7fdceb8cb000 r--p 00000000 fd:01 12811864                   /usr/lib/locale/locale-archive
+7fdceb8cb000-7fdceb8d7000 rw-p 00000000 00:00 0 
+7fdceb8e6000-7fdceb8e7000 rw-p 00000000 00:00 0 
+7fdceb8e7000-7fdceb8ee000 r--s 00000000 fd:01 8648005                    /usr/lib64/gconv/gconv-modules.cache
+7fdceb8ee000-7fdceb8ef000 r--p 00000000 00:44 6992690059979919388        /common/software/install/migrated/R/4.1.0/lib64/R/library/translations/en/LC_MESSAGES/R.mo
+7fdceb8ef000-7fdceb8f4000 rw-p 00000000 00:00 0 
+7fdceb8f4000-7fdceb8f5000 r--p 00021000 fd:01 439901                     /usr/lib64/ld-2.17.so
+7fdceb8f5000-7fdceb8f6000 rw-p 00022000 fd:01 439901                     /usr/lib64/ld-2.17.so
+7fdceb8f6000-7fdceb8f7000 rw-p 00000000 00:00 0 
+7ffdee1ac000-7ffdee272000 rw-p 00000000 00:00 0                          [stack]
+7ffdee2ea000-7ffdee2ec000 r-xp 00000000 00:00 0                          [vdso]
+ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsyscall]
+Error in unserialize(node$con) : error reading from connection
+Calls: parLapply ... FUN -> recvData -> recvData.SOCKnode -> unserialize
+Execution halted
