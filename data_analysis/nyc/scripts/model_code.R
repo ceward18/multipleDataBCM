@@ -227,8 +227,8 @@ SIHRD_full_undetected <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(1, 10) # IR 
-    gamma2 ~ dgamma(1, 10) # HR 
+    gamma1 ~ dgamma(14, 100) # IR 
+    gamma2 ~ dgamma(14, 100) # HR 
     lambda ~ dgamma(1, 10) # IH 
     phi ~ dgamma(1, 10)    # HD
     
@@ -330,8 +330,8 @@ SIHRD_full_undetected_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(1, 10) # IR 
-    gamma2 ~ dgamma(1, 10) # HR 
+    gamma1 ~ dgamma(14, 100) # IR 
+    gamma2 ~ dgamma(14, 100) # HR 
     lambda ~ dgamma(1, 10) # IH 
     phi ~ dgamma(1, 10)    # HD
     
@@ -400,8 +400,8 @@ SIHRD_full_casesOnly <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(1, 10) # IR 
-    gamma2 ~ dgamma(1, 10) # HR 
+    gamma1 ~ dgamma(14, 100) # IR 
+    gamma2 ~ dgamma(14, 100) # HR 
     lambda ~ dgamma(1, 10) # IH 
     phi ~ dgamma(1, 10)    # HD
     
@@ -496,8 +496,8 @@ SIHRD_full_casesOnly_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(1, 10) # IR 
-    gamma2 ~ dgamma(1, 10) # HR 
+    gamma1 ~ dgamma(14, 100) # IR 
+    gamma2 ~ dgamma(14, 100) # HR 
     lambda ~ dgamma(1, 10) # IH 
     phi ~ dgamma(1, 10)    # HD
     
@@ -569,8 +569,8 @@ SIHRD_inc_undetected <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(1, 10) # IR 
-    gamma2 ~ dgamma(1, 10) # HR 
+    gamma1 ~ dgamma(14, 100) # IR 
+    gamma2 ~ dgamma(14, 100) # HR 
     lambda ~ dgamma(1, 10) # IH 
     phi ~ dgamma(1, 10)    # HD
     
@@ -670,8 +670,8 @@ SIHRD_inc_undetected_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(1, 10) # IR 
-    gamma2 ~ dgamma(1, 10) # HR 
+    gamma1 ~ dgamma(14, 100) # IR 
+    gamma2 ~ dgamma(14, 100) # HR 
     lambda ~ dgamma(1, 10) # IH 
     phi ~ dgamma(1, 10)    # HD
     
@@ -737,8 +737,8 @@ SIHRD_inc_casesOnly <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(1, 10) # IR 
-    gamma2 ~ dgamma(1, 10) # HR 
+    gamma1 ~ dgamma(14, 100) # IR 
+    gamma2 ~ dgamma(14, 100) # HR 
     lambda ~ dgamma(1, 10) # IH 
     phi ~ dgamma(1, 10)    # HD
     
@@ -831,8 +831,8 @@ SIHRD_inc_casesOnly_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(1, 10) # IR 
-    gamma2 ~ dgamma(1, 10) # HR 
+    gamma1 ~ dgamma(14, 100) # IR 
+    gamma2 ~ dgamma(14, 100) # HR 
     lambda ~ dgamma(1, 10) # IH 
     phi ~ dgamma(1, 10)    # HD
     
@@ -903,8 +903,8 @@ SIHRD_noAlarm_undetected <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(1, 10) # IR 
-    gamma2 ~ dgamma(1, 10) # HR 
+    gamma1 ~ dgamma(14, 100) # IR 
+    gamma2 ~ dgamma(14, 100) # HR 
     lambda ~ dgamma(1, 10) # IH 
     phi ~ dgamma(1, 10)    # HD
     
@@ -966,8 +966,8 @@ SIHRD_noAlarm_casesOnly <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(1, 10) # IR 
-    gamma2 ~ dgamma(1, 10) # HR 
+    gamma1 ~ dgamma(14, 100) # IR 
+    gamma2 ~ dgamma(14, 100) # HR 
     lambda ~ dgamma(1, 10) # IH 
     phi ~ dgamma(1, 10)    # HD
     

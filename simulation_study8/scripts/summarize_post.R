@@ -134,7 +134,7 @@ summarizePost <- function(resThree, incData, modelType, assumeType,
         postMeans <- rowMeans(postPred)
         postCI <- apply(postPred, 1, quantile, probs = c(0.025, 0.975))
         
-        if (modelType %in% c('SIHRD_full', 'SIHRD_noAlarm')) {
+        if (modelType %in% c('SIHRD_full', 'SIHRD_inc',  'SIHRD_noAlarm')) {
             
             if (assumeType == 'undetected') {
                 postPredictFit <- data.frame(time = rep(1:tau, 4),
