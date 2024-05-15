@@ -719,7 +719,7 @@ SIHRD_inc_undetected_sim <-  nimbleCode({
     for(t in 2:tau) {
         
         # compute moving average up to t-1
-        smoothC[t] <- movingAverage(Istar[1:(t-1)], bw)[t-1]
+        smoothC[t] <- movingAverage(detectIstar[1:(t-1)], bw)[t-1]
         
         # alarm based on cases only
         alarm[t] <- powerAlarm(smoothC[t], N, k)
@@ -746,11 +746,6 @@ SIHRD_inc_undetected_sim <-  nimbleCode({
         D[t + 1] <- D[t] + Dstar[t] 
         
     }
-    
-    # estimated effective R0
-    R0[1:(tau-maxInf-1)] <- get_R0_full(betat = beta * (1 - alarm[1:tau]), 
-                                        N = N, gamma1 = gamma1, lambda = lambda,
-                                        S = S[1:tau], maxInf = maxInf)
     
     ### Priors
     
@@ -910,11 +905,6 @@ SIHRD_inc_casesOnly_sim <-  nimbleCode({
         D[t + 1] <- D[t] + Dstar[t] 
         
     }
-    
-    # estimated effective R0
-    R0[1:(tau-maxInf-1)] <- get_R0_full(betat = beta * (1 - alarm[1:tau]), 
-                                        N = N, gamma1 = gamma1, lambda = lambda,
-                                        S = S[1:tau], maxInf = maxInf)
     
     ### Priors
     
