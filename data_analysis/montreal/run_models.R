@@ -138,7 +138,7 @@ for (i in batchIdx) {
                       smoothC = smoothC, smoothD = smoothD, 
                       deathData = deathData, hospData = hospData,
                       N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0,
-                      seed = 2)
+                      seed = x)
         
     })
     stopCluster(cl)

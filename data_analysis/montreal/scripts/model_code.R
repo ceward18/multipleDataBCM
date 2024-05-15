@@ -655,11 +655,6 @@ SIHRD_inc_undetected_sim <-  nimbleCode({
         
     }
     
-    # estimated effective R0
-    R0[1:(tau-maxInf-1)] <- get_R0_full(betat = beta * (1 - alarm[1:tau]), 
-                                        N = N, gamma1 = gamma1, lambda = lambda,
-                                        S = S[1:tau], maxInf = maxInf)
-    
     ### Priors
     
     # detection probability (1/4 reported)
@@ -819,10 +814,6 @@ SIHRD_inc_casesOnly_sim <-  nimbleCode({
         
     }
     
-    # estimated effective R0
-    R0[1:(tau-maxInf-1)] <- get_R0_full(betat = beta * (1 - alarm[1:tau]), 
-                                        N = N, gamma1 = gamma1, lambda = lambda,
-                                        S = S[1:tau], maxInf = maxInf)
     
     ### Priors
     
