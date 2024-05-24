@@ -1,7 +1,7 @@
 ################################################################################
 # Run multivariate alarm models 
 # NYC
-# Peaks 1, 4
+# Peaks 1, 2, 4
 # SIR and SIHRD models based on incidence and deaths
 # SIR model based on incidence only
 # assuming all cases reported and only undetected cases
@@ -55,64 +55,86 @@ for (i in batchIdx) {
     
     ### read data
     dat <- read.csv(paste0('./data/nycClean.csv'))
-    dat$smoothedCases <- round(dat$dailyCases)
-    dat$cumulativeCases <- cumsum(dat$smoothedCases)
+    dat$dailyCases <- round(dat$dailyCases)
+    dat$dailyHosp <- round(dat$dailyHosp)
+    dat$dailyDeaths <- round(dat$dailyDeaths)
+    dat$cumulativeCases <- cumsum(dat$dailyCases)
     
-    ### filter out data before peak 1
-    
-    # constants for all models
+    # population size
     N <- dat$Population[1]
     
     # smoothed incidence/hosp/deaths to inform alarm function 
     # (shifted so alarm is informed only by data up to time t-1)
+    # (only used by alarm function models)
     dat$smoothC <- head(movingAverage(c(0, dat$dailyCases), smoothWindow), -1)
     dat$smoothD <- head(movingAverage(c(0, dat$dailyDeaths), smoothWindow), -1)
     
     # get data for the specified peak
-    incData <- dat$smoothedCases[which(dat$peak == peak_i)]
-    hospData <- round(dat$dailyHosp[which(dat$peak == peak_i)])
-    deathData <- round(dat$dailyDeaths[which(dat$peak == peak_i)])
-    
+    incData <- dat$dailyCases[which(dat$peak == peak_i)]
+    hospData <- dat$dailyHosp[which(dat$peak == peak_i)]
+    deathData <- dat$dailyDeaths[which(dat$peak == peak_i)]
     smoothC <- dat$smoothC[which(dat$peak == peak_i)]
     smoothD <- dat$smoothD[which(dat$peak == peak_i)]
     
-    if (peak_i == 1) {
-        idxStart <- 10
-        incData <- incData[-c(1:idxStart)]
-        hospData <- hospData[-c(1:idxStart)]
-        deathData <- deathData[-c(1:idxStart)]
-        
-        smoothC <- smoothC[-c(1:idxStart)]
-        smoothD <- smoothD[-c(1:idxStart)]
-        idxStart <- min(which(dat$peak == peak_i)) + idxStart
-    } else {
-        idxStart <- min(which(dat$peak == peak_i))
-    }
+    
+    # when does peak start
+    idxStart <- min(which(dat$peak == peak_i))
     
     # define priors for initial conditions
-    lengthI <- 5
-    cumInf <- dat$cumulativeCases[max(1, (idxStart - 1))]
-    cumHosp <- round(cumsum(dat$dailyHosp)[max(1, (idxStart - 1))])
+    # for undetected model, getting number of previously infected and removed 
+    # infected before past 7 days and not currently hospitalized or already dead
+    # window of time before peak starts (time X-lengthI to time X)
+    lengthI <- 7  # average infectious for 7 days
+    lengthH <- 15 # average hospitalized for 15 days
+    inWindowI <- max(1, (idxStart - lengthI)):(idxStart - 1)
     
-    if (peak_i == 1) {
-        S0 <- N - cumInf - cumHosp 
+    # currently hospitalized
+    H0 <- sum(dat$dailyHosp[max(1, (idxStart - lengthH)):(idxStart - 1)])
+    
+    # already dead
+    D0 <- cumsum(dat$dailyDeaths)[max(1, (idxStart - 1))]
+    
+    # currently infectious if infected in the past 7 days
+    I0 <- sum(dat$dailyCases[max(1, (idxStart - lengthI)):(idxStart - 1)])
+    
+    # should multiply cases, multiplier depends on peak
+    #   (https://www.healthdata.org/sites/default/files/covid_briefs/101_briefing_Canada.pdf)
+    # wave 1: Feb 25 - 11 July 2020          25% detection
+    # wave 2: Aug 23, 2020 - March 20, 2021  40% detection
+    # wave 3: July 18 - Dec 4, 2021          25% detection
+    # wave 4: Dec 5, 2021 - Mar 12, 2021     20% detection
+    if (assumeType_i == 'undetected') {
+        probDetectTime <- c(rep(0.25, min(which(dat$peak == 2))),
+                            rep(0.4, min(which(dat$peak == 3)) - min(which(dat$peak == 2))),
+                            rep(0.25, min(which(dat$peak == 4)) - min(which(dat$peak == 3))),
+                            rep(0.2, nrow(dat) - min(which(dat$peak == 4))))
+        prev_inf <- cumsum(dat$dailyCases / probDetectTime)[idxStart - lengthI - 1]
+        
+        I0 <- round(I0 / switch(peak_i, 
+                          '1' = 0.25,
+                          '2' = 0.4,
+                          '3' = 0.25, 
+                          '4' = 0.2))
     } else {
-        S0 <- N - cumInf 
-    }
-    
-    I0 <- sum(dat$smoothedCases[max(1, (idxStart - lengthI)):(idxStart - 1)])
-    H0 <- cumHosp
-    if (peak_i == 1) {
-        # for model which assumes all cases observed, H0 > I0 doesn't work
-        if (assumeType_i == 'casesOnly') {
+        prev_inf <- cumsum(dat$dailyCases)[idxStart - lengthI - 1]
+        
+        if (peak_i == 1) {
+            # for model which assumes all cases observed, H0 > I0 doesn't work
             # move H0 to I0
             I0 <- I0 + H0 
             H0 <- 0
+            # if we assume undetected cases, this is fine
         }
-        # if we assume undetected cases, this is fine
     }
-    D0 <- round(cumsum(dat$dailyDeaths)[max(1, (idxStart - 1))])
-    R0 <- N - S0 - I0 - H0 - D0 # should be > 0
+    if (peak_i == 1) {
+        prev_inf <- 0
+    } 
+    
+    # remove = infected before past 7 days and not currently hospitalized or already dead
+    R0 <- prev_inf - H0 - D0
+    
+    # currently susceptible
+    S0 <- N - I0 - H0 - R0 - D0
     c(S0, I0, H0, R0, D0)
     
     # used for posterior predictive fit 

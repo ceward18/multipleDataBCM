@@ -98,10 +98,10 @@ getModelInput <- function(incData, modelType, assumeType, peak,
                               probDetect = rbeta(1,  constantsList$detectA,
                                                  constantsList$detectB),
                               beta = runif(1, 1/7, 1),
-                              gamma1 = rgamma(1, 1, 10), # IR
-                              gamma2 = rgamma(1, 1, 10), # HR
+                              gamma1 = rgamma(1, 14, 100), # IR
+                              gamma2 = rgamma(1, 67, 1000), # HR
                               lambda = rgamma(1, 1, 10), # IH
-                              phi = rgamma(1, 1, 10),    # HD
+                              phi = rgamma(1, 67, 1000),    # HD
                               k = runif(1, 0, 0.02),
                               alpha = rbeta(1, 1, 1),
                               RstarI = round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)])),
@@ -135,10 +135,10 @@ getModelInput <- function(incData, modelType, assumeType, peak,
                               probDetect = rbeta(1,  constantsList$detectA,
                                                  constantsList$detectB),
                               beta = runif(1, 1/7, 1),
-                              gamma1 = rgamma(1, 1, 10), # IR
-                              gamma2 = rgamma(1, 1, 10), # HR
+                              gamma1 = rgamma(1, 14, 100), # IR
+                              gamma2 = rgamma(1, 67, 1000), # HR
                               lambda = rgamma(1, 1, 10), # IH
-                              phi = rgamma(1, 1, 10),    # HD
+                              phi = rgamma(1, 67, 1000),    # HD
                               k = runif(1, 0, 0.02),
                               RstarI = round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)])),
                               RstarH = round(0.01 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
@@ -204,10 +204,10 @@ getModelInput <- function(incData, modelType, assumeType, peak,
             initsList <- list(comp_init = comp_init,
                               probDetect = rbeta(1, constantsList$detectA, constantsList$detectB),
                               beta = runif(1, 1/7, 1),
-                              gamma1 = rgamma(1, 1, 10), # IR
-                              gamma2 = rgamma(1, 1, 10), # HR
+                              gamma1 = rgamma(1, 14, 100), # IR
+                              gamma2 = rgamma(1, 67, 1000), # HR
                               lambda = rgamma(1, 1, 10), # IH
-                              phi = rgamma(1, 1, 10),    # HD
+                              phi = rgamma(1, 67, 1000),    # HD
                               RstarI = round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)])),
                               RstarH = round(0.01 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
             

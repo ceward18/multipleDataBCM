@@ -120,7 +120,7 @@ summarizePost <- function(resThree, incData, modelType, assumeType, peak,
     ##############################################################################
     ### Posterior predictive fit for models where it makes sense
     
-    if (modelType %in% c('SIHRD_full', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')) {
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')) {
         postPred <- postPredFit(incData = incData, modelType = modelType,
                                 assumeType = assumeType, peak = peak,
                                 smoothC = smoothC, smoothD = smoothD, 
@@ -135,7 +135,7 @@ summarizePost <- function(resThree, incData, modelType, assumeType, peak,
         postMeans <- rowMeans(postPred)
         postCI <- apply(postPred, 1, quantile, probs = c(0.025, 0.975))
         
-        if (modelType %in% c('SIHRD_full', 'SIHRD_noAlarm')) {
+        if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
             
             if (assumeType == 'undetected') {
                 postPredictFit <- data.frame(time = rep(1:tau, 4),
