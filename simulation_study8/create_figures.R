@@ -61,7 +61,7 @@ dev.off()
 
 
 ################################################################################
-# Figure 2 - delta parameters measuring relative importance
+# Figure 2 - alpha parameters measuring relative importance
 
 
 paramsPostAll <- readRDS('./results/paramsPostAll.rds')
@@ -282,11 +282,12 @@ postPredFitSimFinal$marg <- factor(postPredFitSimFinal$marg,
                                               'Deaths'))
 
 postPredFitSimFinal$modelType <- factor(postPredFitSimFinal$modelType,
-                                        levels = c('full',
-                                                   'inc', 
-                                                   'fullNoAlarm', 
-                                                   'simpleNoAlarm'),
+                                        levels = c('SIHRD_full', 'SIHRD_inc',
+                                                   'SIR_inc', 
+                                                   'SIHRD_noAlarm', 
+                                                   'SIR_noAlarm'),
                                         labels = c('SIHRD cases + deaths',
+                                                   'SIHRD cases only',
                                                    'SIR cases only',
                                                    'SIHRD no alarm',
                                                    'SIR no alarm'))
@@ -305,7 +306,9 @@ postPredFitSimFinal$assumeType <- factor(postPredFitSimFinal$assumeType,
                                                     'Undetected'))
 
 p1 <- ggplot(subset(postPredFitSimFinal, simNumber == 1 & 
-                        modelType %in% c('SIHRD cases + deaths', 'SIR cases only')), 
+                        modelType %in% c('SIHRD cases + deaths', 
+                                         'SIHRD cases only', 
+                                         'SIR cases only')), 
              aes(x = time, ymin = lower, ymax = upper, col = marg, fill = marg)) + 
     geom_line(linewidth = 0.5, aes(y = truth)) +
     geom_line(aes(y = mean), linetype = 2, linewidth = 0.5) + 

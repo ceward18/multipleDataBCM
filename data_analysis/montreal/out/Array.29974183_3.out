@@ -1,7 +1,0 @@
-[1] "Running: SIHRD_inc, assumption: casesOnly, peak: 1"
-WAIC was calculated as NaN.  You may need to add monitors to model latent states, in order for a valid WAIC calculation.
-Stochastic parents of data are:  beta gamma1 gamma2 lambda phi k comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
-[1] "Running: SIHRD_inc, assumption: casesOnly, peak: 2"
-Stochastic parents of data are:  beta gamma1 gamma2 lambda phi k comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
-[1] "Running: SIHRD_inc, assumption: casesOnly, peak: 4"
-Stochastic parents of data are:  beta gamma1 gamma2 lambda phi k comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .

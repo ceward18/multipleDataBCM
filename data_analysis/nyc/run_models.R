@@ -115,6 +115,15 @@ for (i in batchIdx) {
                           '2' = 0.4,
                           '3' = 0.25, 
                           '4' = 0.2))
+        
+        
+        if (peak_i == 1) {
+            R0 <- prev_inf - D0
+        } else {
+            # remove = infected before past 7 days and not currently hospitalized or already dead
+            R0 <- prev_inf - H0 - D0
+        }
+        
     } else {
         prev_inf <- cumsum(dat$dailyCases)[idxStart - lengthI - 1]
         
@@ -123,15 +132,13 @@ for (i in batchIdx) {
             # move H0 to I0
             I0 <- I0 + H0 
             H0 <- 0
-            # if we assume undetected cases, this is fine
+            
         }
+        
+        # remove = infected before past 7 days and not currently hospitalized or already dead
+        R0 <- prev_inf - H0 - D0
     }
-    if (peak_i == 1) {
-        prev_inf <- 0
-    } 
     
-    # remove = infected before past 7 days and not currently hospitalized or already dead
-    R0 <- prev_inf - H0 - D0
     
     # currently susceptible
     S0 <- N - I0 - H0 - R0 - D0
@@ -139,7 +146,7 @@ for (i in batchIdx) {
     
     # used for posterior predictive fit 
     # previously observed incidence for correct smoothing at beginning of prediction
-    Istar0 <- dat$smoothedCases[max(1, (idxStart - smoothWindow + 1)):(idxStart - 1)]
+    Istar0 <- dat$dailyCases[max(1, (idxStart - smoothWindow + 1)):(idxStart - 1)]
     Dstar0 <- round(dat$dailyDeaths[max(1, (idxStart - smoothWindow + 1)):(idxStart - 1)])
     
     # run three chains in parallel
