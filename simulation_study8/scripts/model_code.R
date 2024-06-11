@@ -101,6 +101,7 @@ get_R0_full <- nimbleFunction(
         pi_IH <- 1 - exp(-lambda)
         
         # for exponential periods
+        # probability of remaining infectious
         multVec <- c(1, rep(NA, maxInf))
         for (i in 2:length(multVec)) {
             multVec[i] <- multVec[i-1] * (1 - pi_IR - pi_IH)
@@ -462,7 +463,8 @@ SIHRD_full_casesOnly <-  nimbleCode({
     for(t in 1:tau) {
         
         # weighted sum of each component
-        alarm[t] <- powerAlarm2(alpha * smoothC[t], (1 - alpha) * smoothD[t],
+        alarm[t] <- powerAlarm2(alpha * smoothC[t], 
+                                (1 - alpha) * smoothD[t],
                                 N, k)
         
         probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * I[t] / N)

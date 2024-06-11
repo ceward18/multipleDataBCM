@@ -30,6 +30,7 @@ postPredFit <- function(incData, modelType, assumeType, peak,
     # get model code
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_inc')) {
         modelCode <- get(paste0(modelType, '_', assumeType, '_sim'))
+        
     } else if (modelType %in% c('SIHRD_noAlarm', 'SIR_noAlarm')){
         # don't need separate code to simulate from these models, as they 
         #   have an alarm function which depends on epidemic trajectory
@@ -73,7 +74,7 @@ postPredFit <- function(incData, modelType, assumeType, peak,
         
         trueVals <- paramsSamples[postIdx, parentNodes]
         
-        postPredAll <- apply(sim_C$run(trueVals, 10), 2, median)
+        postPredAll <- sim_C$run(trueVals, 1)
         
         postPredInc[,j] <- postPredAll[grep('^Istar', dataNodes)]
         
@@ -81,8 +82,7 @@ postPredFit <- function(incData, modelType, assumeType, peak,
             postPredHosp[,j] <- postPredAll[grep('Hstar', dataNodes)]
             postPredDeath[,j] <- postPredAll[grep('Dstar', dataNodes)]
         }
-        
-        
+ 
         if (assumeType == 'undetected') {
             postPredCases[,j] <- postPredAll[grep('detectIstar', dataNodes)]
         }

@@ -53,6 +53,12 @@ getModelInput <- function(incData, modelType, assumeType,
         dataList$Hstar <- hospData
         dataList$Dstar <- deathData
         
+        if (assumeType == 'casesOnly') {
+            RstarI <- round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)]))
+        } else {
+            RstarI <- round(0.3 * c(rep(0, 3), I0, dataList$Istar[1:(tau-4)]))
+        }
+        
         repeat {
             
             ### inits 
@@ -65,7 +71,7 @@ getModelInput <- function(incData, modelType, assumeType,
                               phi = rgamma(1, 10, 100) ,   # HD
                               k = runif(1, 0, 0.02),
                               alpha = rbeta(1, 1, 1),
-                              RstarI = round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)])),
+                              RstarI = RstarI,
                               RstarH = round(0.3 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
             
             probIH <- 1 - exp(-initsList$lambda)

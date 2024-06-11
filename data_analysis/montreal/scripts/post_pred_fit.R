@@ -73,7 +73,7 @@ postPredFit <- function(incData, modelType, assumeType, peak,
         
         trueVals <- paramsSamples[postIdx, parentNodes]
         
-        postPredAll <- apply(sim_C$run(trueVals, 10), 2, median)
+        postPredAll <- sim_C$run(trueVals, 1)
         
         postPredInc[,j] <- postPredAll[grep('^Istar', dataNodes)]
         

@@ -84,6 +84,23 @@ getModelInput <- function(incData, modelType, assumeType, peak,
                      smoothC = smoothC,
                      smoothD = smoothD)
     
+    # only relevant for SIHRD models
+    if (assumeType == 'casesOnly') {
+        RstarI <- round(0.3 * c(rmulti(1, I0, rep(I0/7, 7)), 
+                                dataList$detectIstar[1:(tau-7)]))
+    } else {
+        RstarI <- round(0.3 * c(rmulti(1, I0, rep(I0/7, 7)),
+                                dataList$Istar[1:(tau-7)]))
+    }
+    
+    if (H0 == 0) {
+        RstarH <- round(0.1 * c(rep(0, 15),
+                                hospData[1:(tau-15)]))
+    } else {
+        RstarH <- round(0.1 * c(rmulti(1, H0, rep(H0/15, 15)),
+                                hospData[1:(tau-15)]))
+    }
+    
     
     
     if (modelType == 'SIHRD_full') {
@@ -104,8 +121,8 @@ getModelInput <- function(incData, modelType, assumeType, peak,
                               phi = rgamma(1, 67, 1000),    # HD
                               k = runif(1, 0, 0.02),
                               alpha = rbeta(1, 1, 1),
-                              RstarI = round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)])),
-                              RstarH = round(0.01 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
+                              RstarI = RstarI,
+                              RstarH = RstarH)
             
             probIH <- 1 - exp(-initsList$lambda)
             probIR <- 1 - exp(-initsList$gamma1)
@@ -140,8 +157,8 @@ getModelInput <- function(incData, modelType, assumeType, peak,
                               lambda = rgamma(1, 1, 10), # IH
                               phi = rgamma(1, 67, 1000),    # HD
                               k = runif(1, 0, 0.02),
-                              RstarI = round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)])),
-                              RstarH = round(0.01 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
+                              RstarI = RstarI,
+                              RstarH = RstarH)
             
             probIH <- 1 - exp(-initsList$lambda)
             probIR <- 1 - exp(-initsList$gamma1)
@@ -208,8 +225,8 @@ getModelInput <- function(incData, modelType, assumeType, peak,
                               gamma2 = rgamma(1, 67, 1000), # HR
                               lambda = rgamma(1, 1, 10), # IH
                               phi = rgamma(1, 67, 1000),    # HD
-                              RstarI = round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)])),
-                              RstarH = round(0.01 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
+                              RstarI = RstarI,
+                              RstarH = RstarH)
             
             probIH <- 1 - exp(-initsList$lambda)
             probIR <- 1 - exp(-initsList$gamma1)

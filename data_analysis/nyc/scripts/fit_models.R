@@ -32,7 +32,7 @@ fitAlarmModel <- function(incData, modelType, assumeType, peak,
                            data = modelInputs$dataList, 
                            constants = modelInputs$constantsList,
                            inits = modelInputs$initsList)
-    # browser()
+    peak# browser()
     myConfig <- configureMCMC(myModel)
     
     # track reproductive number

@@ -108,9 +108,9 @@ movingAverage <- function(x, bw) {
     return(out)
 }
 
-montreal$dailyCases <- movingAverage(montreal$dailyCases, 7)
-montreal$dailyDeaths <- movingAverage(montreal$dailyDeaths, 7)
-montreal$dailyHosp <- movingAverage(montreal$dailyHosp, 7)
+montreal$dailyCases <- movingAverage(montreal$dailyCases, 3)
+montreal$dailyDeaths <- movingAverage(montreal$dailyDeaths, 3)
+montreal$dailyHosp <- movingAverage(montreal$dailyHosp, 3)
 
 
 write.csv(montreal, 'montrealClean.csv', quote = F, row.names = F)

@@ -34,7 +34,7 @@ for (dataType in c('inc', 'death', 'equal')) {
     deathData <- simData[, grep('fromH.*2\\]', colnames(simData))]
     
     plotTitle <- switch(dataType,
-                        'inc' = bquote(atop(bold('High incidence importance'), 
+                        'inc' = bquote(atop(bold('High case importance'), 
                                             bold(alpha == 0.85))),
                         'death' = bquote(atop(bold('High deaths importance'), 
                                               alpha == 0.15)),
@@ -98,7 +98,7 @@ paramsPostAll <- paramsPostAll[order(paramsPostAll$dataType,
 
 paramsPostAll$dataType <- factor(paramsPostAll$dataType,
                                  levels = c('inc', 'death', 'equal'),
-                                 labels = c('High incidence importance',
+                                 labels = c('High case importance',
                                             'High deaths importance',
                                             'Equal importance'))
 
@@ -155,7 +155,11 @@ paramsPostAll$model_assume_type <- factor(paramsPostAll$model_assume_type,
                                           levels = c('SIR, Undetected',
                                                      'SIR, Cases Only', 
                                                      'SIHRD, Undetected', 
-                                                     'SIHRD, Cases Only'))
+                                                     'SIHRD, Cases Only'),
+                                          labels = c('SIR, Undetected',
+                                                     'SIR, Detected', 
+                                                     'SIHRD, Undetected', 
+                                                     'SIHRD, Detected'))
 
 
 pdf('./figures/alphaPost2.pdf', height = 3.5, width = 12)
@@ -188,43 +192,66 @@ dev.off()
 ################################################################################
 # Figure 3 - estimating R0
 
-IstarPostAll <- readRDS('./results/IstarPostAll.rds')
 
+R0PostAll <- readRDS('./results/R0PostAll.rds')
 
-IstarPostAll$dataType <- factor(IstarPostAll$dataType,
-                                levels = c('inc', 'death', 'equal'),
-                                labels = c('Incidence importance',
-                                           'Deaths importance',
-                                           'Equal importance'))
+# get true average R0 for each setting
+simDataInc <- readRDS('./data/sim_inc.rds')
+simDataDeath <- readRDS('./data/sim_death.rds')
+simDataEqual <- readRDS('./data/sim_equal.rds')
 
-IstarPostAll$modelType <- factor(IstarPostAll$modelType,
-                                 levels = c('full','simple', 
-                                             'inc',
-                                            'fullNoAlarm',
-                                            'simpleNoAlarm'),
-                                 labels = c('SIHRD incidence + deaths',
-                                            'SIR incidence + deaths',  
-                                            'SIR incidence only',
-                                            'SIHRD no alarm',
-                                            'SIR no alarm'))
+# r0
+r0Data <- data.frame(time = 1:29,
+                     dataType = rep(c('inc', 'death', 'equal'), each = 29),
+                     truth = c(colMeans(simDataInc[, grep('R0', colnames(simDataInc))]),
+                               colMeans(simDataDeath[, grep('R0', colnames(simDataDeath))]),
+                               colMeans(simDataEqual[, grep('R0', colnames(simDataEqual))])))
 
+R0PostAll <- merge(R0PostAll, r0Data, by = c('time', 'dataType'), all.x = T)
 
+R0PostAll$dataType <- factor(R0PostAll$dataType,
+                             levels = c('inc', 'death', 'equal'),
+                             labels = c('Cases important',
+                                        'Deaths important',
+                                        'Equal importance'))
 
-pdf('./figures/IstarPost.pdf', height = 7, width = 12)
-ggplot(subset(IstarPostAll, simNumber == 1),
-       aes(x = time)) + 
-    geom_line(aes(y = truth), linewidth = 0.8) + 
-    geom_line(aes(y = mean), col = 'blue', linewidth = 0.8) + 
-    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, fill = 'blue') + 
-    facet_grid(dataType ~ modelType, scales = 'free_y') +
-    theme_bw()+ 
+R0PostAll$modelType <- factor(R0PostAll$modelType,
+                              levels = c('SIHRD_full',  
+                                         'SIR_full', 
+                                         'SIHRD_inc','SIR_inc', 
+                                         'SIHRD_noAlarm', 'SIR_noAlarm'),
+                              labels = c('SIHRD cases + deaths', 
+                                         'SIR cases + deaths',
+                                         'SIHRD cases only', 
+                                         'SIR cases only',
+                                         'SIHRD no alarm',
+                                         'SIR no alarm'))
+
+R0PostAll$assumeType <- factor(R0PostAll$assumeType,
+                               levels = c('undetected', 'casesOnly'),
+                               labels = c('w/ undetected', 'w/o undetected'))
+
+pdf('./figures/R0Post.pdf', height = 6, width = 12)
+ggplot(subset(R0PostAll, !modelType %in% 
+                  c('SIHRD no alarm', 'SIR no alarm')), 
+       aes(x = time, y = mean, 
+           group = simNumber, col = assumeType)) +
+    geom_line() +
+    geom_line(aes(y = truth), color = 'black') +
+    geom_hline(yintercept = 1, linetype = 2) +
+    facet_nested(dataType ~ modelType + assumeType) +
+    theme_bw() + 
     theme(strip.placement = "outside",
           strip.background = element_rect(fill = 'white'),
           strip.text = element_text(size = 12),
-          axis.title = element_text(size = 12),
-          axis.text = element_text(size = 10),
-          plot.title = element_text(size = 14, h = 0.5)) +
-    labs(x = 'Epidemic Time', y = 'Count', title = 'Posterior mean and 95% credible intervals')
+          axis.title = element_text(size = 14),
+          axis.text = element_text(size = 12),
+          plot.title = element_text(size = 16, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    guides(color = 'none') + 
+    labs(x = 'Epidemic Time', y = expression(R[0](t))) +
+    scale_color_manual(values = c('steelblue1', 'darksalmon'))
 dev.off()
 
 
@@ -301,9 +328,10 @@ postPredFitSimFinal <- postPredFitSimFinal[order(postPredFitSimFinal$dataType,
 
 
 postPredFitSimFinal$assumeType <- factor(postPredFitSimFinal$assumeType,
-                                         levels = c('casesOnly', 'undetected'),
-                                         labels = c('Cases Only',
-                                                    'Undetected'))
+                                         levels = c('undetected', 'casesOnly'),
+                                         labels = c('w/ undetected', 'w/o undetected'))
+
+postPredFitSimFinal <- postPredFitSimFinal[postPredFitSimFinal$marg != 'True Incidence',]
 
 p1 <- ggplot(subset(postPredFitSimFinal, simNumber == 1 & 
                         modelType %in% c('SIHRD cases + deaths', 
@@ -314,8 +342,8 @@ p1 <- ggplot(subset(postPredFitSimFinal, simNumber == 1 &
     geom_line(aes(y = mean), linetype = 2, linewidth = 0.5) + 
     geom_ribbon(alpha = 0.3) +
     facet_nested(dataType~modelType + assumeType,  scales = 'free_y') +
-    scale_color_manual(values = c('grey50', 'black', 'goldenrod2', 'royalblue')) + 
-    scale_fill_manual(values = c('grey50', 'black', 'goldenrod2', 'royalblue')) +
+    scale_color_manual(values = c('black', 'goldenrod2', 'royalblue')) + 
+    scale_fill_manual(values = c('black', 'goldenrod2', 'royalblue')) +
     theme_bw() + 
     theme(strip.placement = "outside",
           strip.background = element_rect(fill = 'white'),
@@ -336,10 +364,10 @@ p2 <- ggplot(subset(postPredFitSimFinal, simNumber == 1 &
     geom_line(aes(y = mean), linetype = 2, linewidth = 0.5) + 
     geom_ribbon(alpha = 0.3) +
     facet_nested(dataType~modelType + assumeType,  scales = 'free_y') +
-    scale_color_manual(values = c('grey50', 'black', 'goldenrod2', 'royalblue')) + 
-    scale_fill_manual(values = c('grey50', 'black', 'goldenrod2', 'royalblue')) +
+    scale_color_manual(values = c('black', 'goldenrod2', 'royalblue')) + 
+    scale_fill_manual(values = c('black', 'goldenrod2', 'royalblue')) +
     theme_bw() + 
-    ylim(0, 200) +
+    ylim(0, 100) +
     theme(strip.placement = "outside",
           strip.background = element_rect(fill = 'white'),
           strip.text = element_text(size = 10),
@@ -351,11 +379,30 @@ p2 <- ggplot(subset(postPredFitSimFinal, simNumber == 1 &
     labs(y = 'Epidemic Time', x = 'Count',
          col = '', fill = '')
 
-pdf('./figures/postPred.pdf', height = 6, width = 12)
-grid.arrange(p1, p2, nrow = 1, widths = c(0.45, 0.55),
-             top=textGrob("Posterior predictive distribution", 
-                          gp = gpar(fontsize = 15, font = 1)))
+pdf('./figures/postPred.pdf', height = 5, width = 10)
+p1
 dev.off()
+
+# pdf('./figures/postPred.pdf', height = 5, width = 14)
+# grid.arrange(p1, p2, nrow = 1, widths = c(0.45, 0.55),
+#              top=textGrob("Posterior predictive distribution", 
+#                           gp = gpar(fontsize = 15, font = 1)))
+# dev.off()
+
+
+# all on one plot and only observed cases
+
+ggplot(subset(postPredFitSimFinal, marg == 'Observed Cases' & simNumber == 1), 
+       aes(x = time, ymin = lower, ymax = upper, col = modelType, fill = modelType)) + 
+    geom_line(linewidth = 1, aes(y = truth), col = 'black') +
+    geom_line(aes(y = mean), linetype = 2, linewidth = 1) + 
+    geom_ribbon(alpha = 0.3) +
+    facet_nested(simNumber~dataType + assumeType, independent = 'y', scales = 'free') +
+    # scale_color_manual(values = c('grey30', 'dodgerblue')) + 
+    # scale_fill_manual(values = c('grey30', 'dodgerblue')) + 
+    theme_bw()
+
+
 
 ################################################################################
 # Example Hill alarms

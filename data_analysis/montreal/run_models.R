@@ -18,7 +18,7 @@ library(nimble)
 source('./scripts/model_code.R')
 
 peak <- c(1,2,4)
-smoothWindow <- 30
+smoothWindow <- 14
 modelType <- c('SIHRD_full', 'SIHRD_inc',
                'SIR_full', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')
 assumeType <- c('undetected', 'casesOnly')
@@ -95,6 +95,8 @@ for (i in batchIdx) {
     # currently infectious if infected in the past 7 days
     I0 <- sum(dat$dailyCases[max(1, (idxStart - lengthI)):(idxStart - 1)])
     
+    if (I0 == 0) I0 <- 1
+    
     # should multiply cases, multiplier depends on peak
     #   (https://www.healthdata.org/sites/default/files/covid_briefs/101_briefing_Canada.pdf)
     # wave 1: Feb 25 - 11 July 2020          25% detection
@@ -106,7 +108,7 @@ for (i in batchIdx) {
                             rep(0.4, min(which(dat$peak == 3)) - min(which(dat$peak == 2))),
                             rep(0.25, min(which(dat$peak == 4)) - min(which(dat$peak == 3))),
                             rep(0.2, nrow(dat) - min(which(dat$peak == 4))))
-        prev_inf <- cumsum(dat$dailyCases / probDetectTime)[idxStart - lengthI - 1]
+        prev_inf <- round(cumsum(dat$dailyCases / probDetectTime))[idxStart - lengthI - 1]
         
         I0 <- round(I0 / switch(peak_i, 
                                 '1' = 0.25,
