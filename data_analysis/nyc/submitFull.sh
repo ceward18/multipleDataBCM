@@ -11,8 +11,8 @@
 #SBATCH --error=./err/Array.%A_%a.error
 
 ####### Set environment variables ###############
-module load openblas/0.3.5_gcc8.2.0_multiarch
-module load R/4.1.0
+source /etc/profile
+module load R/4.2.0-openblas-rocky8
 
 ####### Run your script #########################
 Rscript run_models.R $SLURM_ARRAY_TASK_ID
