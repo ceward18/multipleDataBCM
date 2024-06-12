@@ -11,6 +11,8 @@
 #SBATCH --error=./err/Array.%A_%a.error
 
 ####### Set environment variables ###############
+source /etc/profile
+module load compatibility/mesabi-centos7
 module load openblas/0.3.5_gcc8.2.0_multiarch
 module load R/4.1.0
 
