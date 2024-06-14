@@ -10,8 +10,14 @@ fitAlarmModel <- function(incData, modelType, assumeType, peak,
     source('./scripts/model_code.R')
     source('./scripts/get_model_inputs.R')
     
-    # for reproducibility so inits are always the same
-    set.seed(seed + 3)
+    # for reproducibility, inits vary across peaks/models/assumptions/chains
+    seed <- seed + peak + 
+        as.numeric(factor(modelType, levels = c('SIHRD_full', 'SIHRD_inc',
+                                                'SIR_full', 'SIR_inc',
+                                                'SIHRD_noAlarm', 'SIR_noAlarm'))) + 
+        as.numeric(factor(assumeType, levels = c('undetected', 'casesOnly')))
+    
+    set.seed(seed)
     
     # model-specific constants, data, and inits
     modelInputs <- getModelInput(incData, modelType, assumeType, peak,

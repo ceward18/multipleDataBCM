@@ -114,7 +114,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
             initsList <- list(comp_init = comp_init,
                               probDetect = rbeta(1,  constantsList$detectA,
                                                  constantsList$detectB),
-                              beta = runif(1, 1/7, 1),
+                              beta = runif(1, 1/7, 2),
                               gamma1 = rgamma(1, 14, 100), # IR
                               gamma2 = rgamma(1, 67, 1000), # HR
                               lambda = rgamma(1, 1, 10), # IH
@@ -151,7 +151,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
             initsList <- list(comp_init = comp_init,
                               probDetect = rbeta(1,  constantsList$detectA,
                                                  constantsList$detectB),
-                              beta = runif(1, 1/7, 1),
+                              beta = runif(1, 1/7, 2),
                               gamma1 = rgamma(1, 14, 100), # IR
                               gamma2 = rgamma(1, 67, 1000), # HR
                               lambda = rgamma(1, 1, 10), # IH
@@ -182,7 +182,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
         initsList <- list(comp_init = comp_init,
                           probDetect = rbeta(1, constantsList$detectA,
                                              constantsList$detectB),
-                          beta = runif(1, 1/7, 1),
+                          beta = runif(1, 1/7, 2),
                           k = runif(1, 0, 0.02),
                           alpha = rbeta(1, 1, 1),
                           w0 = rnorm(1, 7, 0.25),
@@ -199,7 +199,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
         initsList <- list(comp_init = comp_init,
                           probDetect = rbeta(1, constantsList$detectA, 
                                              constantsList$detectB),
-                          beta = runif(1, 1/7, 1),
+                          beta = runif(1, 1/7, 2),
                           k = runif(1, 0, 0.02),
                           alpha = rbeta(1, 1, 1),
                           w0 = rnorm(1, 7, 0.25),
@@ -220,7 +220,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
             ### inits 
             initsList <- list(comp_init = comp_init,
                               probDetect = rbeta(1, constantsList$detectA, constantsList$detectB),
-                              beta = runif(1, 1/7, 1),
+                              beta = runif(1, 1/7, 2),
                               gamma1 = rgamma(1, 14, 100), # IR
                               gamma2 = rgamma(1, 67, 1000), # HR
                               lambda = rgamma(1, 1, 10), # IH
@@ -249,7 +249,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
         initsList <- list(comp_init = comp_init,
                           probDetect = rbeta(1, constantsList$detectA, 
                                              constantsList$detectB),
-                          beta = runif(1, 1/7, 1),
+                          beta = runif(1, 1/7, 2),
                           w0 = rnorm(1, 7, 0.25),
                           nu = rgamma(1, 100, 100))
         
@@ -272,7 +272,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
    
     
     ### MCMC specifications
-    niter <- 6e5
+    niter <- 8e5
     nburn <- 3e5
     nthin <- 10
     

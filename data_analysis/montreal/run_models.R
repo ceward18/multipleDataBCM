@@ -20,7 +20,8 @@ source('./scripts/model_code.R')
 peak <- c(1,2,4)
 smoothWindow <- 14
 modelType <- c('SIHRD_full', 'SIHRD_inc',
-               'SIR_full', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')
+               'SIR_full', 'SIR_inc', 
+               'SIHRD_noAlarm', 'SIR_noAlarm')
 assumeType <- c('undetected', 'casesOnly')
 
 allModels <- expand.grid(modelType = modelType,

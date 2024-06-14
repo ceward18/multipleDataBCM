@@ -92,10 +92,10 @@ getModelInput <- function(incData, modelType, assumeType, peak,
     
     # only relevant for SIHRD models
     if (assumeType == 'casesOnly') {
-        RstarI <- round(0.3 * c(rmulti(1, I0, rep(I0/7, 7)), 
+        RstarI <- round(0.2 * c(rmulti(1, I0, rep(I0/7, 7)), 
                                 dataList$detectIstar[1:(tau-7)]))
     } else {
-        RstarI <- round(0.3 * c(rmulti(1, I0, rep(I0/7, 7)),
+        RstarI <- round(0.2 * c(rmulti(1, I0, rep(I0/7, 7)),
                                 dataList$Istar[1:(tau-7)]))
     }
     
@@ -118,7 +118,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
             initsList <- list(comp_init = comp_init,
                               probDetect = rbeta(1,  constantsList$detectA,
                                                  constantsList$detectB),
-                              beta = runif(1, 1/7, 1),
+                              beta = runif(1, 1/7, 2),
                               gamma1 = rgamma(1, 14, 100),  # IR
                               gamma2 = rgamma(1, 67, 1000), # HR
                               lambda = rgamma(1, 1, 10),    # IH
@@ -155,7 +155,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
             initsList <- list(comp_init = comp_init,
                               probDetect = rbeta(1,  constantsList$detectA,
                                                  constantsList$detectB),
-                              beta = runif(1, 1/7, 1),
+                              beta = runif(1, 1/7, 2),
                               gamma1 = rgamma(1, 14, 100),  # IR
                               gamma2 = rgamma(1, 67, 1000), # HR
                               lambda = rgamma(1, 1, 10),    # IH
@@ -186,7 +186,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
         initsList <- list(comp_init = comp_init,
                           probDetect = rbeta(1, constantsList$detectA,
                                              constantsList$detectB),
-                          beta = runif(1, 1/7, 1),
+                          beta = runif(1, 1/7, 2),
                           k = runif(1, 0, 0.02),
                           alpha = rbeta(1, 1, 1),
                           w0 = rnorm(1, 7, 0.25),
@@ -203,7 +203,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
         initsList <- list(comp_init = comp_init,
                           probDetect = rbeta(1, constantsList$detectA, 
                                              constantsList$detectB),
-                          beta = runif(1, 1/7, 1),
+                          beta = runif(1, 1/7, 2),
                           k = runif(1, 0, 0.02),
                           alpha = rbeta(1, 1, 1),
                           w0 = rnorm(1, 7, 0.25),
@@ -224,7 +224,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
             ### inits 
             initsList <- list(comp_init = comp_init,
                               probDetect = rbeta(1, constantsList$detectA, constantsList$detectB),
-                              beta = runif(1, 1/7, 1),
+                              beta = runif(1, 1/7, 2),
                               gamma1 = rgamma(1, 14, 100), # IR
                               gamma2 = rgamma(1, 67, 1000), # HR
                               lambda = rgamma(1, 1, 10), # IH
@@ -253,7 +253,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
         initsList <- list(comp_init = comp_init,
                           probDetect = rbeta(1, constantsList$detectA, 
                                              constantsList$detectB),
-                          beta = runif(1, 1/7, 1),
+                          beta = runif(1, 1/7, 2),
                           w0 = rnorm(1, 7, 0.25),
                           nu = rgamma(1, 100, 100))
         
@@ -275,8 +275,8 @@ getModelInput <- function(incData, modelType, assumeType, peak,
     }
    
     ### MCMC specifications
-    niter <- 6e5
-    nburn <- 3e5
+    niter <- 1e6
+    nburn <- 5e5
     nthin <- 10
     
     list(constantsList = constantsList,
