@@ -11,7 +11,7 @@ fitAlarmModel <- function(incData, modelType, assumeType, peak,
     source('./scripts/get_model_inputs.R')
     
     # for reproducibility, inits vary across peaks/models/assumptions/chains
-    seed <- seed + peak + 
+    seed <- seed + as.numeric(peak) + 
         as.numeric(factor(modelType, levels = c('SIHRD_full', 'SIHRD_inc',
                                                 'SIR_full', 'SIR_inc',
                                                 'SIHRD_noAlarm', 'SIR_noAlarm'))) + 

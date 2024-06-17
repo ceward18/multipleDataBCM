@@ -164,7 +164,11 @@ kable(tabPrint, row.names = F, format = 'latex', align = 'lccc',
 ################################################################################
 # R0
 
-R0PostAll <- readRDS('nyc/results/R0PostAll.rds')
+R0PostAll_nyc <- readRDS('nyc/results/R0PostAll.rds')
+R0PostAll_nyc$city <- 'NYC'
+R0PostAll_montreal <- readRDS('montreal/results/R0PostAll.rds')
+R0PostAll_montreal$city <- 'Montreal'
+R0PostAll <- rbind.data.frame(R0PostAll_nyc, R0PostAll_montreal)
 
 # undetected only
 R0PostAll <- R0PostAll[R0PostAll$assumeType == 'undetected',]
@@ -176,18 +180,60 @@ R0PostAll$modelType <- factor(R0PostAll$modelType,
                               labels = c('SIHRD inc+deaths', 
                                          'SIHRD inc', 
                                          'SIR inc+deaths', 
-                                         'SIR inc', 'SIHRD no alarm', 'SIR no alarm'))
+                                         'SIR inc', 'SIHRD no alarm',
+                                         'SIR no alarm'))
 
-ggplot(R0PostAll,
-       aes(x = time, y = mean, ymin = lower, ymax = upper, 
-           col = modelType, fill = modelType)) +
+R0PostAll$peak <- paste0('Wave ', R0PostAll$peak)
+
+p1 <- ggplot(subset(R0PostAll, city == 'Montreal' & 
+                    modelType %in% c('SIHRD inc+deaths', 
+                                                'SIR inc', 
+                                                'SIHRD no alarm')),
+             aes(x = time, y = mean, ymin = lower, ymax = upper)) +
     geom_line() + 
     geom_ribbon(alpha = 0.3) +
-    facet_nested(peak~modelType, scales = "free_x", independent = "x") +
+    facet_nested(peak ~ modelType, scales = "free", independent = "x") +
     theme_bw() + 
-    theme(strip.background = element_rect(fill = 'white')) + 
     geom_hline(yintercept = 1, linetype = 2) + 
-    guides(col = 'none', fill = 'none')
+    guides(col = 'none', fill = 'none')  +
+    theme(strip.placement = "outside",
+          strip.background = element_rect(fill = 'white'),
+          strip.text = element_text(size = 10),
+          strip.text.x = element_text(size = 10),
+          strip.text.y = element_blank(),
+          axis.text = element_text(size = 8),
+          plot.title = element_text(size = 12, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    labs(x = 'Epidemic time', y = expression(R[0](t)),
+         title = 'Montreal')
+
+p2 <- ggplot(subset(R0PostAll, city == 'NYC' & 
+                        modelType %in% c('SIHRD inc+deaths', 
+                                         'SIR inc', 
+                                         'SIHRD no alarm')),
+             aes(x = time, y = mean, ymin = lower, ymax = upper)) +
+    geom_line() + 
+    geom_ribbon(alpha = 0.3) +
+    facet_nested(peak ~ modelType, scales = "free", independent = "x") +
+    theme_bw() + 
+    geom_hline(yintercept = 1, linetype = 2) + 
+    guides(col = 'none', fill = 'none')  +
+    theme(strip.placement = "outside",
+          strip.background = element_rect(fill = 'white'),
+          strip.text = element_text(size = 10),
+          axis.title = element_text(size = 10),
+          axis.text = element_text(size = 8),
+          plot.title = element_text(size = 12, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    labs(x = 'Epidemic time', y = NULL,
+         title = 'NYC')
+
+
+pdf('figures/nyc_montreal_r0.pdf', height = 4, width = 9)
+grid.arrange(p1, p2, nrow = 1)
+dev.off()
 
 
 ################################################################################
@@ -277,10 +323,126 @@ ggplot(subset(postPred_nyc, assumeType == 'undetected'),
     theme_bw()
 
 
+postPredAll <- rbind.data.frame(postPred_montreal, postPred_nyc)
+
+postPredAll$modelType <- factor(postPredAll$modelType,
+                              levels = c('SIHRD_full', 'SIHRD_inc', 
+                                         'SIR_full', 'SIR_inc', 
+                                         'SIHRD_noAlarm', 'SIR_noAlarm'),
+                              labels = c('SIHRD inc+deaths', 'SIHRD inc', 
+                                         'SIR inc+deaths', 'SIR inc', 
+                                         'SIHRD no alarm', 'SIR no alarm'))
+
+
+postPredAll$peak <- paste0('Wave ', postPredAll$peak)
+
+p3 <- ggplot(subset(postPredAll, assumeType == 'undetected' & 
+                        modelType %in% c('SIHRD inc+deaths', 'SIR inc', 'SIHRD no alarm') & 
+                        marg == 'cases' & city == 'NYC'), 
+             aes(x = date, col = modelType, fill = modelType)) +
+    geom_line(aes(y = truth)) + 
+    geom_line(aes(y = mean), linetype = 2) + 
+    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) +
+    facet_nested(peak ~ modelType, scales = T, independent = 'x') +
+    theme_bw() + 
+    guides(col = 'none', fill = 'none') +
+    theme(strip.placement = "outside",
+          strip.background = element_rect(fill = 'white'),
+          strip.text.x = element_text(size = 10),
+          strip.text.y = element_blank(),
+          axis.title = element_text(size = 10),
+          axis.text = element_text(size = 8),
+          plot.title = element_text(size = 12, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    scale_y_continuous(labels = scales::comma)+ 
+    labs(x = 'Date', y = 'Case Count', title = 'Montreal')
+
+p4 <- ggplot(subset(postPredAll, assumeType == 'undetected' & 
+                        modelType %in% c('SIHRD inc+deaths', 'SIR inc', 'SIHRD no alarm') & 
+                        marg == 'cases' & city == 'NYC'), 
+             aes(x = date, col = modelType, fill = modelType)) +
+    geom_line(aes(y = truth)) + 
+    geom_line(aes(y = mean), linetype = 2) + 
+    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) +
+    facet_nested(peak ~ modelType, scales = T, independent = 'x') +
+    theme_bw() + 
+    guides(col = 'none', fill = 'none') +
+    theme(strip.placement = "outside",
+          strip.background = element_rect(fill = 'white'),
+          strip.text = element_text(size = 10),
+          axis.title = element_text(size = 10),
+          axis.text = element_text(size = 8),
+          plot.title = element_text(size = 12, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    scale_y_continuous(labels = scales::comma) + 
+    labs(x = 'Date', y = NULL, title = 'NYC')
+
+
+
+pdf('figures/nyc_montreal_postPred.pdf', height = 4, width = 9)
+grid.arrange(p3, p4, nrow = 1)
+dev.off()
+
+
+
+p3 <- ggplot(subset(postPredAll, assumeType == 'undetected' & 
+                        modelType %in% c('SIHRD inc+deaths', 'SIR inc', 'SIHRD no alarm') & 
+                        marg == 'cases' & city == 'Montreal'), 
+             aes(x = date)) +
+    geom_line(aes(y = truth)) + 
+    geom_line(aes(y = mean), linetype = 2) + 
+    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) +
+    facet_nested(peak ~ modelType, scales = T, independent = 'x') +
+    theme_bw() + 
+    guides(col = 'none', fill = 'none') +
+    theme(strip.placement = "outside",
+          strip.background = element_rect(fill = 'white'),
+          strip.text.x = element_blank(),
+          strip.text.y = element_blank(),
+          axis.title = element_text(size = 10),
+          axis.text = element_text(size = 8),
+          plot.title = element_text(size = 12, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    scale_y_continuous(labels = scales::comma)+ 
+    labs(x = 'Date', y = 'Case Count', title = NULL)
+
+p4 <- ggplot(subset(postPredAll, assumeType == 'undetected' & 
+                        modelType %in% c('SIHRD inc+deaths', 'SIR inc', 'SIHRD no alarm') & 
+                        marg == 'cases' & city == 'NYC'), 
+             aes(x = date)) +
+    geom_line(aes(y = truth)) + 
+    geom_line(aes(y = mean), linetype = 2) + 
+    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) +
+    facet_nested(peak ~ modelType, scales = T, independent = 'x') +
+    theme_bw() + 
+    guides(col = 'none', fill = 'none') +
+    theme(strip.placement = "outside",
+          strip.background = element_rect(fill = 'white'),
+          strip.text.y = element_text(size = 10),
+          strip.text.x = element_blank(),
+          axis.title = element_text(size = 10),
+          axis.text = element_text(size = 8),
+          plot.title = element_text(size = 12, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    scale_y_continuous(labels = scales::comma) + 
+    labs(x = 'Date', y = NULL, title = NULL)
+
+
+
+
+pdf('figures/nyc_montreal_resultsComb.pdf', height = 8, width = 10)
+grid.arrange(p1, p2, p3, p4, nrow = 2)
+dev.off()
+
+
 ################################################################################
 # alarm over time
 
-alarmTimePostAll <- readRDS('montreal/results/alarmTimePostAll.rds')
+alarmTimePostAll <- readRDS('nyc/results/alarmTimePostAll.rds')
 
 # undetected only
 alarmTimePostAll <- alarmTimePostAll[alarmTimePostAll$assumeType == 'undetected',]
@@ -303,4 +465,4 @@ ggplot(alarmTimePostAll,
     theme_bw() + 
     theme(strip.background = element_rect(fill = 'white')) + 
     guides(col = 'none', fill = 'none') +
-    ylim(c(0, 1))
+    ylim(c(0, 0.5))
