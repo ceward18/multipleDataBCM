@@ -11,7 +11,7 @@ fitAlarmModel <- function(incData, modelType, assumeType, peak,
     source('./scripts/get_model_inputs.R')
     
     # for reproducibility, inits vary across peaks/models/assumptions/chains
-    seed <- seed + peak + 
+    seed <- seed + as.numeric(peak) + 
         as.numeric(factor(modelType, levels = c('SIHRD_full', 'SIHRD_inc',
                                                 'SIR_full', 'SIR_inc',
                                                 'SIHRD_noAlarm', 'SIR_noAlarm'))) + 
@@ -45,12 +45,7 @@ fitAlarmModel <- function(incData, modelType, assumeType, peak,
     myConfig$addMonitors('R0')
     
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc')) {
-        
-        # use slice sampling for transmission parameters
-        paramsForSlice <- c('beta', 'k')
-        myConfig$removeSampler(paramsForSlice)
-        myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
-        
+
         # samplers for RstarI and RstarH
         myConfig$removeSamplers('RstarI') # Nodes will be expanded
         myConfig$addSampler(target = c('RstarI'),

@@ -15,7 +15,7 @@ postPredFit <- function(incData, modelType, assumeType, peak,
                                  hospData, deathData,
                                  N, S0, I0, H0, D0, R0)
     
-    modelInputs$constantsList$bw <- 30
+    modelInputs$constantsList$bw <- 14
     
     modelInputs$constantsList$smoothC0 <- smoothC[1]
     modelInputs$constantsList$Istar0 <- Istar0

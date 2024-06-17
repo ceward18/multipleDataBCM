@@ -87,15 +87,17 @@ for (i in batchIdx) {
     lengthI <- 7  # average infectious for 7 days
     lengthH <- 15 # average hospitalized for 15 days
     inWindowI <- max(1, (idxStart - lengthI)):(idxStart - 1)
+    inWindowH <- max(1, (idxStart - lengthH)):(idxStart - 1)
+    
     
     # currently hospitalized
-    H0 <- sum(dat$dailyHosp[max(1, (idxStart - lengthH)):(idxStart - 1)])
+    H0 <- sum(dat$dailyHosp[inWindowH])
     
     # already dead
     D0 <- cumsum(dat$dailyDeaths)[max(1, (idxStart - 1))]
     
     # currently infectious if infected in the past 7 days
-    I0 <- sum(dat$dailyCases[max(1, (idxStart - lengthI)):(idxStart - 1)])
+    I0 <- sum(dat$dailyCases[inWindowI])
     
     # should multiply cases, multiplier depends on peak
     #   (https://www.healthdata.org/sites/default/files/covid_briefs/101_briefing_Canada.pdf)
@@ -115,7 +117,6 @@ for (i in batchIdx) {
                           '2' = 0.4,
                           '3' = 0.25, 
                           '4' = 0.2))
-        
         
         if (peak_i == 1) {
             R0 <- prev_inf - D0

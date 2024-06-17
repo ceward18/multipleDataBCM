@@ -261,7 +261,6 @@ getModelInput <- function(incData, modelType, assumeType, peak,
         
     }
     
-    
     if (assumeType == 'casesOnly') {
         constantsList$detectA <- NULL
         constantsList$detectB <- NULL
@@ -275,7 +274,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
     }
    
     ### MCMC specifications
-    niter <- 1e6
+    niter <- 1.2e6
     nburn <- 5e5
     nthin <- 10
     
