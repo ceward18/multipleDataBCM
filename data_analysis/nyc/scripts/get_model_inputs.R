@@ -94,6 +94,7 @@ getModelInput <- function(incData, modelType, assumeType, peak,
     }
     
     if (H0 == 0) {
+        
         RstarH <- round(0.1 * c(rep(0, 15),
                                 hospData[1:(tau-15)]))
     } else {
@@ -269,7 +270,6 @@ getModelInput <- function(incData, modelType, assumeType, peak,
         dataList$Istar <- incData
         
     }
-   
     
     ### MCMC specifications
     niter <- 8e5

@@ -164,10 +164,52 @@ kable(tabPrint, row.names = F, format = 'latex', align = 'lccc',
 ################################################################################
 # R0
 
+# need to add actual dates to the R0 and posterior predictions as those are indexed
+# by epidemic time
+
+subset(dat_longer, type == 'Cases') %>%
+    group_by(city, peak) %>%
+    summarize(tau = length(date))
+
+nyc_dat <- data.frame(city = 'NYC',
+                      time = c(1:98, 1:227, 1:77), 
+                      peak = rep(c(1,2,4), c(98, 227, 77)),
+                      date = c(nyc$date[which(nyc$peak == 1)],
+                               nyc$date[which(nyc$peak == 2)],
+                               nyc$date[which(nyc$peak == 4)]),
+                      cases = c(nyc$dailyCases[which(nyc$peak == 1)],
+                                nyc$dailyCases[which(nyc$peak == 2)],
+                                nyc$dailyCases[which(nyc$peak == 4)]),
+                      hosp = c(nyc$dailyHosp[which(nyc$peak == 1)],
+                               nyc$dailyHosp[which(nyc$peak == 2)],
+                               nyc$dailyHosp[which(nyc$peak == 4)]),
+                      death = c(nyc$dailyDeaths[which(nyc$peak == 1)],
+                                nyc$dailyDeaths[which(nyc$peak == 2)],
+                                nyc$dailyDeaths[which(nyc$peak == 4)]))
+
+
+montreal_dat <- data.frame(city = 'Montreal',
+                           time = c(1:123, 1:329, 1:98), 
+                           peak = rep(c(1,2,4), c(123, 329, 98)),
+                           date = c(montreal$date[which(montreal$peak == 1)],
+                                    montreal$date[which(montreal$peak == 2)],
+                                    montreal$date[which(montreal$peak == 4)]),
+                           cases = c(montreal$dailyCases[which(montreal$peak == 1)],
+                                     montreal$dailyCases[which(montreal$peak == 2)],
+                                     montreal$dailyCases[which(montreal$peak == 4)]),
+                           hosp = c(montreal$dailyHosp[which(montreal$peak == 1)],
+                                    montreal$dailyHosp[which(montreal$peak == 2)],
+                                    montreal$dailyHosp[which(montreal$peak == 4)]),
+                           death = c(montreal$dailyDeaths[which(montreal$peak == 1)],
+                                     montreal$dailyDeaths[which(montreal$peak == 2)],
+                                     montreal$dailyDeaths[which(montreal$peak == 4)]))
+
 R0PostAll_nyc <- readRDS('nyc/results/R0PostAll.rds')
-R0PostAll_nyc$city <- 'NYC'
+R0PostAll_nyc <- merge(R0PostAll_nyc, nyc_dat, by = c('peak', 'time'), all.x = T)
+
 R0PostAll_montreal <- readRDS('montreal/results/R0PostAll.rds')
-R0PostAll_montreal$city <- 'Montreal'
+R0PostAll_montreal <- merge(R0PostAll_montreal, montreal_dat, by = c('peak', 'time'), all.x = T)
+
 R0PostAll <- rbind.data.frame(R0PostAll_nyc, R0PostAll_montreal)
 
 # undetected only
@@ -177,19 +219,20 @@ R0PostAll$modelType <- factor(R0PostAll$modelType,
                               levels = c('SIHRD_full', 'SIHRD_inc', 
                                          'SIR_full', 'SIR_inc', 
                                          'SIHRD_noAlarm', 'SIR_noAlarm'),
-                              labels = c('SIHRD inc+deaths', 
-                                         'SIHRD inc', 
-                                         'SIR inc+deaths', 
-                                         'SIR inc', 'SIHRD no alarm',
+                              labels = c('SIHRD cases + deaths', 
+                                         'SIHRD cases only', 
+                                         'SIR cases + deaths', 
+                                         'SIR cases only', 'SIHRD no alarm',
                                          'SIR no alarm'))
 
 R0PostAll$peak <- paste0('Wave ', R0PostAll$peak)
 
+
 p1 <- ggplot(subset(R0PostAll, city == 'Montreal' & 
-                    modelType %in% c('SIHRD inc+deaths', 
-                                                'SIR inc', 
+                    modelType %in% c('SIHRD cases + deaths', 
+                                                'SIR cases only', 
                                                 'SIHRD no alarm')),
-             aes(x = time, y = mean, ymin = lower, ymax = upper)) +
+             aes(x = date, y = mean, ymin = lower, ymax = upper)) +
     geom_line() + 
     geom_ribbon(alpha = 0.3) +
     facet_nested(peak ~ modelType, scales = "free", independent = "x") +
@@ -198,21 +241,22 @@ p1 <- ggplot(subset(R0PostAll, city == 'Montreal' &
     guides(col = 'none', fill = 'none')  +
     theme(strip.placement = "outside",
           strip.background = element_rect(fill = 'white'),
-          strip.text = element_text(size = 10),
-          strip.text.x = element_text(size = 10),
+          strip.text = element_text(size = 12),
+          strip.text.x = element_text(size = 12),
           strip.text.y = element_blank(),
-          axis.text = element_text(size = 8),
+          axis.text.y = element_text(size = 8),
+          axis.text.x = element_text(size = 8, angle = 45, vjust = 1, hjust=1),
           plot.title = element_text(size = 12, h = 0.5),
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank()) +
-    labs(x = 'Epidemic time', y = expression(R[0](t)),
-         title = 'Montreal')
+    labs(x = 'Date', y = expression(R[0](t)), title = 'Montreal')+
+    scale_x_date(date_breaks ="1 month", date_labels = "%b")
 
 p2 <- ggplot(subset(R0PostAll, city == 'NYC' & 
-                        modelType %in% c('SIHRD inc+deaths', 
-                                         'SIR inc', 
+                        modelType %in% c('SIHRD cases + deaths', 
+                                         'SIR cases only', 
                                          'SIHRD no alarm')),
-             aes(x = time, y = mean, ymin = lower, ymax = upper)) +
+             aes(x = date, y = mean, ymin = lower, ymax = upper)) +
     geom_line() + 
     geom_ribbon(alpha = 0.3) +
     facet_nested(peak ~ modelType, scales = "free", independent = "x") +
@@ -221,14 +265,16 @@ p2 <- ggplot(subset(R0PostAll, city == 'NYC' &
     guides(col = 'none', fill = 'none')  +
     theme(strip.placement = "outside",
           strip.background = element_rect(fill = 'white'),
-          strip.text = element_text(size = 10),
+          strip.text = element_text(size = 12),
           axis.title = element_text(size = 10),
-          axis.text = element_text(size = 8),
+          axis.text.y = element_text(size = 8),
+          axis.text.x = element_text(size = 8, angle = 45, vjust = 1, hjust=1),
           plot.title = element_text(size = 12, h = 0.5),
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank()) +
-    labs(x = 'Epidemic time', y = NULL,
-         title = 'NYC')
+    labs(x = 'Date', y = NULL,
+         title = 'NYC') +
+    scale_x_date(date_breaks ="1 month", date_labels = "%b")
 
 
 pdf('figures/nyc_montreal_r0.pdf', height = 4, width = 9)
@@ -239,28 +285,7 @@ dev.off()
 ################################################################################
 # Posterior prediction
 
-# need to add actual dates to the posterior predictions as those are indexed
-# by epidemic time
-
-subset(dat_longer, type == 'Cases') %>%
-    group_by(city, peak) %>%
-    summarize(tau = length(date))
-
-nyc_dat <- data.frame(city = 'NYC',
-           time = c(1:98, 1:227, 1:77), 
-           peak = rep(c(1,2,4), c(98, 227, 77)),
-           date = c(nyc$date[which(nyc$peak == 1)],
-                    nyc$date[which(nyc$peak == 2)],
-                    nyc$date[which(nyc$peak == 4)]),
-           cases = c(nyc$dailyCases[which(nyc$peak == 1)],
-                     nyc$dailyCases[which(nyc$peak == 2)],
-                     nyc$dailyCases[which(nyc$peak == 4)]),
-           hosp = c(nyc$dailyHosp[which(nyc$peak == 1)],
-                    nyc$dailyHosp[which(nyc$peak == 2)],
-                    nyc$dailyHosp[which(nyc$peak == 4)]),
-           death = c(nyc$dailyDeaths[which(nyc$peak == 1)],
-                      nyc$dailyDeaths[which(nyc$peak == 2)],
-                      nyc$dailyDeaths[which(nyc$peak == 4)]))
+# need in long format to merge with posterior predictions
 
 nyc_dat_long <- reshape(nyc_dat, 
                    varying = c("cases", "hosp", "death"), 
@@ -270,22 +295,6 @@ nyc_dat_long <- reshape(nyc_dat,
                    new.row.names = 1:10000,
                    direction = "long")
 
-montreal_dat <- data.frame(city = 'Montreal',
-                      time = c(1:123, 1:329, 1:98), 
-                      peak = rep(c(1,2,4), c(123, 329, 98)),
-                      date = c(montreal$date[which(montreal$peak == 1)],
-                               montreal$date[which(montreal$peak == 2)],
-                               montreal$date[which(montreal$peak == 4)]),
-                      cases = c(montreal$dailyCases[which(montreal$peak == 1)],
-                                montreal$dailyCases[which(montreal$peak == 2)],
-                                montreal$dailyCases[which(montreal$peak == 4)]),
-                      hosp = c(montreal$dailyHosp[which(montreal$peak == 1)],
-                               montreal$dailyHosp[which(montreal$peak == 2)],
-                               montreal$dailyHosp[which(montreal$peak == 4)]),
-                      death = c(montreal$dailyDeaths[which(montreal$peak == 1)],
-                                 montreal$dailyDeaths[which(montreal$peak == 2)],
-                                 montreal$dailyDeaths[which(montreal$peak == 4)]))
-
 montreal_dat_long <- reshape(montreal_dat, 
                         varying = c("cases", "hosp", "death"), 
                         v.names = "truth",
@@ -293,6 +302,8 @@ montreal_dat_long <- reshape(montreal_dat,
                         times = c("cases", "hosp", "death"), 
                         new.row.names = 1:10000,
                         direction = "long")
+
+
 
 # posterior predictions
 postPred_nyc <- readRDS('nyc/results/postPredFitAll.rds')
@@ -305,40 +316,24 @@ postPred_nyc <- merge(postPred_nyc, nyc_dat_long, by = c('peak', 'time', 'marg')
 postPred_montreal <- merge(postPred_montreal, montreal_dat_long, by = c('peak', 'time', 'marg'),
                       all.x = T)
 
-
-ggplot(subset(postPred_montreal, assumeType == 'undetected'), 
-       aes(x = date, col = marg, group = marg, fill = marg)) +
-    geom_line(aes(y = truth)) + 
-    geom_line(aes(y = mean), linetype = 2) + 
-    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) +
-    facet_nested(peak ~ modelType, scales = T, independent = 'x') +
-    theme_bw()
-
-ggplot(subset(postPred_nyc, assumeType == 'undetected'), 
-       aes(x = date, col = marg, group = marg, fill = marg)) +
-    geom_line(aes(y = truth)) + 
-    geom_line(aes(y = mean), linetype = 2) + 
-    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) +
-    facet_nested(peak ~ modelType, scales = T, independent = 'x') +
-    theme_bw()
-
-
 postPredAll <- rbind.data.frame(postPred_montreal, postPred_nyc)
 
 postPredAll$modelType <- factor(postPredAll$modelType,
                               levels = c('SIHRD_full', 'SIHRD_inc', 
                                          'SIR_full', 'SIR_inc', 
                                          'SIHRD_noAlarm', 'SIR_noAlarm'),
-                              labels = c('SIHRD inc+deaths', 'SIHRD inc', 
-                                         'SIR inc+deaths', 'SIR inc', 
+                              labels = c('SIHRD cases + deaths', 'SIHRD cases only', 
+                                         'SIR cases + deaths', 'SIR cases only', 
                                          'SIHRD no alarm', 'SIR no alarm'))
 
 
 postPredAll$peak <- paste0('Wave ', postPredAll$peak)
 
 p3 <- ggplot(subset(postPredAll, assumeType == 'undetected' & 
-                        modelType %in% c('SIHRD inc+deaths', 'SIR inc', 'SIHRD no alarm') & 
-                        marg == 'cases' & city == 'NYC'), 
+                        modelType %in% c('SIHRD cases + deaths', 
+                                         'SIR cases only',
+                                         'SIHRD no alarm') & 
+                        marg == 'cases' & city == 'Montreal'), 
              aes(x = date, col = modelType, fill = modelType)) +
     geom_line(aes(y = truth)) + 
     geom_line(aes(y = mean), linetype = 2) + 
@@ -359,7 +354,7 @@ p3 <- ggplot(subset(postPredAll, assumeType == 'undetected' &
     labs(x = 'Date', y = 'Case Count', title = 'Montreal')
 
 p4 <- ggplot(subset(postPredAll, assumeType == 'undetected' & 
-                        modelType %in% c('SIHRD inc+deaths', 'SIR inc', 'SIHRD no alarm') & 
+                        modelType %in% c('SIHRD cases + deaths', 'SIR cases only', 'SIHRD no alarm') & 
                         marg == 'cases' & city == 'NYC'), 
              aes(x = date, col = modelType, fill = modelType)) +
     geom_line(aes(y = truth)) + 
@@ -388,7 +383,7 @@ dev.off()
 
 
 p3 <- ggplot(subset(postPredAll, assumeType == 'undetected' & 
-                        modelType %in% c('SIHRD inc+deaths', 'SIR inc', 'SIHRD no alarm') & 
+                        modelType %in% c('SIHRD cases + deaths', 'SIR cases only', 'SIHRD no alarm') & 
                         marg == 'cases' & city == 'Montreal'), 
              aes(x = date)) +
     geom_line(aes(y = truth)) + 
@@ -402,16 +397,19 @@ p3 <- ggplot(subset(postPredAll, assumeType == 'undetected' &
           strip.text.x = element_blank(),
           strip.text.y = element_blank(),
           axis.title = element_text(size = 10),
-          axis.text = element_text(size = 8),
+          axis.text.y = element_text(size = 8),
+          axis.text.x = element_text(size = 8, angle = 45, vjust = 1, hjust=1),
           plot.title = element_text(size = 12, h = 0.5),
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank()) +
     scale_y_continuous(labels = scales::comma)+ 
-    labs(x = 'Date', y = 'Case Count', title = NULL)
+    labs(x = 'Date', y = 'Case Count', title = NULL)+
+    scale_x_date(date_breaks ="1 month", date_labels = "%b")
 
 p4 <- ggplot(subset(postPredAll, assumeType == 'undetected' & 
-                        modelType %in% c('SIHRD inc+deaths', 'SIR inc', 'SIHRD no alarm') & 
-                        marg == 'cases' & city == 'NYC'), 
+                        modelType %in% c('SIHRD cases + deaths', 'SIR cases only', 'SIHRD no alarm') & 
+                        marg %in% c('cases') & 
+                  city == 'NYC'), 
              aes(x = date)) +
     geom_line(aes(y = truth)) + 
     geom_line(aes(y = mean), linetype = 2) + 
@@ -421,21 +419,55 @@ p4 <- ggplot(subset(postPredAll, assumeType == 'undetected' &
     guides(col = 'none', fill = 'none') +
     theme(strip.placement = "outside",
           strip.background = element_rect(fill = 'white'),
-          strip.text.y = element_text(size = 10),
+          strip.text.y = element_text(size = 12),
           strip.text.x = element_blank(),
+          axis.title = element_text(size = 10),
+          axis.text.y = element_text(size = 8),
+          axis.text.x = element_text(size = 8, angle = 45, vjust = 1, hjust=1),
+          plot.title = element_text(size = 12, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    scale_y_continuous(labels = scales::comma) + 
+    labs(x = 'Date', y = NULL, title = NULL)+
+    scale_x_date(date_breaks ="1 month", date_labels = "%b")
+
+
+
+
+pdf('figures/nyc_montreal_resultsComb.pdf', height = 10, width = 13)
+grid.arrange(p1, p2, p3, p4, nrow = 2)
+dev.off()
+
+
+
+
+# hospitalizations and deaths
+postPredAll$marg <- factor(postPredAll$marg,
+                           levels = c('cases', 'hosp', 'death'),
+                           labels = c('cases', 'Hospitalizations', 'Deaths'))
+
+pdf('figures/nyc_montreal_hospDeathPred.pdf', height = 4, width = 8)
+ggplot(subset(postPredAll, assumeType == 'undetected' & 
+                  modelType %in% c('SIHRD cases + deaths') & 
+                  marg %in% c('Deaths', 'Hospitalizations') ), 
+       aes(x = date, group = marg, fill = marg)) +
+    geom_line(aes(y = truth, col = marg)) + 
+    geom_line(aes(y = mean, col = marg), linetype = 2) + 
+    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2) +
+    facet_nested(city ~ peak , scales = T, independent = 'all') +
+    theme_bw() + 
+    theme(strip.placement = "outside",
+          strip.background = element_rect(fill = 'white'),
+          strip.text = element_text(size = 12),
           axis.title = element_text(size = 10),
           axis.text = element_text(size = 8),
           plot.title = element_text(size = 12, h = 0.5),
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank()) +
     scale_y_continuous(labels = scales::comma) + 
-    labs(x = 'Date', y = NULL, title = NULL)
-
-
-
-
-pdf('figures/nyc_montreal_resultsComb.pdf', height = 8, width = 10)
-grid.arrange(p1, p2, p3, p4, nrow = 2)
+    labs(x = 'Date', y = NULL, title = 'Posterior Prediction of Hospitalizations and Deaths\nSIHRD cases + deaths alarm', col = '', fill = '') +
+    scale_color_manual(values = c('goldenrod2', 'royalblue')) +
+    scale_fill_manual(values = c('goldenrod2', 'royalblue'))
 dev.off()
 
 
@@ -451,10 +483,10 @@ alarmTimePostAll$modelType <- factor(alarmTimePostAll$modelType,
                               levels = c('SIHRD_full', 'SIHRD_inc', 
                                          'SIR_full', 'SIR_inc', 
                                          'SIHRD_noAlarm', 'SIR_noAlarm'),
-                              labels = c('SIHRD inc+deaths', 
-                                         'SIHRD inc', 
-                                         'SIR inc+deaths', 
-                                         'SIR inc', 'SIHRD no alarm', 'SIR no alarm'))
+                              labels = c('SIHRD cases + deaths', 
+                                         'SIHRD cases only', 
+                                         'SIR cases + deaths', 
+                                         'SIR cases only', 'SIHRD no alarm', 'SIR no alarm'))
 
 ggplot(alarmTimePostAll,
        aes(x = time, y = mean, ymin = lower, ymax = upper, 

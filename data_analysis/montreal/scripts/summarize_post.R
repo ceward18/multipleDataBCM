@@ -15,6 +15,7 @@ source('./scripts/model_code.R')
 source('./scripts/get_model_inputs.R')
 source('./scripts/get_WAIC.R')
 source('./scripts/post_pred_fit.R')
+source('./scripts/post_pred_forecast.R')
 
 summarizePost <- function(resThree, incData, modelType, assumeType, peak,
                           smoothC, smoothD, hospData, deathData,
@@ -180,13 +181,79 @@ summarizePost <- function(resThree, incData, modelType, assumeType, peak,
     }
     
     ##############################################################################
+    ### Posterior predictive forecasting for models where it makes sense
+    
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')) {
+        postPred <- postPredForecast(incData = incData, modelType = modelType,
+                                     assumeType = assumeType, peak = peak,
+                                     smoothC = smoothC, smoothD = smoothD, 
+                                     hospData = hospData, deathData = deathData, 
+                                     paramsSamples = samples,
+                                     N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0,
+                                     Istar0 = Istar0, Dstar0 = Dstar0)
+        
+        # remove NA rows (inc model only)
+        postPred <- postPred[!is.na(postPred[,1]),]
+        
+        postMeans <- rowMeans(postPred)
+        postCI <- apply(postPred, 1, quantile, probs = c(0.025, 0.975))
+        
+        nDaysSim <- 50
+        timeRange <- tau + 1:nDaysSim
+        
+        if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
+            
+            if (assumeType == 'undetected') {
+                postPredictForecast <- data.frame(time = rep(timeRange, 4),
+                                                  marg = rep(c('inc', 'cases', 'hosp', 'death'), each = nDaysSim),
+                                                  mean = postMeans,
+                                                  lower = postCI[1,],
+                                                  upper = postCI[2,])
+                
+            } else if (assumeType == 'casesOnly') {
+                postPredictForecast <- data.frame(time = rep(timeRange, 3),
+                                                  marg = rep(c('cases', 'hosp', 'death'), each = nDaysSim),
+                                                  mean = postMeans,
+                                                  lower = postCI[1,],
+                                                  upper = postCI[2,])
+            }
+            
+        } else {
+            
+            if (assumeType == 'undetected') {
+                postPredictForecast <- data.frame(time = rep(timeRange, 2),
+                                                  marg = rep(c('inc', 'cases'), each = nDaysSim),
+                                                  mean = postMeans,
+                                                  lower = postCI[1,],
+                                                  upper = postCI[2,])
+                
+            } else if (assumeType == 'casesOnly') {
+                postPredictForecast <- data.frame(time = timeRange,
+                                                  marg = rep('cases', nDaysSim),
+                                                  mean = postMeans,
+                                                  lower = postCI[1,],
+                                                  upper = postCI[2,])
+            }
+        }
+        
+        
+    } else {
+        postPredictForecast <- data.frame(time = NA, 
+                                          marg = NA,
+                                          mean = NA,
+                                          lower = NA,
+                                          upper = NA)
+    }
+    
+    ##############################################################################
     ### output
     list(gdiag = gdiag,
          postParams = postParams,
          postAlarmTime = postAlarmTime,
          postR0 = postR0,
          waic = waic,
-         postPredictFit = postPredictFit)
+         postPredictFit = postPredictFit,
+         postPredictForecast = postPredictForecast)
     
 }
 

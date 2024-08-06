@@ -23,18 +23,19 @@ smoothWindow <- 14
 modelType <- c('SIHRD_full', 'SIHRD_inc',
                'SIR_full', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')
 assumeType <- c('undetected', 'casesOnly')
+timePeriod <- c(3, 4, 6, 8)
 
 allModels <- expand.grid(modelType = modelType,
                          peak = peak,
                          assumeType = assumeType,
+                         timePeriod = timePeriod,
                          stringsAsFactors = FALSE)
-
-
 
 # 36 total - 12 per peak
 allModels <- allModels[order(allModels$modelType,
                              allModels$assumeType, 
-                             allModels$peak),]
+                             allModels$peak,
+                             allModels$timePeriod),]
 rownames(allModels) <- NULL
 
 tmp <- allModels[seq(1,nrow(allModels), 3),]
@@ -48,10 +49,12 @@ for (i in batchIdx) {
     modelType_i <- allModels$modelType[i]
     assumeType_i <- allModels$assumeType[i]
     peak_i <- allModels$peak[i]
+    timePeriod_i <- allModels$timePeriod[i]
     
     print(paste0('Running: ', modelType_i, 
                  ', assumption: ', assumeType_i, 
-                 ', peak: ', peak_i))
+                 ', peak: ', peak_i,
+                 ', weeks: 1-', timePeriod_i))
     
     ### read data
     dat <- read.csv(paste0('./data/nycClean.csv'))
@@ -69,16 +72,21 @@ for (i in batchIdx) {
     dat$smoothC <- head(movingAverage(c(0, dat$dailyCases), smoothWindow), -1)
     dat$smoothD <- head(movingAverage(c(0, dat$dailyDeaths), smoothWindow), -1)
     
-    # get data for the specified peak
-    incData <- dat$dailyCases[which(dat$peak == peak_i)]
-    hospData <- dat$dailyHosp[which(dat$peak == peak_i)]
-    deathData <- dat$dailyDeaths[which(dat$peak == peak_i)]
-    smoothC <- dat$smoothC[which(dat$peak == peak_i)]
-    smoothD <- dat$smoothD[which(dat$peak == peak_i)]
-    
     
     # when does peak start
     idxStart <- min(which(dat$peak == peak_i))
+    
+    # when does data end (based on time period assumed)
+    idxEnd <- idxStart + 7*timePeriod_i - 1
+    
+    # get data for the specified peak
+    incData <- dat$dailyCases[idxStart:idxEnd]
+    hospData <- dat$dailyHosp[idxStart:idxEnd]
+    deathData <- dat$dailyDeaths[idxStart:idxEnd]
+    smoothC <- dat$smoothC[idxStart:idxEnd]
+    smoothD <- dat$smoothD[idxStart:idxEnd]
+    
+    
     
     # define priors for initial conditions
     # for undetected model, getting number of previously infected and removed 
@@ -113,10 +121,10 @@ for (i in batchIdx) {
         prev_inf <- round(cumsum(dat$dailyCases / probDetectTime))[idxStart - lengthI - 1]
         
         I0 <- round(I0 / switch(peak_i, 
-                          '1' = 0.25,
-                          '2' = 0.4,
-                          '3' = 0.25, 
-                          '4' = 0.2))
+                                '1' = 0.25,
+                                '2' = 0.4,
+                                '3' = 0.25, 
+                                '4' = 0.2))
         
         if (peak_i == 1) {
             R0 <- prev_inf - D0
@@ -184,6 +192,7 @@ for (i in batchIdx) {
                                    N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0,
                                    Istar0 = Istar0, Dstar0 = Dstar0)
     
+    
     # if the model did not converge save the chains so these can be examined later
     if (!all(postSummaries$gdiag$gr < 1.1)) {
         
@@ -194,13 +203,14 @@ for (i in batchIdx) {
         
         saveRDS(resThree, 
                 paste0('./output/chains_', modelType_i, '_', assumeType_i, 
-                       '_peak', peak_i, '.rds'))
+                       '_peak', peak_i, '_weeks', timePeriod_i, '.rds'))
     }
     
     # save results in separate files
     modelInfo <- data.frame(modelType = modelType_i, 
                             peak = peak_i,
-                            assumeType = assumeType_i)
+                            assumeType = assumeType_i,
+                            timePeriod = timePeriod_i)
     
     if (i == batchIdx[1]) {
         
@@ -210,6 +220,7 @@ for (i in batchIdx) {
         R0Post <- cbind.data.frame(postSummaries$postR0, modelInfo)
         waicPost <- cbind.data.frame(postSummaries$waic, modelInfo)
         predFitPost <- cbind.data.frame(postSummaries$postPredictFit, modelInfo)
+        predForecastPost <- cbind.data.frame(postSummaries$postPredictForecast, modelInfo)
         
     } else {
         gr <- rbind.data.frame(gr, 
@@ -224,6 +235,8 @@ for (i in batchIdx) {
                                      cbind.data.frame(postSummaries$waic, modelInfo))
         predFitPost <- rbind.data.frame(predFitPost, 
                                         cbind.data.frame(postSummaries$postPredictFit, modelInfo))
+        predForecastPost <- rbind.data.frame(predForecastPost, 
+                                        cbind.data.frame(postSummaries$postPredictForecast, modelInfo))
     }
     
 } # end loop
@@ -237,4 +250,4 @@ saveRDS(alarmTimePost, paste0('./output/alarmTimePost_Batch', idxPrint, '.rds'))
 saveRDS(R0Post, paste0('./output/R0Post_Batch', idxPrint, '.rds'))
 saveRDS(waicPost, paste0('./output/waicPost_Batch', idxPrint, '.rds'))
 saveRDS(predFitPost, paste0('./output/predFitPostBatch', idxPrint, '.rds'))
-
+saveRDS(predForecastPost, paste0('./output/predForecastPostBatch', idxPrint, '.rds'))
