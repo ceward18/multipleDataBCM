@@ -38,9 +38,9 @@ allModels <- allModels[order(allModels$modelType,
                              allModels$timePeriod),]
 rownames(allModels) <- NULL
 
-tmp <- allModels[seq(1,nrow(allModels), 3),]
+tmp <- allModels[seq(1,nrow(allModels), 4),]
 
-batchSize <- 3
+batchSize <- 4
 batchIdx <- batchSize * (idx - 1) + 1:batchSize
 
 

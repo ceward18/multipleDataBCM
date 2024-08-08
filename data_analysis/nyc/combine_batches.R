@@ -102,3 +102,22 @@ for (i in 2:length(postPredFitFiles)) {
 postPredFitAll <- postPredFitAll[!is.na(postPredFitAll$time),]
 
 saveRDS(postPredFitAll,  paste0('./', resultsFolder, '/postPredFitAll.rds'))
+
+
+################################################################################
+# posterior predictive forecasting
+
+postPredFiles <- outputFiles[grep('predForecastPost', outputFiles)]
+
+postPredAll <- readRDS(paste0('./', outputFolder, '/', postPredFiles[1]))
+
+for (i in 2:length(postPredFitFiles)) {
+    postPred_i <- readRDS(paste0('./', outputFolder, '/', postPredFiles[i]))
+    postPredAll <-rbind.data.frame(postPredAll, postPred_i)
+}
+
+# remove NA (simple model)
+postPredAll <- postPredAll[!is.na(postPredAll$time),]
+
+saveRDS(postPredAll,  paste0('./', resultsFolder, '/postPredForecastAll.rds'))
+
