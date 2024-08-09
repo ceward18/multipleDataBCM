@@ -1,6 +1,6 @@
 #!/bin/bash
 ####### Reserve computing resources #############
-#SBATCH --job-name=SIHRD_nyc
+#SBATCH --job-name=BCM_data_analysis
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=6

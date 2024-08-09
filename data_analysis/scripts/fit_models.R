@@ -110,8 +110,7 @@ fitAlarmModel <- function(incData, city, modelType, peak,
     runMCMC(compiled$myMCMC, 
             niter = niter, 
             nburnin = nburn,
-            thin = nthin,
-            setSeed = seed)
+            thin = nthin)
     
 }
 

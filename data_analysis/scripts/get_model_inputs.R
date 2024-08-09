@@ -76,6 +76,7 @@ getModelInput <- function(incData, city, modelType, peak,
     
     # only relevant for SIHRD models
     # distribute initial infections to be removed anytime in first 7 days
+    # some infected go to hospital, so doesn't need to be one to one with Istar
     RstarI <- round(0.2 * c(rmulti(1, I0, rep(I0/7, 7)),
                             dataList$Istar[1:(tau-7)]))
     

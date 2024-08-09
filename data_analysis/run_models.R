@@ -35,9 +35,9 @@ allModels <- allModels[order(allModels$city,
                              allModels$timePeriod),]
 rownames(allModels) <- NULL
 
-tmp <- allModels[seq(1,nrow(allModels), 4),]
+tmp <- allModels[seq(1,nrow(allModels), 3),]
 
-batchSize <- 4
+batchSize <- 3
 batchIdx <- batchSize * (idx - 1) + 1:batchSize
 
 
@@ -126,7 +126,7 @@ for (i in batchIdx) {
     
     if (peak_i == 1) {
         # need to add a few more to I0 so it makes sense with observed hospitalization data
-        I0 <- I0 + H0 + 5
+        I0 <- I0 + H0 + 10
         # peak 1 = no previous infectious
         R0 <- D0
     } else {
@@ -164,7 +164,7 @@ for (i in batchIdx) {
                       smoothC = smoothC, smoothD = smoothD, 
                       deathData = deathData, hospData = hospData,
                       N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0,
-                      seed = 1)
+                      seed = 3)
         
     })
     stopCluster(cl)
