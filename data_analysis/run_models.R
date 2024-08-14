@@ -158,7 +158,7 @@ for (i in batchIdx) {
         # source relevant scripts
         source('./scripts/fit_models.R')
         
-        # debugonce(fitAlarmModel)
+         debugonce(fitAlarmModel)
         fitAlarmModel(incData = incData, city = city_i,
                       modelType = modelType_i, peak = peak_i, 
                       smoothC = smoothC, smoothD = smoothD, 
@@ -171,6 +171,7 @@ for (i in batchIdx) {
     
     source('./scripts/summarize_post.R')
     # debugonce(summarizePost)
+    # debugonce(postPredForecast)
     postSummaries <- summarizePost(resThree = resThree, incData = incData,
                                    city = city_i,
                                    modelType = modelType_i, peak = peak_i, 

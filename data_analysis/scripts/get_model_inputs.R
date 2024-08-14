@@ -85,7 +85,7 @@ getModelInput <- function(incData, city, modelType, peak,
         RstarH <- round(0.1 * c(rep(0, 15),
                                 hospData[1:(tau-15)]))
     } else {
-        RstarH <- round(0.1 * c(rmulti(1, H0, rep(H0/15, 15)),
+        RstarH <- round(0.3 * c(rmulti(1, H0, rep(H0/15, 15)),
                                 hospData[1:(tau-15)]))
     }
     
@@ -105,7 +105,7 @@ getModelInput <- function(incData, city, modelType, peak,
                               gamma2 = rgamma(1, 67, 1000), # HR
                               lambda = rgamma(1, 1, 10), # IH
                               phi = rgamma(1, 67, 1000),    # HD
-                              k = runif(1, 0, 0.02),
+                              k = runif(1, 0.01, 0.02),
                               alpha = rbeta(1, 1, 1),
                               RstarI = RstarI,
                               RstarH = RstarH)
@@ -142,7 +142,7 @@ getModelInput <- function(incData, city, modelType, peak,
                               gamma2 = rgamma(1, 67, 1000), # HR
                               lambda = rgamma(1, 1, 10), # IH
                               phi = rgamma(1, 67, 1000),    # HD
-                              k = runif(1, 0, 0.02),
+                              k = runif(1, 0.01, 0.02),
                               RstarI = RstarI,
                               RstarH = RstarH)
             
@@ -169,7 +169,7 @@ getModelInput <- function(incData, city, modelType, peak,
                           probDetect = rbeta(1, constantsList$detectA,
                                              constantsList$detectB),
                           beta = runif(1, 1/7, 2),
-                          k = runif(1, 0, 0.02),
+                          k = runif(1, 0.01, 0.02),
                           alpha = rbeta(1, 1, 1),
                           w0 = rnorm(1, 7, 0.25),
                           nu = rgamma(1, 100, 100))
@@ -186,7 +186,7 @@ getModelInput <- function(incData, city, modelType, peak,
                           probDetect = rbeta(1, constantsList$detectA, 
                                              constantsList$detectB),
                           beta = runif(1, 1/7, 2),
-                          k = runif(1, 0, 0.02),
+                          k = runif(1, 0.01, 0.02),
                           alpha = rbeta(1, 1, 1),
                           w0 = rnorm(1, 7, 0.25),
                           nu = rgamma(1, 100, 100))
@@ -247,6 +247,7 @@ getModelInput <- function(incData, city, modelType, peak,
     niter <- 8e5
     nburn <- 3e5
     nthin <- 10
+    
     
     list(constantsList = constantsList,
          dataList = dataList,

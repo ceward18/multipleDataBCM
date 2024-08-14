@@ -15,7 +15,7 @@ postPredForecast <- function(incData, city, modelType, peak,
                                  smoothC, smoothD,
                                  hospData, deathData,
                                  N, S0, I0, H0, D0, R0)
-  
+    
     # set up timings
     obsTime <- modelInputs$constantsList$tau
     nDaysSim <- 50
@@ -39,24 +39,47 @@ postPredForecast <- function(incData, city, modelType, peak,
     # get model code
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_inc')) {
         modelCode <- get(paste0(modelType, '_sim'))
- 
+        
     } else if (modelType %in% c('SIHRD_noAlarm', 'SIR_noAlarm')){
         # don't need separate code to simulate from these models, as they 
         #   have an alarm function which depends on epidemic trajectory
         modelCode <- get(modelType)
     }
     
+    # extend data for modeling
+    modelInputs$dataList$detectIstar <- c(modelInputs$dataList$detectIstar,
+                                          rep(NA, nDaysSim))
+    modelInputs$dataList$Istar <- c(modelInputs$dataList$Istar,
+                                    rep(NA, nDaysSim))
+    
+    if (grepl('SIHRD', modelType)) {
+        modelInputs$dataList$Hstar <- c(modelInputs$dataList$Hstar,
+                                        rep(NA, nDaysSim))
+        modelInputs$dataList$Dstar <- c(modelInputs$dataList$Dstar,
+                                        rep(NA, nDaysSim))
+        
+    }
+    
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_inc')) {
+        modelInputs$dataList$smoothC <- c(modelInputs$dataList$smoothC,
+                                          rep(NA, nDaysSim))
+        
+        if (grepl('SIHRD', modelType)) {
+            modelInputs$dataList$smoothD <- c(modelInputs$dataList$smoothD,
+                                              rep(NA, nDaysSim))
+        }
+    }
+    
     # compile model and simulator
     myModelPred <- nimbleModel(modelCode, 
-                               constants = modelInputs$constantsList)
+                               constants = modelInputs$constantsList,
+                               data = modelInputs$dataList )
     
     compiledPred  <- compileNimble(myModelPred) 
     
-  
     # add hospData, and deathData if SIHRD to paramsSamples as these are observed at first
-   
     
-    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
+    if (grepl('SIHRD', modelType)) {
         dataNodes <- c(paste0('Istar[', predTime, ']'), 
                        paste0('Hstar[', predTime, ']'),
                        paste0('Dstar[', predTime, ']'), 
@@ -82,8 +105,8 @@ postPredForecast <- function(incData, city, modelType, peak,
     detectIstarObs <- matrix(incData, nrow = nrow(paramsSamples), ncol = length(incData), byrow = T)
     colnames(detectIstarObs) <- paste0('detectIstar[', 1:length(incData), ']')
     
-    IstarObs <- matrix( modelInputs$dataList$Istar, nrow = nrow(paramsSamples), 
-                        ncol = length(incData), byrow = T)
+    IstarObs <- matrix(modelInputs$dataList$Istar[1:obsTime], nrow = nrow(paramsSamples), 
+                       ncol = length(incData), byrow = T)
     colnames(IstarObs) <- paste0('Istar[', 1:length(incData), ']')
     
     
