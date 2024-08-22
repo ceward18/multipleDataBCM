@@ -15,13 +15,13 @@ getModelInput <- function(incData, city, modelType, peak,
     tau <- length(incData)
     
     #### initial conditions probability
-    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
+    if (grepl('SIHRD', modelType)) {
         
         # SIHRD model
         initProb <- c(S0, I0, H0, R0, D0)/N
         comp_init <- rmulti(1, N, initProb)
         
-    } else if (modelType %in% c('SIR_full', 'SIR_inc', 'SIR_noAlarm')) {
+    } else if (grepl('SIR', modelType)) {
         
         # SIR models 
         initProb <- c(S0, rep(I0/maxInf, maxInf), R0)/N
@@ -82,7 +82,7 @@ getModelInput <- function(incData, city, modelType, peak,
     
     if (H0 == 0) {
         # can't distribute initial hospitalizations when there aren't any
-        RstarH <- round(0.1 * c(rep(0, 15),
+        RstarH <- round(0.3 * c(rep(0, 15),
                                 hospData[1:(tau-15)]))
     } else {
         RstarH <- round(0.3 * c(rmulti(1, H0, rep(H0/15, 15)),

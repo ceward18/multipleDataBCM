@@ -158,13 +158,13 @@ for (i in batchIdx) {
         # source relevant scripts
         source('./scripts/fit_models.R')
         
-         debugonce(fitAlarmModel)
+         # debugonce(fitAlarmModel)
         fitAlarmModel(incData = incData, city = city_i,
                       modelType = modelType_i, peak = peak_i, 
                       smoothC = smoothC, smoothD = smoothD, 
                       deathData = deathData, hospData = hospData,
                       N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0,
-                      seed = 2)
+                      seed = x)
         
     })
     stopCluster(cl)
