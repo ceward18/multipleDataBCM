@@ -171,7 +171,7 @@ getModelInput <- function(incData, city, modelType, peak,
                           beta = runif(1, 1/7, 2),
                           k = runif(1, 0.01, 0.02),
                           alpha = rbeta(1, 1, 1),
-                          w0 = rnorm(1, 7, 0.25),
+                          w0 = runif(1, 6, 8),
                           nu = rgamma(1, 100, 100))
         
         # end modeltype == 'SIR_full'
@@ -188,7 +188,7 @@ getModelInput <- function(incData, city, modelType, peak,
                           beta = runif(1, 1/7, 2),
                           k = runif(1, 0.01, 0.02),
                           alpha = rbeta(1, 1, 1),
-                          w0 = rnorm(1, 7, 0.25),
+                          w0 = runif(1, 6, 8),
                           nu = rgamma(1, 100, 100))
         
         # end modeltype == 'SIR_inc'
@@ -236,7 +236,7 @@ getModelInput <- function(incData, city, modelType, peak,
                           probDetect = rbeta(1, constantsList$detectA, 
                                              constantsList$detectB),
                           beta = runif(1, 1/7, 2),
-                          w0 = rnorm(1, 7, 0.25),
+                          w0 = runif(1, 6, 8),
                           nu = rgamma(1, 100, 100))
         
         # end modeltype == 'SIR_noAlarm'

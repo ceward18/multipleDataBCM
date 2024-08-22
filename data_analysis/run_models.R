@@ -164,7 +164,7 @@ for (i in batchIdx) {
                       smoothC = smoothC, smoothD = smoothD, 
                       deathData = deathData, hospData = hospData,
                       N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0,
-                      seed = x)
+                      seed = 2)
         
     })
     stopCluster(cl)
@@ -190,7 +190,7 @@ for (i in batchIdx) {
         resThree[[3]] <- resThree[[3]][seq(1,nrow(resThree[[3]]), 100),]
         
         saveRDS(resThree, 
-                paste0('./output/chains_', modelType_i, '_city', city_i,
+                paste0('./output/chains_', modelType_i, '_', city_i,
                        '_peak', peak_i, '_weeks', timePeriod_i, '.rds'))
     }
     

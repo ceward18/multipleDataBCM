@@ -10,12 +10,14 @@ fitAlarmModel <- function(incData, city, modelType, peak,
     source('./scripts/model_code.R')
     source('./scripts/get_model_inputs.R')
     
-    # for reproducibility, inits vary across peaks/models/chains/city
-    seed <- seed + as.numeric(peak) + 
+    # for reproducibility, inits vary across peaks/models/chains/city/n_weeks
+    seed <- seed + 
+        as.numeric(peak) + 
         as.numeric(factor(modelType, levels = c('SIHRD_full', 'SIHRD_inc',
                                                 'SIR_full', 'SIR_inc',
                                                 'SIHRD_noAlarm', 'SIR_noAlarm'))) + 
-        as.numeric(factor(city, levels = c('nyc', 'montreal'))) 
+        as.numeric(factor(city, levels = c('nyc', 'montreal'))) + 
+        length(incData)
     
     set.seed(seed)
     
@@ -45,35 +47,7 @@ fitAlarmModel <- function(incData, city, modelType, peak,
     # track reproductive number
     myConfig$addMonitors('R0')
     
-    if (modelType %in% c('SIHRD_full', 'SIHRD_inc')) {
-
-        # samplers for RstarI and RstarH
-        myConfig$removeSamplers('RstarI') # Nodes will be expanded
-        myConfig$addSampler(target = c('RstarI'),
-                            type = "RstarUpdate")
-        
-        myConfig$removeSamplers('RstarH') # Nodes will be expanded
-        myConfig$addSampler(target = c('RstarH'),
-                            type = "RstarUpdate")
-        
-        # need to ensure all stochastic nodes are monitored for WAIC calculation
-        myConfig$addMonitors(c('RstarI', 'RstarH'))
-        
-    } else if (modelType == 'SIR_full') {
-        
-        # use slice sampling for transmission parameters
-        paramsForSlice <- c('beta', 'k', 'w0')
-        myConfig$removeSampler(paramsForSlice)
-        myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
-        
-    } else if (modelType == 'SIR_inc') { 
-        
-        # use slice sampling for transmission parameters
-        paramsForSlice <- c('beta', 'k', 'w0')
-        myConfig$removeSampler(paramsForSlice)
-        myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
-        
-    } else if (modelType == 'SIHRD_noAlarm') {
+    if (grepl('SIHRD', modelType)) {
         
         # samplers for RstarI and RstarH
         myConfig$removeSamplers('RstarI') # Nodes will be expanded
@@ -87,17 +61,29 @@ fitAlarmModel <- function(incData, city, modelType, peak,
         # need to ensure all stochastic nodes are monitored for WAIC calculation
         myConfig$addMonitors(c('RstarI', 'RstarH'))
         
-    } else if (modelType == 'SIR_noAlarm') {
+        # use joint sampling for transmission parameters
+        jointParams <- c('beta', 'gamma1', 'lambda')
+        if (!grepl('noAlarm', modelType)) {
+            jointParams <- c(jointParams, 'k')
+        } 
+        myConfig$removeSampler(jointParams)
+        myConfig$addSampler(target = jointParams, type = "AF_slice")
         
-        # joint sampler for beta and w0
-        myConfig$removeSampler(c('beta', 'w0'))
-        myConfig$addSampler(target = c('beta', 'w0'), type = "AF_slice")
+    } else if (grepl('SIR', modelType)) {
+        
+        # use slice sampling for transmission parameters
+        jointParams <- c('beta', 'w0')
+        if (!grepl('noAlarm', modelType)) {
+            jointParams <- c(jointParams, 'k')
+        } 
+        myConfig$removeSampler(jointParams)
+        myConfig$addSampler(target = jointParams, type = "AF_slice")
         
     } 
-   
+    
     # monitor alarm functions when present
-    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_full', 'SIR_inc')) {
-        myConfig$addMonitors(c('alarm'))
+    if (!grepl('noAlarm', modelType)) {
+        myConfig$addMonitors('alarm')
     } 
     
     print(myConfig)

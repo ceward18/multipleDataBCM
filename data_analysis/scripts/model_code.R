@@ -227,7 +227,7 @@ SIHRD_full <-  nimbleCode({
     # transitions
     gamma1 ~ dgamma(140, 1000) # IR 
     gamma2 ~ dgamma(67, 1000) # HR 
-    lambda ~ dgamma(1, 10) # IH 
+    lambda ~ dgamma(20, 1000) # IH 
     phi ~ dgamma(67, 1000)    # HD
     
     # alarm functions
@@ -330,7 +330,7 @@ SIHRD_full_sim <-  nimbleCode({
     # transitions
     gamma1 ~ dgamma(140, 1000) # IR 
     gamma2 ~ dgamma(67, 1000) # HR 
-    lambda ~ dgamma(1, 10) # IH 
+    lambda ~ dgamma(20, 1000) # IH 
     phi ~ dgamma(67, 1000)    # HD
     
     # alarm functions
@@ -403,7 +403,7 @@ SIHRD_inc <-  nimbleCode({
     # transitions
     gamma1 ~ dgamma(140, 1000) # IR 
     gamma2 ~ dgamma(67, 1000) # HR 
-    lambda ~ dgamma(1, 10) # IH 
+    lambda ~ dgamma(20, 1000) # IH 
     phi ~ dgamma(67, 1000)    # HD
     
     # alarm functions
@@ -504,7 +504,7 @@ SIHRD_inc_sim <-  nimbleCode({
     # transitions
     gamma1 ~ dgamma(140, 1000) # IR 
     gamma2 ~ dgamma(67, 1000) # HR 
-    lambda ~ dgamma(1, 10) # IH 
+    lambda ~ dgamma(20, 1000) # IH 
     phi ~ dgamma(67, 1000)    # HD
     
     # alarm functions
@@ -568,8 +568,8 @@ SIR_full <-  nimbleCode({
     alpha ~ dbeta(1, 1)
     
     # IDD Curve
-    w0 ~ dnorm(7, sd = 0.25)
-    nu ~ dgamma(100, 100)
+    w0 ~ dnorm(7, sd = 0.1)
+    nu ~ dgamma(1000, 1000)
     
     
     
@@ -627,8 +627,8 @@ SIR_inc <-  nimbleCode({
     k ~ dgamma(0.1, 0.1)
     
     # IDD Curve
-    w0 ~ dnorm(7, sd = 0.25)
-    nu ~ dgamma(100, 100)
+    w0 ~ dnorm(7, sd = 0.1)
+    nu ~ dgamma(1000, 1000)
     
 })
 
@@ -699,8 +699,8 @@ SIR_inc_sim <-  nimbleCode({
     k ~ dgamma(0.1, 0.1)
     
     # IDD Curve
-    w0 ~ dnorm(7, sd = 0.25)
-    nu ~ dgamma(100, 100)
+    w0 ~ dnorm(7, sd = 0.1)
+    nu ~ dgamma(1000, 1000)
     
 })
 
@@ -751,8 +751,8 @@ SIR_noAlarm <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # IDD Curve
-    w0 ~ dnorm(7, sd = 0.25)
-    nu ~ dgamma(100, 100)
+    w0 ~ dnorm(7, sd = 0.1)
+    nu ~ dgamma(1000, 1000)
     
     
 })
@@ -820,7 +820,7 @@ SIHRD_noAlarm <-  nimbleCode({
     # transitions
     gamma1 ~ dgamma(140, 1000) # IR 
     gamma2 ~ dgamma(67, 1000) # HR 
-    lambda ~ dgamma(1, 10) # IH 
+    lambda ~ dgamma(20, 1000) # IH 
     phi ~ dgamma(67, 1000)    # HD
     
 })
