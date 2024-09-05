@@ -21,7 +21,7 @@ postPredForecast <- function(incData, city, modelType, peak,
     nDaysSim <- 50
     predTime <- obsTime + 1:nDaysSim
     
-    modelInputs$constantsList$bw <- 14
+    modelInputs$constantsList$bw <- 30
     
     modelInputs$constantsList$smoothC0 <- smoothC[1]
     modelInputs$constantsList$Istar0 <- Istar0
@@ -64,7 +64,7 @@ postPredForecast <- function(incData, city, modelType, peak,
         modelInputs$dataList$smoothC <- c(modelInputs$dataList$smoothC,
                                           rep(NA, nDaysSim))
         
-        if (grepl('SIHRD', modelType)) {
+        if (modelType == 'SIHRD_full') {
             modelInputs$dataList$smoothD <- c(modelInputs$dataList$smoothD,
                                               rep(NA, nDaysSim))
         }

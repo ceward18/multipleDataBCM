@@ -5,7 +5,7 @@
 # waves defined on their website:
 # wave 1: Feb 23 - 11 July 2020
 # wave 2: Aug 23, 2020 - March 20, 2021 (delta)
-# wave 5: Dec 5, 2021 - March 12, 2022 (omicron)
+# wave 3: Dec 5, 2021 - March 12, 2022 (omicron)
 ################################################################################
 
 
@@ -95,12 +95,9 @@ movingAverage <- function(x, bw) {
 
 # smooth due to weekend effects
 # keep raw data for first month
-montreal$dailyCases <- c(montreal$dailyCases[1:30], 
-                         round(movingAverage(montreal$dailyCases, 3))[-c(1:30)])
-montreal$dailyHosp <- c(montreal$dailyHosp[1:30], 
-                        round(movingAverage(montreal$dailyHosp, 3))[-c(1:30)])
-montreal$dailyDeaths <- c(montreal$dailyDeaths[1:30], 
-                          round(movingAverage(montreal$dailyDeaths, 3))[-c(1:30)])
+montreal$dailyCases <- ceiling(movingAverage(montreal$dailyCases, 7))
+montreal$dailyHosp <- ceiling(movingAverage(montreal$dailyHosp, 7))
+montreal$dailyDeaths <- ceiling(movingAverage(montreal$dailyDeaths, 7))
 
 
 write.csv(montreal, 'montrealClean.csv', quote = F, row.names = F)

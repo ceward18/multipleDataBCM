@@ -244,8 +244,8 @@ getModelInput <- function(incData, city, modelType, peak,
     }
     
     ### MCMC specifications
-    niter <- 1.5e6
-    nburn <- 1e6
+    niter <- 8e5
+    nburn <- 3e5
     nthin <- 10
     
     

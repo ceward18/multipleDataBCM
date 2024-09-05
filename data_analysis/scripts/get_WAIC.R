@@ -52,8 +52,6 @@ getWAIC <- function(samples, city, modelType, peak,
         waicList <- calculateWAIC(samples, compiled)
     }
     
-    
-    
     data.frame(waic = waicList$WAIC,
                lppd = waicList$lppd,
                pWAIC = waicList$pWAIC)

@@ -85,13 +85,10 @@ movingAverage <- function(x, bw) {
     return(out)
 }
 
-# keep raw data for first month
-nyc$dailyCases <- c(nyc$dailyCases[1:30], 
-                    round(movingAverage(nyc$dailyCases, 5))[-c(1:30)])
-nyc$dailyHosp <- c(nyc$dailyHosp[1:30], 
-                   round(movingAverage(nyc$dailyHosp, 5))[-c(1:30)])
-nyc$dailyDeaths <- c(nyc$dailyDeaths[1:30], 
-                     round(movingAverage(nyc$dailyDeaths, 5))[-c(1:30)])
+# smooth out weekend reporting effects
+nyc$dailyCases <- ceiling(movingAverage(nyc$dailyCases, 7))
+nyc$dailyHosp <- ceiling(movingAverage(nyc$dailyHosp, 7))
+nyc$dailyDeaths <- ceiling(movingAverage(nyc$dailyDeaths, 7))
 
 par(mfrow = c(1,3))
 plot(nyc$date[which(nyc$peak == 1)], 

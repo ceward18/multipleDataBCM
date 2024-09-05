@@ -17,7 +17,7 @@ source('./scripts/model_code.R')
 
 city <- c('nyc', 'montreal')
 peak <- c('1', '2', '3')
-smoothWindow <- 14
+smoothWindow <- 30
 modelType <- c('SIHRD_full', 'SIHRD_inc',
                'SIR_full', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')
 timePeriod <- c(4, 6, 8)
@@ -130,7 +130,13 @@ for (i in batchIdx) {
         # peak 1 = no previous infectious
         R0 <- D0
     } else {
-        prev_inf <- round(cumsum(dat$dailyCases / probDetectTime))[idxStart - lengthI - 1]
+        
+        # account for waning immunity by initializing previous infections to have occurred only in the past 6 months
+        lengthR <- 30*6
+        inWindowR <- max(1, (idxStart - lengthI - lengthR)):(idxStart - lengthI - 1)
+        
+        prev_inf <- sum(dat$dailyCases[inWindowR])
+        # prev_inf <- round(cumsum(dat$dailyCases / probDetectTime))[idxStart - lengthI - 1]
         # remove = infected before past 7 days and not currently hospitalized or already dead
         R0 <- prev_inf - H0 - D0
     }
@@ -140,7 +146,7 @@ for (i in batchIdx) {
     c(S0, I0, H0, R0, D0)
     
     # used for posterior predictive fit 
-    # previously observed incidence for correct smoothing at beginning of prediction
+    # previously observed cases for correct smoothing at beginning of prediction
     Istar0 <- dat$dailyCases[max(1, (idxStart - smoothWindow + 1)):(idxStart - 1)]
     Dstar0 <- round(dat$dailyDeaths[max(1, (idxStart - smoothWindow + 1)):(idxStart - 1)])
     
