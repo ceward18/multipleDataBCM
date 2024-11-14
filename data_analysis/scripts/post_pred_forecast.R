@@ -61,12 +61,10 @@ postPredForecast <- function(incData, city, modelType, peak,
     }
     
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_inc')) {
-        modelInputs$dataList$smoothC <- c(modelInputs$dataList$smoothC,
-                                          rep(NA, nDaysSim))
+        modelInputs$dataList$smoothC <- NULL
         
         if (modelType == 'SIHRD_full') {
-            modelInputs$dataList$smoothD <- c(modelInputs$dataList$smoothD,
-                                              rep(NA, nDaysSim))
+            modelInputs$dataList$smoothD <- NULL
         }
     }
     

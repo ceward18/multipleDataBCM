@@ -86,9 +86,10 @@ movingAverage <- function(x, bw) {
 }
 
 # smooth out weekend reporting effects
+# don't smooth deaths as those are not reported dates,they are from death files
 nyc$dailyCases <- ceiling(movingAverage(nyc$dailyCases, 7))
 nyc$dailyHosp <- ceiling(movingAverage(nyc$dailyHosp, 7))
-nyc$dailyDeaths <- ceiling(movingAverage(nyc$dailyDeaths, 7))
+
 
 par(mfrow = c(1,3))
 plot(nyc$date[which(nyc$peak == 1)], 

@@ -94,10 +94,15 @@ movingAverage <- function(x, bw) {
 }
 
 # smooth due to weekend effects
-# keep raw data for first month
-montreal$dailyCases <- ceiling(movingAverage(montreal$dailyCases, 7))
-montreal$dailyHosp <- ceiling(movingAverage(montreal$dailyHosp, 7))
-montreal$dailyDeaths <- ceiling(movingAverage(montreal$dailyDeaths, 7))
+# keep raw data for first portion of time
+# don't smooth deaths as those are not reported dates,they are from death files
+# cases are test results date
+
+montreal$dailyCases <- c(montreal$dailyCases[1:18], 
+                         round(movingAverage(montreal$dailyCases, 7))[-c(1:18)])
+montreal$dailyHosp <- c(montreal$dailyHosp[1:24], 
+                        round(movingAverage(montreal$dailyHosp, 7))[-c(1:24)])
+
 
 
 write.csv(montreal, 'montrealClean.csv', quote = F, row.names = F)

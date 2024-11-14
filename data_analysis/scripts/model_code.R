@@ -225,10 +225,10 @@ SIHRD_full <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(140, 1000) # IR 
-    gamma2 ~ dgamma(67, 1000) # HR 
-    lambda ~ dgamma(20, 1000) # IH 
-    phi ~ dgamma(67, 1000)    # HD
+    gamma1 ~ dgamma(1429, 10000)    # IR 
+    gamma2 ~ dgamma(6700, 100000)   # HR 
+    lambda ~ dgamma(2000, 100000)   # IH 
+    phi ~ dgamma(6700, 100000)      # HD
     
     # alarm functions
     k ~ dgamma(0.1, 0.1)
@@ -328,10 +328,10 @@ SIHRD_full_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(140, 1000) # IR 
-    gamma2 ~ dgamma(67, 1000) # HR 
-    lambda ~ dgamma(20, 1000) # IH 
-    phi ~ dgamma(67, 1000)    # HD
+    gamma1 ~ dgamma(1429, 10000)    # IR 
+    gamma2 ~ dgamma(6700, 100000)   # HR 
+    lambda ~ dgamma(2000, 100000)   # IH 
+    phi ~ dgamma(6700, 100000)      # HD
     
     # alarm functions
     k ~ dgamma(0.1, 0.1)
@@ -401,10 +401,10 @@ SIHRD_inc <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(140, 1000) # IR 
-    gamma2 ~ dgamma(67, 1000) # HR 
-    lambda ~ dgamma(20, 1000) # IH 
-    phi ~ dgamma(67, 1000)    # HD
+    gamma1 ~ dgamma(1429, 10000)    # IR 
+    gamma2 ~ dgamma(6700, 100000)   # HR 
+    lambda ~ dgamma(2000, 100000)   # IH 
+    phi ~ dgamma(6700, 100000)      # HD
     
     # alarm functions
     k ~ dgamma(0.1, 0.1)
@@ -502,10 +502,10 @@ SIHRD_inc_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(140, 1000) # IR 
-    gamma2 ~ dgamma(67, 1000) # HR 
-    lambda ~ dgamma(20, 1000) # IH 
-    phi ~ dgamma(67, 1000)    # HD
+    gamma1 ~ dgamma(1429, 10000)    # IR 
+    gamma2 ~ dgamma(6700, 100000)   # HR 
+    lambda ~ dgamma(2000, 100000)   # IH 
+    phi ~ dgamma(6700, 100000)      # HD
     
     # alarm functions
     k ~ dgamma(0.1, 0.1)
@@ -818,10 +818,10 @@ SIHRD_noAlarm <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(140, 1000) # IR 
-    gamma2 ~ dgamma(67, 1000) # HR 
-    lambda ~ dgamma(20, 1000) # IH 
-    phi ~ dgamma(67, 1000)    # HD
+    gamma1 ~ dgamma(1429, 10000)    # IR 
+    gamma2 ~ dgamma(6700, 100000)   # HR 
+    lambda ~ dgamma(2000, 100000)   # IH 
+    phi ~ dgamma(6700, 100000)      # HD
     
 })
 

@@ -164,7 +164,7 @@ summarizePost <- function(resThree, incData, city, modelType, peak,
     
     ##############################################################################
     ### Posterior predictive forecasting for models where it makes sense
-    
+
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')) {
         postPred <- postPredForecast(incData = incData, city = city,
                                      modelType = modelType, peak = peak,
