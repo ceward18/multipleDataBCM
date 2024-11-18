@@ -62,7 +62,7 @@ fitAlarmModel <- function(incData, city, modelType, peak,
         myConfig$addMonitors(c('RstarI', 'RstarH'))
         
         # use joint sampling for transmission parameters
-        jointParams <- c('beta', 'gamma1', 'lambda')
+        jointParams <- c('beta', 'gamma1', 'lambda', 'gamma2', 'phi')
         if (!grepl('noAlarm', modelType)) {
             jointParams <- c(jointParams, 'k')
         } 

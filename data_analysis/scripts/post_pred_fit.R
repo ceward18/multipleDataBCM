@@ -21,7 +21,7 @@ postPredFit <- function(incData, city, modelType, peak,
     modelInputs$constantsList$Istar0 <- Istar0
     modelInputs$constantsList$Istar0Length <- length(Istar0)
     
-    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
+    if (modelType %in% c('SIHRD_full')) {
         modelInputs$constantsList$smoothD0 <- smoothD[1]
         modelInputs$constantsList$Dstar0 <- Dstar0
         modelInputs$constantsList$Dstar0Length <- length(Dstar0)

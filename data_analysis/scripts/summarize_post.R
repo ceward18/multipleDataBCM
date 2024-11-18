@@ -36,6 +36,7 @@ summarizePost <- function(resThree, incData, city, modelType, peak,
     
     ##############################################################################
     ### gelman-rubin
+    print('Calculating GR diagnostic...')
     
     res_mcmc <- mcmc.list(mcmc(paramSamples1),
                           mcmc(paramSamples2),
@@ -47,6 +48,7 @@ summarizePost <- function(resThree, incData, city, modelType, peak,
     
     ##############################################################################
     ### posterior mean and 95% CI for parameters
+    print('Summarizing posterior distributions...')
     
     paramsPost <- rbind(paramSamples1, paramSamples2, paramSamples3)
     postMeans <- colMeans(paramsPost)
@@ -107,6 +109,7 @@ summarizePost <- function(resThree, incData, city, modelType, peak,
     
     ##############################################################################
     ### WAIC values
+    print('Calculating WAIC...')
     
     # samples to use for WAIC calculation differ by model
     samples <- rbind(resThree[[1]], resThree[[2]], resThree[[3]])
@@ -119,6 +122,7 @@ summarizePost <- function(resThree, incData, city, modelType, peak,
     
     ##############################################################################
     ### Posterior predictive fit for models where it makes sense
+    print('Calculating posterior predictive fit...')
     
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')) {
         postPred <- postPredFit(incData = incData, city = city,
@@ -164,6 +168,7 @@ summarizePost <- function(resThree, incData, city, modelType, peak,
     
     ##############################################################################
     ### Posterior predictive forecasting for models where it makes sense
+    print('Posterior predictive forecasting...')
 
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')) {
         postPred <- postPredForecast(incData = incData, city = city,

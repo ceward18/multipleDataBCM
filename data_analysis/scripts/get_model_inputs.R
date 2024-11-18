@@ -75,25 +75,20 @@ getModelInput <- function(incData, city, modelType, peak,
                      smoothD = smoothD)
     
     # only relevant for SIHRD models
-    # distribute initial infections to be removed anytime in first 7 days
+    # distribute initial infections to be removed anytime in first maxInf days
     # ~2% infected go to hospital, so use 90% to be conservative
-    RstarI <- round(0.9 * c(rmulti(1, I0, rep(I0/7, 7)),
-                            dataList$Istar[1:(tau-7)]))
+    RstarI <- round(0.9 * c(rmulti(1, I0, rep(I0/maxInf, maxInf)),
+                            dataList$Istar[1:(tau-maxInf)]))
     
     # RstarH is removals from hospitalizations
     
     # with no removals, we would have this many in H at any time
-    totalH_noR <- cumsum(c(H0, hospData)) - c(D0, deathData)
-    # shift for removals to happen after 15 days
-    if (H0 == 0) {
-        # can't distribute initial hospitalizations when there aren't any
-        RstarH <- round(0.2 * c(rep(0, 15), totalH_noR[1:(tau-15)]))
-    } else {
-        RstarH <- round(0.2 * c(rmulti(1, H0, rep(H0/15, 15)), totalH_noR[1:(tau-15)]))
-    }
-    # make sure its not negative
+    totalH_noR <- cumsum(c(H0, hospData)) - cumsum(c(0, deathData))
+    RstarH <- round(0.25 * diff(totalH_noR))
     RstarH <- pmax(rep(0, length(RstarH)), RstarH)
 
+
+    
     if (modelType == 'SIHRD_full') {
         
         dataList$Hstar <- hospData
@@ -135,6 +130,7 @@ getModelInput <- function(incData, city, modelType, peak,
         
         dataList$Hstar <- hospData
         dataList$Dstar <- deathData
+        dataList$smoothD <- NULL
         
         repeat {
             
@@ -252,7 +248,6 @@ getModelInput <- function(incData, city, modelType, peak,
     niter <- 8e5
     nburn <- 3e5
     nthin <- 10
-    
     
     list(constantsList = constantsList,
          dataList = dataList,
