@@ -13,6 +13,7 @@ library(knitr)
 library(kableExtra)
 library(openxlsx)
 library(plyr)
+library(dplyr)
 
 source('./scripts/model_code.R')
 
@@ -148,6 +149,89 @@ ggplot(data = subset(paramsPostAll,
           panel.grid.minor = element_blank())
 dev.off()
 
+pdf('./figures/alphaPost3.pdf', height = 5, width = 12)
+ggplot(data = subset(paramsPostAll, 
+                     param %in% 'alpha'),  
+       aes(x = simNumber, y = mean, ymin=lower, ymax=upper, 
+           col = assumeType, group = assumeType)) +
+    geom_point(size = 1, position = position_dodge(width = 0.9), alpha = 0.8) + 
+    geom_errorbar(width=0, position = position_dodge(width = 0.9), alpha = 0.8) +
+    geom_hline(aes(yintercept = truth), col = 'black',
+               linetype = 2, linewidth = 0.5) +
+    facet_nested(modelType ~  dataType + assumeType) +
+    labs(x = 'Simulation Number', y = '', 
+         title = expression(paste('Posterior mean and 95% Credible Intervals for ',
+                                  alpha)),
+         col = '') +
+    theme_bw() + 
+    ylim(0, 1) + 
+    scale_color_manual(values = c('grey20', 'red')) + 
+    theme(strip.placement = "outside",
+          strip.background = element_rect(fill = 'white'),
+          strip.text = element_text(size = 12),
+          axis.title = element_text(size = 12),
+          axis.text = element_text(size = 10),
+          legend.text = element_text(size = 12),
+          plot.title = element_text(size = 14, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank())
+dev.off()
+
+
+
+pdf('./figures/alphaPost4.pdf', height = 5, width = 9)
+ggplot(data = subset(paramsPostAll, 
+                     param %in% 'alpha' & assumeType == 'Undetected'),  
+       aes(x = simNumber, y = mean, ymin=lower, ymax=upper)) +
+    geom_point(size = 0.2, position = position_dodge(width = 0.9), alpha = 0.8) + 
+    geom_errorbar(width=0, position = position_dodge(width = 0.9), alpha = 0.8,
+                  linewidth = 0.2) +
+    geom_hline(aes(yintercept = truth), col = 'red',
+               linetype = 2, linewidth = 0.5) +
+    facet_nested(modelType ~  dataType ) +
+    labs(x = 'Simulation Number', y = '', 
+         title = expression(paste('Posterior mean and 95% Credible Intervals for ',
+                                  alpha)),
+         col = '') +
+    theme_bw() + 
+    ylim(0, 1) + 
+    theme(strip.placement = "outside",
+          strip.background = element_rect(fill = 'white'),
+          strip.text = element_text(size = 12),
+          axis.title = element_text(size = 12),
+          axis.text = element_text(size = 10),
+          legend.text = element_text(size = 12),
+          plot.title = element_text(size = 14, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank())
+dev.off()
+
+ggplot(data = subset(paramsPostAll, 
+                     param %in% 'alpha' & assumeType == 'Undetected' &
+                         dataType == 'High deaths importance' & modelType == 'SIHRD'),  
+       aes(x = simNumber, y = mean, ymin=lower, ymax=upper)) +
+    geom_point(size = 0.2, position = position_dodge(width = 0.9), alpha = 0.8) + 
+    geom_errorbar(width=0, position = position_dodge(width = 0.9), alpha = 0.8,
+                  linewidth = 0.2) +
+    geom_hline(aes(yintercept = truth), col = 'red',
+               linetype = 2, linewidth = 0.5) +
+    facet_nested(modelType ~  dataType ) +
+    labs(x = 'Simulation Number', y = '', 
+         title = expression(paste('Posterior mean and 95% Credible Intervals for ',
+                                  alpha)),
+         col = '') +
+    theme_bw() + 
+    theme(strip.placement = "outside",
+          strip.background = element_rect(fill = 'white'),
+          strip.text = element_text(size = 12),
+          axis.title = element_text(size = 12),
+          axis.text = element_text(size = 10),
+          legend.text = element_text(size = 12),
+          plot.title = element_text(size = 14, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank())
+
+
 paramsPostAll$model_assume_type <- paste0(paramsPostAll$modelType, ', ',
                                           paramsPostAll$assumeType)
 
@@ -254,6 +338,136 @@ ggplot(subset(R0PostAll, !modelType %in%
     scale_color_manual(values = c('steelblue1', 'darksalmon'))
 dev.off()
 
+
+R0PostAll$compartmentType <- ifelse(grepl('SIR', R0PostAll$modelType),
+                                    'SIR', 'SIHRD')
+R0PostAll$alarmType <- 'No alarm'
+R0PostAll$alarmType <- ifelse(grepl('cases only', R0PostAll$modelType),
+                              'Cases only', R0PostAll$alarmType)
+
+R0PostAll$alarmType <- ifelse(grepl('cases \\+ deaths', R0PostAll$modelType),
+                              'Cases + deaths', R0PostAll$alarmType)
+
+pdf('./figures/R0Post2.pdf', height = 6, width = 10)
+ggplot(subset(R0PostAll, assumeType == 'w/ undetected' ), 
+       aes(x = time, y = mean, 
+           group = simNumber)) +
+    geom_line(color = 'steelblue1') +
+    geom_line(aes(y = truth), color = 'black') +
+    geom_hline(yintercept = 1, linetype = 2) +
+    facet_nested(dataType ~ compartmentType + alarmType ) +
+    theme_bw() + 
+    theme(strip.placement = "outside",
+          strip.background = element_rect(fill = 'white'),
+          strip.text = element_text(size = 12),
+          axis.title = element_text(size = 14),
+          axis.text = element_text(size = 12),
+          plot.title = element_text(size = 16, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    guides(color = 'none') + 
+    labs(x = 'Epidemic Time', y = expression(R[0](t)),
+         title =expression('Posterior mean estimates of'~R[0](t)))
+dev.off()
+
+
+################################################################################
+# undetected vs detected in estimation of alpha and R0 MSE?
+
+R0postMSE <- R0PostAll %>%
+    group_by(dataType, assumeType, compartmentType, alarmType, time) %>%
+    summarise(mse = sqrt(mean((mean - truth)^2)),
+              bias = mean(abs(mean - truth))) %>%
+    data.frame()
+
+R0postMSE$assumeType <- factor(R0postMSE$assumeType,
+                               labels = c('Yes', 'No'))
+
+pdf('./figures/R0Post_RMSE.pdf', height = 5, width = 9)
+ggplot(subset(R0postMSE, !alarmType == 'No alarm'), 
+       aes(x = time, y = mse, col = assumeType)) +
+    geom_line(linewidth = 0.5) +
+    facet_nested(dataType ~ compartmentType + alarmType, scales = 'free_y' ) +
+    theme_bw() + 
+    theme(strip.placement = "outside",
+          strip.background = element_rect(fill = 'white'),
+          strip.text = element_text(size = 10),
+          axis.title = element_text(size = 12),
+          axis.text = element_text(size = 8),
+          plot.title = element_text(size = 12, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    labs(x = 'Epidemic Time', y = 'RMSE', color = 'Undetected infections\nmodeled',
+         title =expression('RMSE of'~R[0](t))) +
+    scale_color_manual(values = c('steelblue1', 'darksalmon'))
+dev.off()
+
+
+# alpha estimation
+
+
+paramsPostAll <- readRDS('./results/paramsPostAll.rds')
+paramsTruth <- read.xlsx('simParamsSummary.xlsx')
+
+
+### wide to long
+paramsTruth <- reshape(paramsTruth, 
+                       varying = colnames(paramsTruth)[-1], 
+                       v.names = "truth",
+                       timevar = "param", 
+                       times = colnames(paramsTruth)[-1], 
+                       new.row.names = 1:1000,
+                       direction = "long")
+paramsTruth <- paramsTruth[-which(colnames(paramsTruth) %in% c('id'))]
+
+# merge with truth
+paramsPostAll <- merge(paramsPostAll, paramsTruth, 
+                       by = c('param', 'dataType'),
+                       all.x = T)
+
+paramsPostAll <- paramsPostAll[paramsPostAll$param == 'alpha',]
+
+
+paramsPostMSE <- paramsPostAll %>%
+    group_by(dataType, assumeType, modelType) %>%
+    summarise(mse = sqrt(mean((mean - truth)^2)),
+              bias = mean(abs(mean - truth)),
+              coverage =  mean(truth > lower & truth < upper)) %>%
+    data.frame()
+
+paramsPostMSE$assumeType <- factor(paramsPostMSE$assumeType,
+                                   levels = c('undetected', 'casesOnly'),
+                                   labels = c('Yes', 'No'))
+
+
+paramsPostMSE$compartmentType <- ifelse(grepl('SIR', paramsPostMSE$modelType),
+                                    'SIR', 'SIHRD')
+
+paramsPostMSE$dataType <- factor(paramsPostMSE$dataType,
+                                 levels = c('inc', 'death', 'equal'),
+                                 labels = c('High case importance',
+                                            'High deaths importance',
+                                            'Equal importance'))
+
+paramsPostMSE <- paramsPostMSE[,c('dataType', 'compartmentType', 
+                                 'assumeType', 'mse')]
+paramsPostMSE <- paramsPostMSE[order(paramsPostMSE$dataType,
+                                     paramsPostMSE$compartmentType, 
+                                     paramsPostMSE$assumeType),]
+
+
+paramsPostMSE_tab <- reshape(paramsPostMSE, 
+                             timevar = "assumeType",
+                             idvar = c("dataType", "compartmentType"),
+                             direction = "wide")
+
+paramsPostMSE_tab <- reshape(paramsPostMSE_tab, 
+                             timevar = "compartmentType",
+                             idvar = c("dataType"),
+                             direction = "wide")
+
+paramsPostMSE_tab[,2:5] <- round(paramsPostMSE_tab[,2:5], 2)
+paramsPostMSE_tab
 
 ################################################################################
 # Posterior predictive fit
