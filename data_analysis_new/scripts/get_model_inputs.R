@@ -204,11 +204,6 @@ getModelInput <- function(incData, modelType, peak,
     nburn <- 3e5
     nthin <- 10
     
-    ### MCMC specifications
-    niter <- 100
-    nburn <- 0
-    nthin <- 1
-    
     list(constantsList = constantsList,
          dataList = dataList,
          initsList = initsList,
