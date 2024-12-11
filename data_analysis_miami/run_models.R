@@ -1,7 +1,7 @@
 ################################################################################
 # Run multivariate alarm models 
-# NYC and Montreal
-# Peaks 1, 2, 4
+# Miami
+# Peaks 1 and 2
 # ignoring undetected infections 
 ################################################################################
 
@@ -15,8 +15,8 @@ library(nimble)
 ### source scripts (for movingAverage function)
 source('./scripts/model_code.R')
 
-city <- c('nyc', 'montreal')
-peak <- c('1', '2', '3')
+city <- c('miami')
+peak <- c('1', '2')
 smoothWindow <- 30
 modelType <- c('SIHRD_full', 'SIHRD_inc',
                'SIR_full', 'SIR_inc', 
@@ -29,7 +29,7 @@ allModels <- expand.grid(city = city,
                          timePeriod = timePeriod,
                          stringsAsFactors = FALSE)
 
-# 108 total - 18 for each of 3 peaks and 2 cities
+# 36 total - 18 for each of 2 peaks 
 allModels <- allModels[order(allModels$city,
                              allModels$modelType,
                              allModels$peak,
@@ -83,6 +83,7 @@ for (i in batchIdx) {
     smoothC <- dat$smoothC[idxStart:idxEnd]
     smoothD <- dat$smoothD[idxStart:idxEnd]
     
+    
     # define priors for initial conditions
     # infected before past 7 days and not currently hospitalized or already dead
     # window of time before peak starts (time X-lengthI to time X)
@@ -92,7 +93,7 @@ for (i in batchIdx) {
     inWindowH <- max(1, (idxStart - lengthH)):(idxStart - 1)
     
     # currently hospitalized
-    H0 <- sum(dat$dailyHosp[inWindowH])
+    H0 <- sum(dat$dailyHosp[inWindowH], na.rm = T)
     
     # already dead
     D0 <- cumsum(dat$dailyDeaths)[max(1, (idxStart - 1))]
@@ -101,10 +102,9 @@ for (i in batchIdx) {
     I0 <- sum(dat$dailyCases[inWindowI])
     
     if (peak_i == 1) {
-        # need to add a few more to I0 so it makes sense with observed hospitalization data
+        #  add a few more to I0
         I0 <- I0 + H0 + 10
         
-        if(city_i == 'nyc') I0 <- I0 + 30
         # peak 1 = no previous infectious
         R0 <- D0
     } else {
@@ -140,26 +140,25 @@ for (i in batchIdx) {
         # source relevant scripts
         source('./scripts/fit_models.R')
         
-        debugonce(fitAlarmModel)
+        # debugonce(fitAlarmModel)
         fitAlarmModel(incData = incData, city = city_i,
                       modelType = modelType_i, peak = peak_i, 
                       smoothC = smoothC, smoothD = smoothD, 
                       deathData = deathData, hospData = hospData,
                       N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0,
-                      seed = 1)
+                      seed = x)
         
     })
     stopCluster(cl)
     
     source('./scripts/summarize_post.R')
     # debugonce(summarizePost)
-    # debugonce(postPredForecast)
     postSummaries <- summarizePost(resThree = resThree, incData = incData,
                                    modelType = modelType_i, peak = peak_i, 
                                    smoothC = smoothC, smoothD = smoothD,
                                    hospData = hospData, deathData = deathData,
-                                   N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0,
-                                   Istar0 = Istar0, Dstar0 = Dstar0)
+                                   N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, 
+                                   R0 = R0, Istar0 = Istar0, Dstar0 = Dstar0)
     
     
     # if the model did not converge save the chains so these can be examined later
@@ -189,7 +188,6 @@ for (i in batchIdx) {
         R0Post <- cbind.data.frame(postSummaries$postR0, modelInfo)
         waicPost <- cbind.data.frame(postSummaries$waic, modelInfo)
         predFitPost <- cbind.data.frame(postSummaries$postPredictFit, modelInfo)
-        predForecastPost <- cbind.data.frame(postSummaries$postPredictForecast, modelInfo)
         
     } else {
         gr <- rbind.data.frame(gr, 
@@ -204,8 +202,6 @@ for (i in batchIdx) {
                                      cbind.data.frame(postSummaries$waic, modelInfo))
         predFitPost <- rbind.data.frame(predFitPost, 
                                         cbind.data.frame(postSummaries$postPredictFit, modelInfo))
-        predForecastPost <- rbind.data.frame(predForecastPost, 
-                                        cbind.data.frame(postSummaries$postPredictForecast, modelInfo))
     }
     
 } # end loop
@@ -219,4 +215,3 @@ saveRDS(alarmTimePost, paste0('./output/alarmTimePost_Batch', idxPrint, '.rds'))
 saveRDS(R0Post, paste0('./output/R0Post_Batch', idxPrint, '.rds'))
 saveRDS(waicPost, paste0('./output/waicPost_Batch', idxPrint, '.rds'))
 saveRDS(predFitPost, paste0('./output/predFitPostBatch', idxPrint, '.rds'))
-saveRDS(predForecastPost, paste0('./output/predForecastPostBatch', idxPrint, '.rds'))

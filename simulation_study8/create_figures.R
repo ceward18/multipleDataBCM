@@ -383,23 +383,33 @@ R0postMSE <- R0PostAll %>%
 R0postMSE$assumeType <- factor(R0postMSE$assumeType,
                                labels = c('Yes', 'No'))
 
-pdf('./figures/R0Post_RMSE.pdf', height = 5, width = 9)
+
+strip_design <- strip_nested(
+    text_x = elem_list_text(size = c(14, 12)),
+    by_layer_x = TRUE
+)
+
+
+pdf('./figures/R0Post_RMSE.pdf', height = 5.5, width = 9)
 ggplot(subset(R0postMSE, !alarmType == 'No alarm'), 
        aes(x = time, y = mse, col = assumeType)) +
-    geom_line(linewidth = 0.5) +
-    facet_nested(dataType ~ compartmentType + alarmType, scales = 'free_y' ) +
+    geom_line(linewidth = 0.8) +
+    facet_nested(dataType ~ compartmentType + alarmType,
+                 scales = 'free_y', strip = strip_design ) +
     theme_bw() + 
     theme(strip.placement = "outside",
           strip.background = element_rect(fill = 'white'),
-          strip.text = element_text(size = 10),
+          strip.text.y = element_text(size = 10),
           axis.title = element_text(size = 12),
           axis.text = element_text(size = 8),
-          plot.title = element_text(size = 12, h = 0.5),
+          legend.title = element_text(size = 14),
+          legend.text = element_text(size = 13),
+          plot.title = element_text(size = 14, h = 0.5),
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank()) +
     labs(x = 'Epidemic Time', y = 'RMSE', color = 'Undetected infections\nmodeled',
          title =expression('RMSE of'~R[0](t))) +
-    scale_color_manual(values = c('steelblue1', 'darksalmon'))
+    scale_color_manual(values = c('steelblue1', 'tomato'))
 dev.off()
 
 

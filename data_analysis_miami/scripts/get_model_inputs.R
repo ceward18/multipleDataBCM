@@ -40,6 +40,8 @@ getModelInput <- function(incData, modelType, peak,
                      smoothC = smoothC,
                      smoothD = smoothD)
     
+    
+    
     # only relevant for SIHRD models
     # distribute initial infections to be removed anytime in first maxInf days
     # ~2% infected go to hospital, so use 90% to be conservative
@@ -53,17 +55,28 @@ getModelInput <- function(incData, modelType, peak,
     
     
     # RstarH is removals from hospitalizations
+    if (peak == 1) {
+        
+        missing_idx <- which(is.na(hospData))
+        hospData[missing_idx[1:10]] <- 0
+        hospData<- round(approxfun(1:length(hospData), hospData)(1:length(hospData)))
+        
+    } else if (peak == 2) {
+        # use midpoints
+        hospData<- round(approxfun(1:length(hospData), hospData)(1:length(hospData)))
+        
+    }
+    
     
     # with no removals, we would have this many in H at any time
     totalH_noR <- cumsum(c(H0, hospData)) - cumsum(c(0, deathData))
-    RstarH <- round(0.25 * diff(totalH_noR))
+    RstarH <- round(0.1 * diff(totalH_noR))
     RstarH <- pmax(rep(0, length(RstarH)), RstarH)
 
 
     
     if (modelType == 'SIHRD_full') {
         
-        dataList$Hstar <- hospData
         dataList$Dstar <- deathData
         
         repeat {
@@ -78,7 +91,8 @@ getModelInput <- function(incData, modelType, peak,
                               k = runif(1, 0.0001, 0.01),
                               alpha = rbeta(1, 1, 1),
                               RstarI = RstarI,
-                              RstarH = RstarH)
+                              RstarH = RstarH,
+                              Hstar = hospData)
             
             probIH <- 1 - exp(-initsList$lambda)
             probIR <- 1 - exp(-initsList$gamma1)
@@ -98,7 +112,6 @@ getModelInput <- function(incData, modelType, peak,
         
     } else if (modelType == 'SIHRD_inc') {
         
-        dataList$Hstar <- hospData
         dataList$Dstar <- deathData
         dataList$smoothD <- NULL
         
@@ -113,7 +126,8 @@ getModelInput <- function(incData, modelType, peak,
                               phi = rgamma(1, 6700, 100000),    # HD
                               k = runif(1, 0.0001, 0.01),
                               RstarI = RstarI,
-                              RstarH = RstarH)
+                              RstarH = RstarH,
+                              Hstar = hospData)
             
             probIH <- 1 - exp(-initsList$lambda)
             probIR <- 1 - exp(-initsList$gamma1)
@@ -161,7 +175,6 @@ getModelInput <- function(incData, modelType, peak,
     } else if (modelType == 'SIHRD_noAlarm') {
         
         ### data
-        dataList$Hstar <- hospData
         dataList$Dstar <- deathData
         dataList$smoothC <- NULL
         dataList$smoothD <- NULL
@@ -176,7 +189,8 @@ getModelInput <- function(incData, modelType, peak,
                               lambda = rgamma(1, 2000, 100000), # IH
                               phi = rgamma(1, 6700, 100000),    # HD
                               RstarI = RstarI,
-                              RstarH = RstarH)
+                              RstarH = RstarH,
+                              Hstar = hospData)
             
             probIH <- 1 - exp(-initsList$lambda)
             probIR <- 1 - exp(-initsList$gamma1)
