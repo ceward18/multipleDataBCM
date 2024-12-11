@@ -83,7 +83,7 @@ getModelInput <- function(incData, modelType, peak,
             
             ### inits 
             initsList <- list(comp_init = comp_init,
-                              beta = runif(1, 0.01, 1),
+                              beta = runif(1, 0.01, 0.5),
                               gamma1 = rgamma(1, 1429, 10000),  # IR
                               gamma2 = rgamma(1, 6700, 100000), # HR
                               lambda = rgamma(1, 2000, 100000), # IH
@@ -119,7 +119,7 @@ getModelInput <- function(incData, modelType, peak,
             
             ### inits 
             initsList <- list(comp_init = comp_init,
-                              beta = runif(1, 0.01, 1),
+                              beta = runif(1, 0.01, 0.5),
                               gamma1 = rgamma(1, 1429, 10000),  # IR
                               gamma2 = rgamma(1, 6700, 100000), # HR
                               lambda = rgamma(1, 2000, 100000), # IH
@@ -149,7 +149,7 @@ getModelInput <- function(incData, modelType, peak,
         
         ### inits 
         initsList <- list(comp_init = comp_init,
-                          beta = runif(1, 0.01, 1),
+                          beta = runif(1, 0.01, 0.5),
                           k = runif(1, 0.0001, 0.01),
                           alpha = rbeta(1, 1, 1),
                           w0 = runif(1, 6.8, 7.2),
@@ -164,7 +164,7 @@ getModelInput <- function(incData, modelType, peak,
         
         ### inits 
         initsList <- list(comp_init = comp_init,
-                          beta = runif(1, 0.01, 1),
+                          beta = runif(1, 0.01, 0.5),
                           k = runif(1, 0.0001, 0.01),
                           alpha = rbeta(1, 1, 1),
                           w0 = runif(1, 6.8, 7.2),
@@ -183,7 +183,7 @@ getModelInput <- function(incData, modelType, peak,
             
             ### inits 
             initsList <- list(comp_init = comp_init,
-                              beta = runif(1, 0.01, 1),
+                              beta = runif(1, 0.01, 0.5),
                               gamma1 = rgamma(1, 1429, 10000),  # IR
                               gamma2 = rgamma(1, 6700, 100000), # HR
                               lambda = rgamma(1, 2000, 100000), # IH
@@ -211,7 +211,7 @@ getModelInput <- function(incData, modelType, peak,
         
         ### inits 
         initsList <- list(comp_init = comp_init,
-                          beta = runif(1, 0.01, 1),
+                          beta = runif(1, 0.01, 0.5),
                           w0 = runif(1, 6.8, 7.2),
                           nu = rgamma(1, 1000, 1000))
         

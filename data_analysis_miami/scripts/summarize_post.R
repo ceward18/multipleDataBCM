@@ -22,11 +22,11 @@ summarizePost <- function(resThree, incData, modelType, peak,
                           N, S0, I0, H0, D0, R0, Istar0, Dstar0) {
     
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
-        paramSamples1 <- resThree[[1]][,-grep('alarm|R0|Rstar|
+        paramSamples1 <- resThree[[1]][,-grep('alarm|R0|Rstar|Hstar|
                                               |comp_init\\[3\\]|comp_init\\[4\\]|comp_init\\[5\\]', colnames(resThree[[1]]))]
-        paramSamples2 <- resThree[[2]][,-grep('alarm|R0|Rstar|
+        paramSamples2 <- resThree[[2]][,-grep('alarm|R0|Rstar|Hstar|
                                               |comp_init\\[3\\]|comp_init\\[4\\]|comp_init\\[5\\]', colnames(resThree[[2]]))]
-        paramSamples3 <- resThree[[3]][,-grep('alarm|R0|Rstar|
+        paramSamples3 <- resThree[[3]][,-grep('alarm|R0|Rstar|Hstar|
                                               |comp_init\\[3\\]|comp_init\\[4\\]|comp_init\\[5\\]', colnames(resThree[[3]]))]
     } else if (modelType %in% c('SIR_full', 'SIR_inc', 'SIR_noAlarm')) {
         paramSamples1 <- resThree[[1]][,-grep('alarm|R0|comp_init\\[16\\]', colnames(resThree[[1]]))]
