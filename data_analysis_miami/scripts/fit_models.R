@@ -16,7 +16,7 @@ fitAlarmModel <- function(incData, city, modelType, peak,
         as.numeric(factor(modelType, levels = c('SIHRD_full', 'SIHRD_inc',
                                                 'SIR_full', 'SIR_inc',
                                                 'SIHRD_noAlarm', 'SIR_noAlarm'))) + 
-        as.numeric(factor(city, levels = c('nyc', 'montreal', 'miami'))) + 
+        as.numeric(factor(city, levels = c('montreal', 'miami'))) + 
         length(incData)
     
     set.seed(seed)
@@ -69,11 +69,16 @@ fitAlarmModel <- function(incData, city, modelType, peak,
         
         # need to ensure all stochastic nodes are monitored for WAIC calculation
         myConfig$addMonitors(c('RstarI', 'RstarH', 'Hstar'))
+    
         
         # use joint sampling for transmission parameters
         jointParams <- c('beta', 'gamma1', 'lambda', 'gamma2', 'phi')
+        # add k and alpha where appropriate
         if (!grepl('noAlarm', modelType)) {
             jointParams <- c(jointParams, 'k')
+        } 
+        if (grepl('full', modelType)) {
+            jointParams <- c(jointParams, 'alpha')
         } 
         myConfig$removeSampler(jointParams)
         myConfig$addSampler(target = jointParams, type = "AF_slice")
@@ -84,6 +89,9 @@ fitAlarmModel <- function(incData, city, modelType, peak,
         jointParams <- c('beta', 'w0')
         if (!grepl('noAlarm', modelType)) {
             jointParams <- c(jointParams, 'k')
+        } 
+        if (grepl('full', modelType)) {
+            jointParams <- c(jointParams, 'alpha')
         } 
         myConfig$removeSampler(jointParams)
         myConfig$addSampler(target = jointParams, type = "AF_slice")
