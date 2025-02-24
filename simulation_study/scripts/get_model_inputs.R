@@ -6,8 +6,8 @@
 ################################################################################
 
 
-getModelInput <- function(incData, modelType, smoothC, smoothH, smoothD,
-                          hospData, deathData) {
+getModelInput <- function(incData, modelType, assumeType, 
+                          smoothC, smoothD, hospData, deathData) {
     
     # constants that are the same for all models
     N <- 1e6
@@ -15,85 +15,63 @@ getModelInput <- function(incData, modelType, smoothC, smoothH, smoothD,
     R0 <- 0
     S0 <- N - I0 - R0
     tau <- length(incData)
+    maxInf <- 10
+    
+    ### initial conditions probability
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
+        
+        # SIHRD model - start of epidemic so no H, R, D
+        initProb <- c(S0, I0, 0, 0, 0)/N
+        comp_init <- rmulti(1, N, initProb)
+        
+    } else if (modelType %in% c('SIR_full', 'SIR_inc', 'SIR_noAlarm')) {
+        
+        # SIR models - start of epidemic so R[0] = 0
+        initProb <- c(S0, rep(I0/maxInf, maxInf), R0)/N
+        comp_init <- rmulti(1, N, initProb)
+        
+    }
     
     ### constants
-    n <- 50
-    
-    minC <- floor(min(smoothC))
-    minH <- floor(min(smoothH))
-    minD <- floor(min(smoothD))
-    maxC <- ceiling(max(smoothC))
-    maxH <- ceiling(max(smoothH))
-    maxD <- ceiling(max(smoothD))
-    
-    xC <- seq(0, maxC, length.out = n)
-    xH <- seq(0, maxH, length.out = n)
-    xD <- seq(0, maxD, length.out = n)
-    
     constantsList <- list(tau = tau,
                           N = N,
-                          S0 = S0,
-                          I0 = I0,
-                          minC = minC,
-                          minH = minH,
-                          minD = minD,
-                          maxC = maxC,
-                          maxH = maxH,
-                          maxD = maxD,
-                          n = n,
-                          xC = xC,
-                          xH = xH,
-                          xD = xD,
-                          maxInf = 10)
+                          initProb = initProb,
+                          maxInf = maxInf)
+    
+    # conditional inference - fix unobserved Istar at 4 times what was observed
+    # (for models that allow undetected infections)
+    Istar <- round(incData / 0.25)
     
     ### data
-    dataList <- list(Istar = incData,
+    dataList <- list(detectIstar = incData,
+                     Istar = Istar,
                      smoothC = smoothC,
-                     smoothH = smoothH,
-                     smoothD = smoothD,
-                     constrain_deltas = 1)
-    
-    if (modelType == 'simple') {
-        
-        ### inits 
-        initsList <- list(beta = runif(1, 1/7, 1),
-                          nuC = runif(1, 1, 10),
-                          nuH = runif(1, 1, 10),
-                          nuD = runif(1, 1, 10),
-                          x0C = runif(1, 0, maxC/3),
-                          x0H = runif(1, 0, maxH/3),
-                          x0D = runif(1, 0, maxD/3),
-                          deltaC = runif(1, 0, 0.3),
-                          deltaH = runif(1, 0, 0.3),
-                          deltaD = runif(1, 0, 0.3),
-                          w0 = rnorm(1, 3, 0.5),
-                          k = rgamma(1, 100, 100))
-        
-        # end modeltype == 'simple'
-        
-    } else if (modelType == 'full') {
+                     smoothD = smoothD)
+
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
         
         dataList$Hstar <- hospData
         dataList$Dstar <- deathData
         
+        if (assumeType == 'casesOnly') {
+            RstarI <- round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)]))
+        } else {
+            RstarI <- round(0.3 * c(rep(0, 3), I0, dataList$Istar[1:(tau-4)]))
+        }
+        
         repeat {
             
             ### inits 
-            initsList <- list(beta = runif(1, 1/7, 1),
-                              gamma1 = runif(1), # IR
-                              gamma2 = runif(1), # HR
-                              lambda = runif(1), # IH
-                              phi = runif(1) ,   # HD
-                              nuC = runif(1, 1, 5),
-                              nuH = runif(1, 1, 5),
-                              nuD = runif(1, 1, 5),
-                              x0C = runif(1, 0, maxC/3),
-                              x0H = runif(1, 0, maxH/3),
-                              x0D = runif(1, 0, maxD/3),
-                              deltaC = runif(1, 0, 0.3),
-                              deltaH = runif(1, 0, 0.3),
-                              deltaD = runif(1, 0, 0.3),
-                              RstarI = round(0.3 * c(rep(0, 3), I0, dataList$Istar[1:(tau-4)])),
+            initsList <- list(comp_init = comp_init,
+                              probDetect = rbeta(1, 250, 750),
+                              beta = runif(1, 1/7, 1),
+                              gamma1 = rgamma(1, 20, 100), # IR
+                              gamma2 = rgamma(1, 20, 100), # HR
+                              lambda = rgamma(1, 3, 100), # IH
+                              phi = rgamma(1, 10, 100) ,   # HD
+                              k = runif(1, 0, 0.02),
+                              alpha = rbeta(1, 1, 1),
+                              RstarI = RstarI,
                               RstarH = round(0.3 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
             
             probIH <- 1 - exp(-initsList$lambda)
@@ -101,20 +79,68 @@ getModelInput <- function(incData, modelType, smoothC, smoothH, smoothD,
             
             probHR <- 1 - exp(-initsList$gamma2)
             probHD <- 1 - exp(-initsList$phi)
-            
+
             if ((probIH + probIR < 1) & (probHR + probHD < 1)) break
             
-        }
-       
+        } 
         
         names(initsList$RstarI) <- paste0('RstarI[', 1:tau, ']')
         names(initsList$RstarH) <- paste0('RstarH[', 1:tau, ']')
+        
+        if (modelType == 'SIHRD_inc') {
+            dataList$smoothD <- NULL
+            initsList$alpha <- NULL
+        }
+        
+        # end modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')
+        
+    } else if (modelType %in% c('SIR_full', 'SIR_inc', 'SIR_noAlarm')) {
+        
+        ### inits 
+        initsList <- list(comp_init = comp_init,
+                          probDetect = rbeta(1, 250, 750),
+                          beta = runif(1, 1/7, 1),
+                          k = runif(1, 0, 0.02),
+                          alpha = rbeta(1, 1, 1),
+                          w0 = rnorm(1, 5, 0.25),
+                          nu = rgamma(1, 100, 100))
+        
+        # end modelType %in% c('SIR_full', 'SIR_inc', 'SIR_noAlarm')
+        
+    }
+    
+    if (modelType %in% c('SIHRD_inc', 'SIR_inc')) {
+        dataList$smoothD <- NULL
+        initsList$alpha <- NULL
+    }
+    
+    if (modelType %in% c('SIHRD_noAlarm', 'SIR_noAlarm')) {
+        dataList$smoothC <- NULL
+        dataList$smoothD <- NULL
+        
+        initsList$alpha <- NULL
+        initsList$k <- NULL
+        
+        if (modelType == 'SIHRD_noAlarm') {
+            dataList$Hstar <- hospData
+            dataList$Dstar <- deathData
+        }
     }
     
     
+    if (assumeType == 'casesOnly') {
+        initsList$probDetect <- NULL
+        initsList$Istar <- NULL
+        
+        # change data
+        dataList$detectIstar <- NULL
+        dataList$Istar <- incData
+
+    }
+    
     ### MCMC specifications
-    niter <- 6e5
-    nburn <- 3e5
+    niter <- 3e5
+    nburn <- 1e5
     nthin <- 10
     
     list(constantsList = constantsList,
@@ -122,9 +148,6 @@ getModelInput <- function(incData, modelType, smoothC, smoothH, smoothD,
          initsList = initsList,
          niter = niter,
          nburn = nburn,
-         nthin = nthin,
-         xC = xC,
-         xH = xH,
-         xD = xD)
+         nthin = nthin)
     
 }

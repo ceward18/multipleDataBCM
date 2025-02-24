@@ -24,23 +24,6 @@ for (i in 2:length(grFiles)) {
 saveRDS(grAll, paste0('./', resultsFolder, '/grAll.rds'))
 
 ################################################################################
-# posterior alarms - for models that estimate the alarm function separately
-
-alarmFiles <- outputFiles[grep('alarmPost', outputFiles)]
-
-alarmAll <- readRDS(paste0('./', outputFolder, '/', alarmFiles[1]))
-
-for (i in 2:length(alarmFiles)) {
-    alarm_i <- readRDS(paste0('./', outputFolder, '/', alarmFiles[i]))
-    alarmAll <-rbind.data.frame(alarmAll, alarm_i)
-}
-
-rownames(alarmAll) <- NULL
-
-saveRDS(alarmAll, paste0('./', resultsFolder, '/alarmPostAll.rds'))
-
-
-################################################################################
 # posterior alarms - for models that estimate all alarm functions
 
 alarmFiles <- outputFiles[grep('alarmTimePost', outputFiles)]
@@ -70,6 +53,21 @@ for (i in 2:length(paramsPostFiles)) {
 
 saveRDS(paramsPostAll,  paste0('./', resultsFolder, '/paramsPostAll.rds'))
 
+
+################################################################################
+# posterior R0 
+
+R0PostFiles <- outputFiles[grep('R0Post', outputFiles)]
+
+R0PostAll <- readRDS(paste0('./', outputFolder, '/', R0PostFiles[1]))
+
+for (i in 2:length(R0PostFiles)) {
+    R0Post_i <- readRDS(paste0('./', outputFolder, '/', R0PostFiles[i]))
+    R0PostAll <-rbind.data.frame(R0PostAll, R0Post_i)
+}
+
+saveRDS(R0PostAll,  paste0('./', resultsFolder, '/R0PostAll.rds'))
+
 ################################################################################
 # WAIC
 
@@ -85,18 +83,18 @@ for (i in 2:length(waicFiles)) {
 saveRDS(waicAll,  paste0('./', resultsFolder, '/waicAll.rds'))
 
 ################################################################################
-# R0 posterior over time
+# posterior predictive fit
 
+postPredFitFiles <- outputFiles[grep('predFitPost', outputFiles)]
 
-r0PostFiles <- outputFiles[grep('R0Post', outputFiles)]
+postPredFitAll <- readRDS(paste0('./', outputFolder, '/', postPredFitFiles[1]))
 
-r0PostAll <- readRDS(paste0('./', outputFolder, '/', r0PostFiles[1]))
-
-for (i in 2:length(r0PostFiles)) {
-    r0Post_i <- readRDS(paste0('./', outputFolder, '/', r0PostFiles[i]))
-    r0PostAll <-rbind.data.frame(r0PostAll, r0Post_i)
+for (i in 2:length(postPredFitFiles)) {
+    postPredFit_i <- readRDS(paste0('./', outputFolder, '/', postPredFitFiles[i]))
+    postPredFitAll <-rbind.data.frame(postPredFitAll, postPredFit_i)
 }
 
-rownames(r0PostAll) <- NULL
+# remove NA (simple model)
+postPredFitAll <- postPredFitAll[!is.na(postPredFitAll$time),]
 
-saveRDS(r0PostAll,  paste0('./', resultsFolder, '/r0PostAll.rds'))
+saveRDS(postPredFitAll,  paste0('./', resultsFolder, '/postPredFitAll.rds'))

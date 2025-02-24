@@ -5,15 +5,16 @@
 # called from summarize post after samples have been combined across chains
 ################################################################################
 
-getWAIC <- function(samples, modelType, incData, smoothC, smoothH, smoothD,
+getWAIC <- function(samples, modelType, assumeType, 
+                    incData, smoothC, smoothD,
                     hospData, deathData) {
     
     # model-specific constants, data, and inits
-    modelInputs <- getModelInput(incData, modelType, smoothC, smoothH, smoothD,
-                                 hospData, deathData)
+    modelInputs <- getModelInput(incData, modelType, assumeType,
+                                 smoothC, smoothD, hospData, deathData)
     
     ### get appropriate model code
-    modelCode <- get(paste0('SIHRD_', modelType))
+    modelCode <- get(paste0(modelType, '_', assumeType))
     
     ### create nimble model
     myModel <- nimbleModel(modelCode, 
@@ -23,18 +24,29 @@ getWAIC <- function(samples, modelType, incData, smoothC, smoothH, smoothD,
     
     compiled <- compileNimble(myModel) 
     
+    if (assumeType == 'casesOnly') {
+        
+        incDataSamples <- matrix(rep(incData), NROW(samples),
+                                  ncol = length(incData), byrow = T)
+        colnames(incDataSamples) <- paste0('Istar[', 1:ncol(incDataSamples), ']')
+        samples <- cbind(samples, incDataSamples)
+        
+    } else if (assumeType == 'undetected') {
+        
+        Istar <- round(incData / 0.25)
+        incDataSamples <- matrix(rep(Istar), NROW(samples),
+                                 ncol = length(Istar), byrow = T)
+        colnames(incDataSamples) <- paste0('Istar[', 1:ncol(incDataSamples), ']')
+        samples <- cbind(samples, incDataSamples)
+    }
     
-    incDataSamples <- matrix(rep(incData), NROW(samples),
-                             ncol = length(incData), byrow = T)
-    colnames(incDataSamples) <- paste0('Istar[', 1:ncol(incDataSamples), ']')
-    samplesIstar <- cbind(samples, incDataSamples)
     
-    if (modelType == 'full') {
+    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
         
         hospDataSamples <- matrix(rep(hospData), NROW(samples),
                                  ncol = length(hospData), byrow = T)
         colnames(hospDataSamples) <- paste0('Hstar[', 1:ncol(hospDataSamples), ']')
-        samplesHstar <- cbind(samplesIstar, hospDataSamples)
+        samplesHstar <- cbind(samples, hospDataSamples)
         
         deathDataSamples <- matrix(rep(deathData), NROW(samples),
                                  ncol = length(deathData), byrow = T)
@@ -45,7 +57,7 @@ getWAIC <- function(samples, modelType, incData, smoothC, smoothH, smoothD,
         
     } else {
         
-        waicList <- calculateWAIC(samplesIstar, compiled)
+        waicList <- calculateWAIC(samples, compiled)
     }
     
     

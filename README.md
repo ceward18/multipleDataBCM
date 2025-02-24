@@ -1,8 +1,16 @@
 # multipleDataBCM
 
-simulation_study = three sources, hill function, original priors
-simulation_study2 = two sources, hill function, original priors
-simulation_study3 = three sources, threshold function, original priors
-simulation_study4 = two sources, hill function, correlated delta priors
-simulation_study5 = three sources, hill function, correlated delta priors
-simulation_study5 = two sources, hill function, correlated delta priors, undetected
+This repository contains code associated with the simulation study and data analysis presented in "Multivariable Behavioral Change Modeling of Epidemics in the Presence of Undetected Infections" by Ward et al. (2023). The ArXiv version of the paper can be found here: ______.
+
+## simulation_study
+
+This directory contains the code needed to run the simulation study presented in Section 3.
+
+The create_figures.R script in this directory can be run to reproduce Figures 2 - 5.
+
+
+## data_analysis
+
+This directory contains code to reproduce the analysis of COVID-19 data from Miami-Dade county and Montreal presented in Section 4.
+
+The figures_and_tables.R script in this directory can be run to reproduce Figures 6 - 8 and Tables 1 and 2.
