@@ -80,7 +80,7 @@ get_R0 <- nimbleFunction(
             t1 <- k
             t2 <- k + bw - 1
             pi_SI <- 1 - exp(-betat[t1:t2] * iddCurve / N)
-            sumSmooth[k] <- sum(pi_SI) * S[k]
+            sumSmooth[k] <- sum(pi_SI[t1:t2] * S[t1:t2])
         }
         
         return(sumSmooth)
@@ -113,7 +113,7 @@ get_R0_full <- nimbleFunction(
         for(k in 1:(nTime - bw)){
             t1 <- k
             t2 <- k + bw - 1
-            sumSmooth[k] <- sum(pi_SI[t1:t2] * multVec) * S[k]
+            sumSmooth[k] <- sum(pi_SI[t1:t2] * multVec * S[t1:t2]) 
         }
         
         return(sumSmooth)
@@ -201,7 +201,8 @@ SIHRD_sim <-  nimbleCode({
         smoothD[t] <- movingAverage(Dstar[1:(t-1)], bw)[t-1]
         
         # compute alarms for each component
-        alarm[t] <- powerAlarm2(alpha * smoothC[t], (1 - alpha) * smoothD[t],
+        alarm[t] <- powerAlarm2(alpha * smoothC[t], 
+                                (1 - alpha) * smoothD[t],
                                 N, k)
         
         probSI[t] <- 1 - exp(- beta * (1 - alarm[t]) * I[t] / N)

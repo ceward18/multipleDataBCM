@@ -31,8 +31,8 @@ allFits <- expand.grid(simNumber = 1:nSim,
 
 rownames(allFits) <- NULL
 
-# 180
-tmp <- allFits[seq(1,nrow(allFits), 10),]
+# 360
+tmp <- allFits[seq(1,nrow(allFits), 5),]
 rownames(tmp) <- NULL
 
 
