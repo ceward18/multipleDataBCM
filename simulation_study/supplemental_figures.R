@@ -118,6 +118,35 @@ R0PostAll$assumeType <- factor(R0PostAll$assumeType,
                                levels = c('undetected', 'casesOnly'),
                                labels = c('w/ undetected', 'w/o undetected'))
 
+ggplot(subset(R0PostAll, modelType == 'SIHRD_full' & assumeType == 'casesOnly' & dataType == 'High case importance'), 
+       aes(x = time, y = mean, group = simNumber)) + 
+    geom_line() +
+    ylim(0, 8)
+
+ggplot(subset(R0PostAll, is.na(noConverge)), aes(x = time, y = mean, group = simNumber)) + 
+    geom_line() + 
+    facet_nested(dataType + assumeType~ compartmentType + alarmType) +
+    theme_bw() + 
+    theme(strip.placement = "outside",
+          strip.background = element_blank(),
+          strip.text = element_text(size = 9),
+          axis.title = element_text(size = 10),
+          axis.text = element_text(size = 8),
+          legend.title = element_text(size = 10),
+          legend.text = element_text(size = 9),
+          plot.title = element_text(size = 12, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    labs(x = 'Epidemic Time', y = 'RMSE', color = 'Undetected\ninfections\nmodeled',
+         title =expression('RMSE of'~R[0](t))) +
+    scale_color_manual(values = c('steelblue1', 'tomato'))+
+    ylim(0, 8)
+
+
+
+
+
+
 
 
 R0postMSE <- R0PostAll %>%

@@ -77,17 +77,14 @@ get_R0 <- nimbleFunction(
                    maxInf = double(0), iddCurve = double(1)) {
         returnType(double(1))
         
-        # probability of transition given 1 infectious individual (vector length t)
-        pi_SI <- 1 - exp(- betat / N )
-        
-        nTime <- length(pi_SI)
+        nTime <- length(betat)
         bw <- maxInf
         sumSmooth <- rep(NA, nTime - bw)
         for(k in 1:(nTime - bw)){
             t1 <- k
             t2 <- k + bw - 1
             pi_SI <- 1 - exp(-betat[t1:t2] * iddCurve / N)
-            sumSmooth[k] <- sum(pi_SI) * S[k]
+            sumSmooth[k] <- sum(pi_SI * S[t1:t2])
         }
         
         return(sumSmooth)
@@ -119,7 +116,7 @@ get_R0_full <- nimbleFunction(
         for(k in 1:(nTime - bw)){
             t1 <- k
             t2 <- k + bw - 1
-            sumSmooth[k] <- sum(pi_SI[t1:t2] * multVec) * S[k]
+            sumSmooth[k] <- sum(pi_SI[t1:t2] * multVec * S[t1:t2]) 
         }
         
         return(sumSmooth)
