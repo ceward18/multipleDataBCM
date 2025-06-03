@@ -230,7 +230,7 @@ SIHRD_sim <-  nimbleCode({
     # estimated effective R0
     R0[1:(tau-11)] <- get_R0_full(betat = beta * (1 - alarm[1:tau]), 
                                   N = N, gamma1 = gamma1, lambda = lambda,
-                                  S = S[1:tau], maxInf = 10)
+                                  S = S[1:tau], maxInf = 15)
     
     ### Priors
     

@@ -85,7 +85,7 @@ for (i in batchIdx) {
         fitAlarmModel(incData = incData, modelType = modelType_i, 
                       assumeType = assumeType_i, 
                       smoothC = smoothC,  smoothD = smoothD,
-                      hospData = hospData, deathData = deathData, seed = 1)
+                      hospData = hospData, deathData = deathData, seed = x)
     })
     stopCluster(cl)
     
