@@ -101,6 +101,11 @@ fitAlarmModel <- function(incData, modelType, assumeType,
                             type = "RstarUpdate")
         
         myConfig$addMonitors('Istar')
+        
+        # joint sampler for probDetect and lambda
+        myConfig$removeSampler(c('probDetect', 'lambda'))
+        myConfig$addSampler(target = c('probDetect', 'lambda'), type = "AF_slice")
+        
     }
     
     

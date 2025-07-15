@@ -4,6 +4,7 @@
 *.docx
 simulation_study/chains/*
 simulation_study/convergence/*
+simulation_study_new/convergence/*
 simulation_study/out/*
 simulation_study/err/*
 simulation_study/err/submitLonger.sh

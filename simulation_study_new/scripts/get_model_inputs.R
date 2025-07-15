@@ -62,12 +62,12 @@ getModelInput <- function(incData, modelType, assumeType,
             
             ### inits 
             initsList <- list(comp_init = comp_init,
-                              probDetect = rbeta(1, 250, 750),
+                              probDetect = rbeta(1, 2500, 7500),
                               beta = runif(1, 1/7, 1),
-                              gamma1 = rgamma(1, 20, 100), # IR
-                              gamma2 = rgamma(1, 20, 100), # HR
+                              gamma1 = rgamma(1, 2000, 10000), # IR
+                              gamma2 = rgamma(1, 2000, 10000), # HR
                               lambda = rgamma(1, 300, 10000), # IH
-                              phi = rgamma(1, 10, 100) ,   # HD
+                              phi = rgamma(1, 100, 1000) ,   # HD
                               k = runif(1, 0, 0.02),
                               alpha = rbeta(1, 1, 1),
                               Istar = Istar,
@@ -99,7 +99,7 @@ getModelInput <- function(incData, modelType, assumeType,
         
         ### inits 
         initsList <- list(comp_init = comp_init,
-                          probDetect = rbeta(1, 250, 750),
+                          probDetect = rbeta(1, 2500, 7500),
                           beta = runif(1, 1/7, 1),
                           k = runif(1, 0, 0.02),
                           alpha = rbeta(1, 1, 1),

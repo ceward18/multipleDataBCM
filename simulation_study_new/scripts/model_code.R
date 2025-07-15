@@ -235,7 +235,7 @@ SIHRD_sim <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -323,7 +323,7 @@ SIHRD_full_undetected <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -421,7 +421,7 @@ SIHRD_full_undetected_sim <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -655,7 +655,7 @@ SIHRD_inc_undetected <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -750,7 +750,7 @@ SIHRD_inc_undetected_sim <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -977,7 +977,7 @@ SIHRD_noAlarm_undetected <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -1098,7 +1098,7 @@ SIR_full_undetected <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -1209,7 +1209,7 @@ SIR_noAlarm_undetected <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -1312,7 +1312,7 @@ SIR_inc_undetected <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -1383,7 +1383,7 @@ SIR_inc_undetected_sim <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
