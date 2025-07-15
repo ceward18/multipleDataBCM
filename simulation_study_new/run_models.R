@@ -38,8 +38,8 @@ rownames(tmp) <- NULL
 
 ################################################################################
 
-# fit models in batches of 5 (90 batches total)
-batchSize <- 10
+# fit models in batches of 5 (360 batches total)
+batchSize <- 5
 batchIdx <- batchSize * (idx - 1) + 1:batchSize
 
 for (i in batchIdx) {
