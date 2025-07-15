@@ -17,3 +17,4 @@ The following object is masked from ‘package:stats’:
 /common/software/install/manual/R/4.2.0-openblas-rocky8-fix/lib64/R/bin/R: line 8: /usr/bin/uname: Permission denied
 /common/software/install/manual/R/4.2.0-openblas-rocky8-fix/lib64/R/bin/R: line 8: /usr/bin/uname: Permission denied
 /common/software/install/manual/R/4.2.0-openblas-rocky8-fix/lib64/R/bin/R: line 8: /usr/bin/uname: Permission denied
+slurmstepd: error: *** JOB 38367439 ON acn224 CANCELLED AT 2025-07-15T12:10:44 ***
