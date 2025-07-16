@@ -102,9 +102,11 @@ fitAlarmModel <- function(incData, modelType, assumeType,
         
         myConfig$addMonitors('Istar')
         
-        # joint sampler for probDetect and lambda
-        myConfig$removeSampler(c('probDetect', 'lambda'))
-        myConfig$addSampler(target = c('probDetect', 'lambda'), type = "AF_slice")
+        if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
+            # joint sampler for probDetect and lambda in SIHRD models
+            myConfig$removeSampler(c('probDetect', 'lambda'))
+            myConfig$addSampler(target = c('probDetect', 'lambda'), type = "AF_slice")
+        }
         
     }
     
