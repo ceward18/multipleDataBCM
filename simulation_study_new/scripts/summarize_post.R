@@ -27,9 +27,9 @@ summarizePost <- function(resThree, incData, modelType, assumeType,
         paramSamples3 <- resThree[[3]][,-grep('alarm|R0|Rstar|Istar|
                                               |comp_init\\[3\\]|comp_init\\[4\\]|comp_init\\[5\\]', colnames(resThree[[3]]))]
     } else if (modelType %in% c('SIR_full', 'SIR_inc', 'SIR_noAlarm')) {
-        paramSamples1 <- resThree[[1]][,-grep('alarm|R0|Rstar|Istar|comp_init\\[15\\]', colnames(resThree[[1]]))]
-        paramSamples2 <- resThree[[2]][,-grep('alarm|R0|Rstar|Istar|comp_init\\[15\\]', colnames(resThree[[2]]))]
-        paramSamples3 <- resThree[[3]][,-grep('alarm|R0|Rstar|Istar|comp_init\\[15\\]', colnames(resThree[[3]]))]
+        paramSamples1 <- resThree[[1]][,-grep('alarm|R0|Rstar|Istar|comp_init\\[17\\]', colnames(resThree[[1]]))]
+        paramSamples2 <- resThree[[2]][,-grep('alarm|R0|Rstar|Istar|comp_init\\[17\\]', colnames(resThree[[2]]))]
+        paramSamples3 <- resThree[[3]][,-grep('alarm|R0|Rstar|Istar|comp_init\\[17\\]', colnames(resThree[[3]]))]
     }
     
     ##############################################################################
