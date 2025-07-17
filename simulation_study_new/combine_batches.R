@@ -68,6 +68,23 @@ for (i in 2:length(R0PostFiles)) {
 
 saveRDS(R0PostAll,  paste0('./', resultsFolder, '/R0PostAll.rds'))
 
+
+
+################################################################################
+# posterior Istar 
+
+IstarPostFiles <- outputFiles[grep('IstarPost', outputFiles)]
+
+IstarPostAll <- readRDS(paste0('./', outputFolder, '/', IstarPostFiles[1]))
+
+for (i in 2:length(IstarPostFiles)) {
+    IstarPost_i <- readRDS(paste0('./', outputFolder, '/', IstarPostFiles[i]))
+    IstarPostAll <-rbind.data.frame(IstarPostAll, IstarPost_i)
+}
+
+saveRDS(IstarPostAll,  paste0('./', resultsFolder, '/IstarPostAll.rds'))
+
+
 ################################################################################
 # WAIC
 
