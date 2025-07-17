@@ -18,6 +18,7 @@ I0 <- 5
 S0 <- N - I0
 tau <- 40
 bw <- 30
+maxInf <- 15
 
 ### parameter values for all models 
 
@@ -42,7 +43,8 @@ constantsList <- list(N = N,
                       tau = tau,
                       S0 = S0,
                       I0 = I0,
-                      bw = bw)
+                      bw = bw,
+                      maxInf = maxInf)
 
 SIR_sim_model <- nimbleModel(code = SIHRD_sim,
                              constants = constantsList)

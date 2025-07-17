@@ -66,7 +66,7 @@ getModelInput <- function(incData, modelType, assumeType,
                               beta = runif(1, 1/7, 1),
                               gamma1 = rgamma(1, 2000, 10000), # IR
                               gamma2 = rgamma(1, 2000, 10000), # HR
-                              lambda = rgamma(1, 300, 10000), # IH
+                              lambda = rgamma(1, 3000, 100000), # IH
                               phi = rgamma(1, 100, 1000) ,   # HD
                               k = runif(1, 0, 0.02),
                               alpha = rbeta(1, 1, 1),
