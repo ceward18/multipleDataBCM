@@ -35,6 +35,10 @@ for (i in 2:length(alarmFiles)) {
     alarmAll <-rbind.data.frame(alarmAll, alarm_i)
 }
 
+
+# remove NA (noAlarm models)
+alarmAll <- alarmAll[!is.na(alarmAll$time),]
+
 rownames(alarmAll) <- NULL
 
 saveRDS(alarmAll, paste0('./', resultsFolder, '/alarmTimePostAll.rds'))

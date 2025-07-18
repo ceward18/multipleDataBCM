@@ -80,6 +80,7 @@ notConvergeModels$noConverge <- 1
 # Fig 3 - RMSE undetected vs detected in estimation of R0 
 
 R0PostAll <- readRDS('./results/R0PostAll.rds')
+R0PostAll <- R0PostAll[-which(R0PostAll$time == 25),]
 
 # get true average R0 for each setting
 simDataInc <- readRDS('./data/sim_inc.rds')
@@ -329,5 +330,97 @@ ggplot(data = subset(paramsPostAll,
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank())
 dev.off()
+
+################################################################################
+# Figure 5b - alarm function estimation
+
+
+alarmPostAll <- readRDS('./results/alarmTimePostAll.rds')
+
+# get true average R0 for each setting
+simDataInc <- readRDS('./data/sim_inc.rds')
+simDataDeath <- readRDS('./data/sim_death.rds')
+simDataEqual <- readRDS('./data/sim_equal.rds')
+
+# r0
+alarmData <- data.frame(time = 1:max(alarmPostAll$time),
+                     dataType = rep(c('inc', 'death', 'equal'), 
+                                    each = max(alarmPostAll$time)),
+                     truth = c(colMeans(simDataInc[, grep('alarm', colnames(simDataInc))]),
+                               colMeans(simDataDeath[, grep('alarm', colnames(simDataDeath))]),
+                               colMeans(simDataEqual[, grep('alarm', colnames(simDataEqual))])))
+
+alarmPostAll <- merge(alarmPostAll, alarmData, by = c('time', 'dataType'), all.x = T)
+
+alarmPostAll <- merge(alarmPostAll, notConvergeModels, 
+                   by = c('dataType', 'modelType', 'assumeType', 'simNumber'),
+                   all.x = T)
+
+# alarmPostAll <- subset(alarmPostAll, is.na(noConverge))
+
+alarmPostAll$dataType <- factor(alarmPostAll$dataType,
+                             levels = c('inc', 'death', 'equal'),
+                             labels = c('High case importance',
+                                        'High deaths importance',
+                                        'Equal importance'))
+
+alarmPostAll$compartmentType <- ifelse(grepl('SIR', alarmPostAll$modelType),
+                                    'SIR', 'SIHRD')
+
+alarmPostAll$alarmType <- 'No alarm'
+alarmPostAll$alarmType <- ifelse(grepl('inc', alarmPostAll$modelType),
+                              'Cases only', alarmPostAll$alarmType)
+
+alarmPostAll$alarmType <- ifelse(grepl('full', alarmPostAll$modelType),
+                              'Cases + deaths', alarmPostAll$alarmType)
+
+
+
+ggplot(subset(alarmPostAll, assumeType == 'undetected'), 
+       aes(x = time,  y = mean, group = simNumber, col = alarmType)) +
+    geom_line() + 
+    geom_line(aes(y = truth), col = 'black') +
+    facet_nested(compartmentType ~  dataType + alarmType) +
+    theme_bw() + 
+    theme(strip.placement = "outside",
+          strip.background = element_blank(),
+          strip.text = element_text(size = 11),
+          axis.title = element_text(size = 10),
+          axis.text = element_text(size = 9, color = 'black'),
+          legend.title = element_text(size = 10),
+          legend.text = element_text(size = 9),
+          plot.title = element_text(size = 12, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    labs(x = 'Time', y = 'Alarm', col = '',
+         title = 'Posterior mean alarm') +
+    scale_color_manual(values = c('steelblue1', 'tomato'))
+
+
+ggplot(subset(alarmPostAll, simNumber == 2), 
+       aes(x = time,  y = mean, ymin = lower, ymax = upper, 
+           col = assumeType,  fill = assumeType, group = assumeType)) +
+    geom_line() + 
+    geom_ribbon(alpha = 0.2) + 
+    geom_line(aes(y = truth), col = 'black') +
+    facet_nested(compartmentType ~  dataType + alarmType) +
+    theme_bw() + 
+    theme(strip.placement = "outside",
+          strip.background = element_blank(),
+          strip.text = element_text(size = 11),
+          axis.title = element_text(size = 10),
+          axis.text = element_text(size = 9, color = 'black'),
+          legend.title = element_text(size = 10),
+          legend.text = element_text(size = 9),
+          plot.title = element_text(size = 12, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    labs(x = 'Time', y = 'Alarm', col = '', fill = '',
+         title = 'Posterior mean alarm') +
+    scale_color_manual(values = c('steelblue1', 'tomato'))+
+    scale_fill_manual(values = c('steelblue1', 'tomato'))
+
+
+
 
 

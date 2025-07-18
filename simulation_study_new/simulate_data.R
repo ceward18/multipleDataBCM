@@ -50,7 +50,7 @@ SIR_sim_model <- nimbleModel(code = SIHRD_sim,
                              constants = constantsList)
 SIR_sim_model_C <- compileNimble(SIR_sim_model)
 
-dataNodes <- c('Istar', 'detectIstar', 'fromI', 'fromH', 'R0')
+dataNodes <- c('Istar', 'detectIstar', 'fromI', 'fromH', 'R0', 'alarm')
 dataNodes <- SIR_sim_model$expandNodeNames(dataNodes)
 sim_R <- simulator(SIR_sim_model, dataNodes)
 sim_C <- compileNimble(sim_R, project = SIR_sim_model)
