@@ -44,6 +44,8 @@ batchIdx <- batchSize * (idx - 1) + 1:batchSize
 
 for (i in batchIdx) {
     
+    print(Sys.time())
+    
     dataType_i <- allFits$dataType[i]
     modelType_i <- allFits$modelType[i]
     assumeType_i <- allFits$assumeType[i]

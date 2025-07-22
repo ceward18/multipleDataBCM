@@ -14,6 +14,11 @@ outputFiles <- list.files(paste0('./', outputFolder))
 
 grFiles <- outputFiles[grep('gr', outputFiles)]
 
+# check if there are results for everything
+all_gr <- paste0('gr_Batch', sprintf("%03d",1:360), '.rds')
+all_gr[which(!all_gr %in% grFiles)] 
+
+
 grAll <- readRDS(paste0('./', outputFolder, '/', grFiles[1]))
 
 for (i in 2:length(grFiles)) {

@@ -99,7 +99,7 @@ fitAlarmModel <- function(incData, modelType, assumeType,
         myConfig$removeSamplers('Istar') # Nodes will be expanded
         myConfig$addSampler(target = c('Istar'),
                             type = "RstarUpdate",
-                            control = list(nUpdates = 1000))
+                            control = list(nUpdates = 1500))
         
         myConfig$addMonitors('Istar')
         
