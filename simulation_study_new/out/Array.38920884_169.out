@@ -1,0 +1,15 @@
+[1] "2025-07-23 16:58:08 CDT"
+[1] "Data Gen: death, model fit: SIR_noAlarm, assumption: undetected, simulation: 41"
+Stochastic parents of data are:  probDetect beta w0 nu comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] comp_init[6] comp_init[7] comp_init[8] comp_init[9] comp_init[10] comp_init[11] comp_init[12] comp_init[13] comp_init[14] comp_init[15] comp_init[16] comp_init[17] .
+[1] "2025-07-23 19:28:38 CDT"
+[1] "Data Gen: death, model fit: SIR_noAlarm, assumption: undetected, simulation: 42"
+Stochastic parents of data are:  probDetect beta w0 nu comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] comp_init[6] comp_init[7] comp_init[8] comp_init[9] comp_init[10] comp_init[11] comp_init[12] comp_init[13] comp_init[14] comp_init[15] comp_init[16] comp_init[17] .
+[1] "2025-07-23 21:57:14 CDT"
+[1] "Data Gen: death, model fit: SIR_noAlarm, assumption: undetected, simulation: 43"
+Stochastic parents of data are:  probDetect beta w0 nu comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] comp_init[6] comp_init[7] comp_init[8] comp_init[9] comp_init[10] comp_init[11] comp_init[12] comp_init[13] comp_init[14] comp_init[15] comp_init[16] comp_init[17] .
+[1] "2025-07-24 00:28:30 CDT"
+[1] "Data Gen: death, model fit: SIR_noAlarm, assumption: undetected, simulation: 44"
+Stochastic parents of data are:  probDetect beta w0 nu comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] comp_init[6] comp_init[7] comp_init[8] comp_init[9] comp_init[10] comp_init[11] comp_init[12] comp_init[13] comp_init[14] comp_init[15] comp_init[16] comp_init[17] .
+[1] "2025-07-24 02:56:23 CDT"
+[1] "Data Gen: death, model fit: SIR_noAlarm, assumption: undetected, simulation: 45"
+Stochastic parents of data are:  probDetect beta w0 nu comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] comp_init[6] comp_init[7] comp_init[8] comp_init[9] comp_init[10] comp_init[11] comp_init[12] comp_init[13] comp_init[14] comp_init[15] comp_init[16] comp_init[17] .
