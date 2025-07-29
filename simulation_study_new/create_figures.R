@@ -42,7 +42,7 @@ for (dataType in c('inc', 'death', 'equal')) {
                         'equal' = bquote(atop(bold('Equal importance'), 
                                               alpha ==  0.5)))
     
-    plot(incData[1,], type = 'l', col = 'grey', ylim = c(0, 20000),
+    plot(incData[1,], type = 'l', col = 'grey', ylim = c(0, 3500),
          main = plotTitle, cex.lab = 1.2, cex.main = 1.5, lty = 2,
          ylab = 'Count', xlab = 'Epidemic Time')
     for (i in 1:nrow(incData)) {

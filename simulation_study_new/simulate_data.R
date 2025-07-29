@@ -31,7 +31,7 @@ phi <- 0.1     # H to D
 probDetect <- 0.25
 
 # overall alarm parameter
-k <- 0.00015
+k <- 0.00003
 
 # beta
 beta <- 1.5
@@ -77,7 +77,7 @@ nInf <- rowSums(epiSims[,grep('Istar', colnames(epiSims))])
 toSave <- epiSims[nInf > 100,][1:nSim,]
 
 plot(toSave[1,grep('^Istar', colnames(toSave))], type = 'l', col = 'black', 
-     ylim = c(0, 5000), main = 'inc')
+     ylim = c(0, 2000), main = 'inc')
 for (i in 2:nrow(toSave)) {
     lines(toSave[i,grep('^Istar', colnames(toSave))], col = 'black')
     lines(toSave[i,grep('detectIstar', colnames(toSave))], col = 'grey')
@@ -117,7 +117,7 @@ nInf <- rowSums(epiSims[,grep('Istar', colnames(epiSims))])
 toSave <- epiSims[nInf > 100,][1:nSim,]
 
 plot(toSave[1,grep('^Istar', colnames(toSave))], type = 'l', col = 'black', 
-     ylim = c(0, 5000), main = 'deaths')
+     ylim = c(0, 4000), main = 'deaths')
 for (i in 2:nrow(toSave)) {
     lines(toSave[i,grep('^Istar', colnames(toSave))], col = 'black')
     lines(toSave[i,grep('detectIstar', colnames(toSave))], col = 'grey')
@@ -157,7 +157,7 @@ nInf <- rowSums(epiSims[,grep('Istar', colnames(epiSims))])
 toSave <- epiSims[nInf > 100,][1:nSim,]
 
 plot(toSave[1,grep('^Istar', colnames(toSave))], type = 'l', col = 'black', 
-     ylim = c(0, 5000), main = 'equal')
+     ylim = c(0, 2000), main = 'equal')
 for (i in 2:nrow(toSave)) {
     lines(toSave[i,grep('^Istar', colnames(toSave))], col = 'black')
     lines(toSave[i,grep('detectIstar', colnames(toSave))], col = 'grey')
