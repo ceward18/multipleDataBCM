@@ -12,3 +12,4 @@ Stochastic parents of data are:  probDetect beta gamma1 gamma2 lambda phi k alph
 Stochastic parents of data are:  probDetect beta gamma1 gamma2 lambda phi k alpha comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
 [1] "2025-07-30 08:08:16 CDT"
 [1] "Data Gen: inc, model fit: SIHRD_full, assumption: undetected, simulation: 40"
+Stochastic parents of data are:  probDetect beta gamma1 gamma2 lambda phi k alpha comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
