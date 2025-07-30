@@ -1,0 +1,15 @@
+[1] "2025-07-29 19:16:29 CDT"
+[1] "Data Gen: inc, model fit: SIHRD_full, assumption: casesOnly, simulation: 1"
+Stochastic parents of data are:  beta gamma1 gamma2 lambda phi k alpha comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
+[1] "2025-07-29 20:33:48 CDT"
+[1] "Data Gen: inc, model fit: SIHRD_full, assumption: casesOnly, simulation: 2"
+Stochastic parents of data are:  beta gamma1 gamma2 lambda phi k alpha comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
+[1] "2025-07-29 21:52:35 CDT"
+[1] "Data Gen: inc, model fit: SIHRD_full, assumption: casesOnly, simulation: 3"
+Stochastic parents of data are:  beta gamma1 gamma2 lambda phi k alpha comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
+[1] "2025-07-29 23:08:56 CDT"
+[1] "Data Gen: inc, model fit: SIHRD_full, assumption: casesOnly, simulation: 4"
+Stochastic parents of data are:  beta gamma1 gamma2 lambda phi k alpha comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
+[1] "2025-07-30 00:27:03 CDT"
+[1] "Data Gen: inc, model fit: SIHRD_full, assumption: casesOnly, simulation: 5"
+Stochastic parents of data are:  beta gamma1 gamma2 lambda phi k alpha comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
