@@ -38,6 +38,17 @@ allModels <- allModels[order(allModels$city,
                              allModels$timePeriod),]
 rownames(allModels) <- NULL
 
+
+# prior for probDetect depends on wave 
+#   (https://covid19.healthdata.org/united-states-of-america/florida?view=cumulative-deaths&tab=trend)
+# wave 1: March - April 2020          12% detection (on 3/15  estimate 3192, reported 35)
+#                                                   (on 4/1  estimate 4600, reported 1090)
+# wave 2: June - July 2020  26% detection  (on 6/1  estimate 5180, reported 938)
+#                                          (on 7/1  estimate 23406, reported 8141)
+
+allModels$probDetectMean <- ifelse(allModels$peak == 1, 0.12, 0.26)
+
+
 tmp <- allModels[seq(1,nrow(allModels), 3),]
 
 batchSize <- 3
@@ -50,6 +61,7 @@ for (i in batchIdx) {
     modelType_i <- allModels$modelType[i]
     peak_i <- allModels$peak[i]
     timePeriod_i <- allModels$timePeriod[i]
+    probDetectMean_i <- allModels$probDetectMean[i]
     
     print(paste0('Running: ', city_i, 
                  ', model: ', modelType_i, 
@@ -102,11 +114,10 @@ for (i in batchIdx) {
     
     # currently infectious if infected in the past 7 days
     I0 <- sum(dat$dailyCases[inWindowI])
+    #  inflate based on reporting
+    I0 <- round(I0 / probDetectMean_i)
     
     if (peak_i == 1) {
-        #  add a few more to I0
-        I0 <- I0 + H0 + 10
-        
         # peak 1 = no previous infectious
         R0 <- D0
     } else {
@@ -130,7 +141,8 @@ for (i in batchIdx) {
     
     # run three chains in parallel
     cl <- makeCluster(3)
-    clusterExport(cl, list('incData', 'city_i', 'modelType_i', 'peak_i',
+    clusterExport(cl, list('incData', 'city_i', 'modelType_i',
+                           'peak_i', 'probDetectMean_i',
                            'smoothC', 'smoothD', 
                            'deathData', 'hospData',
                            'N', 'S0', 'I0', 'H0', 'D0', 'R0'))
@@ -188,6 +200,7 @@ for (i in batchIdx) {
         paramsPost <- cbind.data.frame(postSummaries$postParams, modelInfo)
         alarmTimePost <- cbind.data.frame(postSummaries$postAlarmTime, modelInfo)
         R0Post <- cbind.data.frame(postSummaries$postR0, modelInfo)
+        IstarPost <- cbind.data.frame(postSummaries$postIstar, modelInfo)
         waicPost <- cbind.data.frame(postSummaries$waic, modelInfo)
         predFitPost <- cbind.data.frame(postSummaries$postPredictFit, modelInfo)
         
@@ -200,6 +213,8 @@ for (i in batchIdx) {
                                           cbind.data.frame(postSummaries$postAlarmTime, modelInfo))
         R0Post <- rbind.data.frame(R0Post, 
                                    cbind.data.frame(postSummaries$postR0, modelInfo))
+        IstarPost <- rbind.data.frame(IstarPost, 
+                                      cbind.data.frame(postSummaries$postIstar, modelInfo))
         waicPost <- rbind.data.frame(waicPost, 
                                      cbind.data.frame(postSummaries$waic, modelInfo))
         predFitPost <- rbind.data.frame(predFitPost, 
@@ -215,5 +230,6 @@ saveRDS(gr, paste0('./output/gr_Batch', idxPrint, '.rds'))
 saveRDS(paramsPost, paste0('./output/paramsPost_Batch', idxPrint, '.rds'))
 saveRDS(alarmTimePost, paste0('./output/alarmTimePost_Batch', idxPrint, '.rds'))
 saveRDS(R0Post, paste0('./output/R0Post_Batch', idxPrint, '.rds'))
+saveRDS(IstarPost, paste0('./output/IstarPost_Batch', idxPrint, '.rds'))
 saveRDS(waicPost, paste0('./output/waicPost_Batch', idxPrint, '.rds'))
 saveRDS(predFitPost, paste0('./output/predFitPostBatch', idxPrint, '.rds'))

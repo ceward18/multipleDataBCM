@@ -17,21 +17,21 @@ source('./scripts/get_WAIC.R')
 source('./scripts/post_pred_fit.R')
 source('./scripts/post_pred_forecast.R')
 
-summarizePost <- function(resThree, incData, modelType, peak,
+summarizePost <- function(resThree, incData, modelType, peak, probDetectMean,
                           smoothC, smoothD, hospData, deathData,
                           N, S0, I0, H0, D0, R0, Istar0, Dstar0) {
     
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
-        paramSamples1 <- resThree[[1]][,-grep('alarm|R0|Rstar|
+        paramSamples1 <- resThree[[1]][,-grep('alarm|R0|Rstar|Istar|
                                               |comp_init\\[3\\]|comp_init\\[4\\]|comp_init\\[5\\]', colnames(resThree[[1]]))]
-        paramSamples2 <- resThree[[2]][,-grep('alarm|R0|Rstar|
+        paramSamples2 <- resThree[[2]][,-grep('alarm|R0|Rstar|Istar|
                                               |comp_init\\[3\\]|comp_init\\[4\\]|comp_init\\[5\\]', colnames(resThree[[2]]))]
-        paramSamples3 <- resThree[[3]][,-grep('alarm|R0|Rstar|
+        paramSamples3 <- resThree[[3]][,-grep('alarm|R0|Rstar|Istar|
                                               |comp_init\\[3\\]|comp_init\\[4\\]|comp_init\\[5\\]', colnames(resThree[[3]]))]
     } else if (modelType %in% c('SIR_full', 'SIR_inc', 'SIR_noAlarm')) {
-        paramSamples1 <- resThree[[1]][,-grep('alarm|R0|comp_init\\[16\\]', colnames(resThree[[1]]))]
-        paramSamples2 <- resThree[[2]][,-grep('alarm|R0|comp_init\\[16\\]', colnames(resThree[[2]]))]
-        paramSamples3 <- resThree[[3]][,-grep('alarm|R0|comp_init\\[16\\]', colnames(resThree[[3]]))]
+        paramSamples1 <- resThree[[1]][,-grep('alarm|R0|Istar|comp_init\\[16\\]', colnames(resThree[[1]]))]
+        paramSamples2 <- resThree[[2]][,-grep('alarm|R0|Istar|comp_init\\[16\\]', colnames(resThree[[2]]))]
+        paramSamples3 <- resThree[[3]][,-grep('alarm|R0|Istar|comp_init\\[16\\]', colnames(resThree[[3]]))]
     }
     
     ##############################################################################
@@ -106,6 +106,24 @@ summarizePost <- function(resThree, incData, modelType, peak,
                          lower = postCI[1,],
                          upper = postCI[2,])
     
+    ##############################################################################
+    ### posterior distribution of Istar for undetectedd
+    
+    IstarSamples1 <- resThree[[1]][,grep('Istar', colnames(resThree[[1]]))]
+    IstarSamples2 <- resThree[[2]][,grep('Istar', colnames(resThree[[2]]))]
+    IstarSamples3 <- resThree[[3]][,grep('Istar', colnames(resThree[[3]]))]
+    IstarSamples <- rbind(IstarSamples1, IstarSamples2, IstarSamples3)
+    
+    postMeans <- colMeans(IstarSamples)
+    postCI <- apply(IstarSamples, 2, quantile, probs = c(0.025, 0.975))
+    
+    postIstar <- data.frame(time = 1:tau,
+                            truth = trueInc,
+                            mean = postMeans,
+                            lower = postCI[1,],
+                            upper = postCI[2,])
+    
+    rownames(postIstar) <- NULL
     
     ##############################################################################
     ### WAIC values
@@ -115,6 +133,7 @@ summarizePost <- function(resThree, incData, modelType, peak,
     samples <- rbind(resThree[[1]], resThree[[2]], resThree[[3]])
     
     waic <- getWAIC(samples = samples, modelType = modelType, peak = peak,
+                    probDetectMean = probDetectMean,
                     smoothC = smoothC, smoothD = smoothD,
                     hospData = hospData, deathData = deathData,
                     N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0)
@@ -173,6 +192,7 @@ summarizePost <- function(resThree, incData, modelType, peak,
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')) {
         postPred <- postPredForecast(incData = incData, 
                                      modelType = modelType, peak = peak,
+                                     probDetectMean = probDetectMean,
                                      smoothC = smoothC, smoothD = smoothD, 
                                      hospData = hospData, deathData = deathData, 
                                      paramsSamples = samples,
@@ -220,6 +240,7 @@ summarizePost <- function(resThree, incData, modelType, peak,
          postParams = postParams,
          postAlarmTime = postAlarmTime,
          postR0 = postR0,
+         postIstar = postIstar,
          waic = waic,
          postPredictFit = postPredictFit,
          postPredictForecast = postPredictForecast)

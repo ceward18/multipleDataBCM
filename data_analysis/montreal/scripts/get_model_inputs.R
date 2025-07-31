@@ -6,7 +6,7 @@
 ################################################################################
 
 
-getModelInput <- function(incData, modelType, peak,
+getModelInput <- function(incData, modelType, peak, probDetectMean,
                           smoothC, smoothD,
                           hospData, deathData,
                           N, S0, I0, H0, D0, R0) {
@@ -28,15 +28,22 @@ getModelInput <- function(incData, modelType, peak,
         comp_init <- rmulti(1, N, initProb)
         
     }
+    
+    a <- probDetectMean * 1e4
+    b <- (1 - probDetectMean) * 1e4
+    # initial value but this will be estimated
+    Istar <- round(incData / probDetectMean)
   
     ### constants
     constantsList <- list(tau = tau,
                           N = N,
                           initProb = initProb,
-                          maxInf = maxInf)
+                          maxInf = maxInf,
+                          a = a, 
+                          b = b)
     
     ### data
-    dataList <- list(Istar = incData,
+    dataList <- list(detectIstar = incData,
                      smoothC = smoothC,
                      smoothD = smoothD)
     
@@ -45,10 +52,10 @@ getModelInput <- function(incData, modelType, peak,
     # ~2% infected go to hospital, so use 90% to be conservative
     if (peak == 1) {
         RstarI <- round(0.9 * c(rep(0, maxInf),
-                          dataList$Istar[1:(tau-maxInf)]))
+                          Istar[1:(tau-maxInf)]))
     } else{
         RstarI <- round(0.9 * c(rmulti(1, I0, rep(I0/maxInf, maxInf)),
-                          dataList$Istar[1:(tau-maxInf)]))
+                          Istar[1:(tau-maxInf)]))
     }
     
     
@@ -70,15 +77,17 @@ getModelInput <- function(incData, modelType, peak,
             
             ### inits 
             initsList <- list(comp_init = comp_init,
+                              probDetect = rbeta(1, constantsList$a, constantsList$b),
                               beta = runif(1, 0.01, 0.5),
                               gamma1 = rgamma(1, 1429, 10000),  # IR
                               gamma2 = rgamma(1, 6700, 100000), # HR
                               lambda = rgamma(1, 2000, 100000), # IH
                               phi = rgamma(1, 6700, 100000),    # HD
-                              k = runif(1, 0.0001, 0.01),
+                              k = runif(1, 0.00001, 0.001),
                               alpha = rbeta(1, 1, 1),
                               RstarI = RstarI,
-                              RstarH = RstarH)
+                              RstarH = RstarH,
+                              Istar = Istar)
             
             probIH <- 1 - exp(-initsList$lambda)
             probIR <- 1 - exp(-initsList$gamma1)
@@ -106,14 +115,16 @@ getModelInput <- function(incData, modelType, peak,
             
             ### inits 
             initsList <- list(comp_init = comp_init,
+                              probDetect = rbeta(1, constantsList$a, constantsList$b),
                               beta = runif(1, 0.01, 0.5),
                               gamma1 = rgamma(1, 1429, 10000),  # IR
                               gamma2 = rgamma(1, 6700, 100000), # HR
                               lambda = rgamma(1, 2000, 100000), # IH
                               phi = rgamma(1, 6700, 100000),    # HD
-                              k = runif(1, 0.0001, 0.01),
+                              k = runif(1, 0.00001, 0.001),
                               RstarI = RstarI,
-                              RstarH = RstarH)
+                              RstarH = RstarH,
+                              Istar = Istar)
             
             probIH <- 1 - exp(-initsList$lambda)
             probIR <- 1 - exp(-initsList$gamma1)
@@ -135,11 +146,13 @@ getModelInput <- function(incData, modelType, peak,
         
         ### inits 
         initsList <- list(comp_init = comp_init,
+                          probDetect = rbeta(1, constantsList$a, constantsList$b),
                           beta = runif(1, 0.01, 0.5),
-                          k = runif(1, 0.0001, 0.01),
+                          k = runif(1, 0.00001, 0.001),
                           alpha = rbeta(1, 1, 1),
                           w0 = runif(1, 6.8, 7.2),
-                          nu = rgamma(1, 1000, 1000))
+                          nu = rgamma(1, 1000, 1000),
+                          Istar = Istar)
         
         # end modeltype == 'SIR_full'
         
@@ -150,11 +163,13 @@ getModelInput <- function(incData, modelType, peak,
         
         ### inits 
         initsList <- list(comp_init = comp_init,
+                          probDetect = rbeta(1, constantsList$a, constantsList$b),
                           beta = runif(1, 0.01, 0.5),
-                          k = runif(1, 0.0001, 0.01),
+                          k = runif(1, 0.00001, 0.001),
                           alpha = rbeta(1, 1, 1),
                           w0 = runif(1, 6.8, 7.2),
-                          nu = rgamma(1, 1000, 1000))
+                          nu = rgamma(1, 1000, 1000),
+                          Istar = Istar)
         
         # end modeltype == 'SIR_inc'
         
@@ -170,13 +185,15 @@ getModelInput <- function(incData, modelType, peak,
             
             ### inits 
             initsList <- list(comp_init = comp_init,
+                              probDetect = rbeta(1, constantsList$a, constantsList$b),
                               beta = runif(1, 0.01, 0.5),
                               gamma1 = rgamma(1, 1429, 10000),  # IR
                               gamma2 = rgamma(1, 6700, 100000), # HR
                               lambda = rgamma(1, 2000, 100000), # IH
                               phi = rgamma(1, 6700, 100000),    # HD
                               RstarI = RstarI,
-                              RstarH = RstarH)
+                              RstarH = RstarH,
+                              Istar = Istar)
             
             probIH <- 1 - exp(-initsList$lambda)
             probIR <- 1 - exp(-initsList$gamma1)
@@ -197,9 +214,11 @@ getModelInput <- function(incData, modelType, peak,
         
         ### inits 
         initsList <- list(comp_init = comp_init,
+                          probDetect = rbeta(1, constantsList$a, constantsList$b),
                           beta = runif(1, 0.01, 0.5),
                           w0 = runif(1, 6.8, 7.2),
-                          nu = rgamma(1, 1000, 1000))
+                          nu = rgamma(1, 1000, 1000),
+                          Istar = Istar)
         
         # end modeltype == 'SIR_noAlarm'
         

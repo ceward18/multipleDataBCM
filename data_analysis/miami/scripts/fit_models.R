@@ -2,7 +2,7 @@
 # function to fit models 
 ################################################################################
 
-fitAlarmModel <- function(incData, city, modelType, peak,
+fitAlarmModel <- function(incData, city, modelType, peak, probDetectMean,
                           smoothC, smoothD, hospData, deathData, 
                           N, S0, I0, H0, D0, R0, seed) {
     
@@ -22,7 +22,7 @@ fitAlarmModel <- function(incData, city, modelType, peak,
     set.seed(seed)
     
     # model-specific constants, data, and inits
-    modelInputs <- getModelInput(incData, modelType, peak,
+    modelInputs <- getModelInput(incData, modelType, peak, probDetectMean,
                                  smoothC, smoothD,
                                  hospData, deathData,
                                  N, S0, I0, H0, D0, R0)
@@ -102,6 +102,13 @@ fitAlarmModel <- function(incData, city, modelType, peak,
     if (!grepl('noAlarm', modelType)) {
         myConfig$addMonitors('alarm')
     } 
+    
+    # data augmentation for undetected infections
+    myConfig$removeSamplers('Istar') # Nodes will be expanded
+    myConfig$addSampler(target = c('Istar'),
+                        type = "RstarUpdate",
+                        control = list(nUpdates = 1500))
+    myConfig$addMonitors('Istar')
     
     print(myConfig)
     

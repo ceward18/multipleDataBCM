@@ -190,6 +190,7 @@ SIHRD_full <-  nimbleCode({
         # SIHRD model
         # S -> I
         Istar[t] ~ dbin(probSI[t], S[t])
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         # I -> H or R using sequential binomial
         Hstar[t] ~ dbin(probIH, I[t])
         RstarI[t] ~ dbin(probIR / (1 - probIH), I[t] - Hstar[t])
@@ -213,13 +214,16 @@ SIHRD_full <-  nimbleCode({
     
     ### Priors
     
+    # detection probability (varies by wave)
+    probDetect ~ dbeta(a, b)
+    
     # transmission
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
     gamma1 ~ dgamma(1429, 10000)    # IR 
     gamma2 ~ dgamma(6700, 100000)   # HR 
-    lambda ~ dgamma(20, 1000)   # IH 
+    lambda ~ dgamma(200, 10000)   # IH 
     phi ~ dgamma(50, 1000)      # HD
     
     # alarm functions
@@ -259,6 +263,7 @@ SIHRD_full_sim <-  nimbleCode({
     # SIHRD model
     # S -> I
     Istar[1] ~ dbin(probSI[1], S[1])
+    detectIstar[1] ~ dbin(probDetect, Istar[1]) # e.g. 25% of cases are detected
     # I -> H or R using sequential binomial
     Hstar[1] ~ dbin(probIH, I[1])
     RstarI[1] ~ dbin(probIR / (1 - probIH), I[1] - Hstar[1])
@@ -278,7 +283,7 @@ SIHRD_full_sim <-  nimbleCode({
     for(t in 2:tau) {
         
         # compute moving average up to t-1
-        smoothC[t] <- get_smooth(Istar[1:(t-1)], t, Istar0[1:Istar0Length], Istar0Length, bw)
+        smoothC[t] <- get_smooth(detectIstar[1:(t-1)], t, Istar0[1:Istar0Length], Istar0Length, bw)
         smoothD[t] <- get_smooth(Dstar[1:(t-1)], t, Dstar0[1:Dstar0Length], Dstar0Length, bw)
         
         # weighted sum of each component
@@ -291,6 +296,7 @@ SIHRD_full_sim <-  nimbleCode({
         # SIHRD model
         # S -> I
         Istar[t] ~ dbin(probSI[t], S[t])
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         # I -> H or R using sequential binomial
         Hstar[t] ~ dbin(probIH, I[t])
         RstarI[t] ~ dbin(probIR / (1 - probIH), I[t] - Hstar[t])
@@ -308,6 +314,8 @@ SIHRD_full_sim <-  nimbleCode({
     }
     
     ### Priors
+    # detection probability (varies by wave)
+    probDetect ~ dbeta(a, b)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -315,7 +323,7 @@ SIHRD_full_sim <-  nimbleCode({
     # transitions
     gamma1 ~ dgamma(1429, 10000)    # IR 
     gamma2 ~ dgamma(6700, 100000)   # HR 
-    lambda ~ dgamma(20, 1000)   # IH 
+    lambda ~ dgamma(200, 10000)   # IH 
     phi ~ dgamma(50, 1000)      # HD
     
     # alarm functions
@@ -354,6 +362,7 @@ SIHRD_inc <-  nimbleCode({
         # SIHRD model
         # S -> I
         Istar[t] ~ dbin(probSI[t], S[t])
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         # I -> H or R using sequential binomial
         Hstar[t] ~ dbin(probIH, I[t])
         RstarI[t] ~ dbin(probIR / (1 - probIH), I[t] - Hstar[t])
@@ -377,13 +386,16 @@ SIHRD_inc <-  nimbleCode({
     
     ### Priors
     
+    # detection probability (varies by wave)
+    probDetect ~ dbeta(a, b)
+    
     # transmission
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
     gamma1 ~ dgamma(1429, 10000)    # IR 
     gamma2 ~ dgamma(6700, 100000)   # HR 
-    lambda ~ dgamma(20, 1000)   # IH 
+    lambda ~ dgamma(200, 10000)   # IH 
     phi ~ dgamma(50, 1000)      # HD
     
     # alarm functions
@@ -419,6 +431,7 @@ SIHRD_inc_sim <-  nimbleCode({
     # SIHRD model
     # S -> I
     Istar[1] ~ dbin(probSI[1], S[1])
+    detectIstar[1] ~ dbin(probDetect, Istar[1]) # e.g. 25% of cases are detected
     # I -> H or R using sequential binomial
     Hstar[1] ~ dbin(probIH, I[1])
     RstarI[1] ~ dbin(probIR / (1 - probIH), I[1] - Hstar[1])
@@ -438,7 +451,7 @@ SIHRD_inc_sim <-  nimbleCode({
     for(t in 2:tau) {
         
         # compute moving average up to t-1
-        smoothC[t] <- get_smooth(Istar[1:(t-1)], t, Istar0[1:Istar0Length], Istar0Length, bw)
+        smoothC[t] <- get_smooth(detectIstar[1:(t-1)], t, Istar0[1:Istar0Length], Istar0Length, bw)
         
         # weighted sum of each component
         alarm[t] <- powerAlarm(smoothC[t], N, k)
@@ -448,6 +461,7 @@ SIHRD_inc_sim <-  nimbleCode({
         # SIHRD model
         # S -> I
         Istar[t] ~ dbin(probSI[t], S[t])
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         # I -> H or R using sequential binomial
         Hstar[t] ~ dbin(probIH, I[t])
         RstarI[t] ~ dbin(probIR / (1 - probIH), I[t] - Hstar[t])
@@ -470,14 +484,17 @@ SIHRD_inc_sim <-  nimbleCode({
                                         S = S[1:tau], maxInf = maxInf)
     
     ### Priors
-
+    
+    # detection probability (varies by wave)
+    probDetect ~ dbeta(a, b)
+    
     # transmission
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
     gamma1 ~ dgamma(1429, 10000)    # IR 
     gamma2 ~ dgamma(6700, 100000)   # HR 
-    lambda ~ dgamma(20, 1000)   # IH 
+    lambda ~ dgamma(200, 10000)   # IH 
     phi ~ dgamma(50, 1000)      # HD
     
     # alarm functions
@@ -512,6 +529,7 @@ SIR_full <-  nimbleCode({
         
         # SIR model
         Istar[t] ~ dbin(probSI[t], S[t])
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         
         # update S and I
         S[t + 1] <- S[t] - Istar[t]
@@ -527,7 +545,10 @@ SIR_full <-  nimbleCode({
     
     
     ### Priors
-
+    
+    # detection probability (varies by wave)
+    probDetect ~ dbeta(a, b)
+    
     # transmission
     beta ~ dgamma(0.1, 0.1)
     
@@ -542,6 +563,8 @@ SIR_full <-  nimbleCode({
     
     
 })
+
+# no sim for SIR full since deaths aren't generated
 
 ################################################################################
 
@@ -568,6 +591,7 @@ SIR_inc <-  nimbleCode({
         
         # SIR model
         Istar[t] ~ dbin(probSI[t], S[t])
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         
         # update S and I
         S[t + 1] <- S[t] - Istar[t]
@@ -582,6 +606,9 @@ SIR_inc <-  nimbleCode({
                                  iddCurve = idd_curve[1:maxInf])
     
     ### Priors
+    
+    # detection probability (varies by wave)
+    probDetect ~ dbeta(a, b)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -618,6 +645,7 @@ SIR_inc_sim <-  nimbleCode({
     
     # SIR model
     Istar[1] ~ dbin(probSI[1], S[1])
+    detectIstar[1] ~ dbin(probDetect, Istar[1]) # e.g. 25% of cases are detected
     
     # update S and I
     S[2] <- S[1] - Istar[1]
@@ -628,7 +656,7 @@ SIR_inc_sim <-  nimbleCode({
     for(t in 2:tau) {
         
         # compute moving average up to t-1
-        smoothC[t] <- get_smooth(Istar[1:(t-1)], t, 
+        smoothC[t] <- get_smooth(detectIstar[1:(t-1)], t, 
                                  Istar0[1:Istar0Length], Istar0Length, bw)
         
         # alarm is function of incidence only
@@ -639,6 +667,7 @@ SIR_inc_sim <-  nimbleCode({
         
         # SIR model
         Istar[t] ~ dbin(probSI[t], S[t])
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         
         # update S and I
         S[t + 1] <- S[t] - Istar[t]
@@ -648,6 +677,9 @@ SIR_inc_sim <-  nimbleCode({
     }
     
     ### Priors
+    
+    # detection probability (varies by wave)
+    probDetect ~ dbeta(a, b)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -682,6 +714,7 @@ SIR_noAlarm <-  nimbleCode({
         
         # SIR model
         Istar[t] ~ dbin(probSI[t], S[t])
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         
         # update S and I
         S[t + 1] <- S[t] - Istar[t]
@@ -698,6 +731,9 @@ SIR_noAlarm <-  nimbleCode({
                                  iddCurve = idd_curve[1:maxInf])
     
     ### Priors
+    
+    # detection probability (varies by wave)
+    probDetect ~ dbeta(a, b)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -736,6 +772,7 @@ SIHRD_noAlarm <-  nimbleCode({
         # SIHRD model
         # S -> I
         Istar[t] ~ dbin(probSI[t], S[t])
+        detectIstar[t] ~ dbin(probDetect, Istar[t]) # e.g. 25% of cases are detected
         # I -> H or R using sequential binomial
         Hstar[t] ~ dbin(probIH, I[t])
         RstarI[t] ~ dbin(probIR / (1 - probIH), I[t] - Hstar[t])
@@ -761,13 +798,16 @@ SIHRD_noAlarm <-  nimbleCode({
     
     ### Priors
     
+    # detection probability (varies by wave)
+    probDetect ~ dbeta(a, b)
+    
     # transmission
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
     gamma1 ~ dgamma(1429, 10000)    # IR 
     gamma2 ~ dgamma(6700, 100000)   # HR
-    lambda ~ dgamma(20, 1000)   # IH 
+    lambda ~ dgamma(200, 10000)   # IH 
     phi ~ dgamma(50, 1000)      # HD
     
 })
@@ -783,7 +823,7 @@ RstarUpdate <- nimbleFunction(
         # percent <- if(!is.null(control$percent)) control$percent else 0.05   
         
         # number of update attempts
-        nUpdates <- 200
+        nUpdates <- 300
     },                                                                  # setup can't return anything
     run = function() {
         currentValue <- model[[target]]                                   
@@ -869,4 +909,108 @@ RstarUpdate <- nimbleFunction(
 
 assign('RstarUpdate', RstarUpdate, envir = .GlobalEnv)
 
+################################################################################
+### Special proposal function for missing hospitalization times
+
+HstarUpdate <- nimbleFunction(
+    name = 'Hstar',                              
+    contains = sampler_BASE,                     
+    setup = function(model, mvSaved, target, control) {                 # REQUIRED setup arguments
+        calcNodes <- model$getDependencies(target) 
+        # percent <- if(!is.null(control$percent)) control$percent else 0.05   
+        
+        # observed part of vector is passed as control argument
+        fixedIndices <- control$fixed
+        
+        # number of update attempts
+        nUpdates <- 20
+    },                                                                  # setup can't return anything
+    run = function() {
+        currentValue <- model[[target]]                                   
+        currentLogProb <- model$getLogProb(calcNodes) 
+        
+        nTimePoints <- length(fixedIndices)
+        
+        # repeat proposal many times 
+        for (it in 1:nUpdates) {
+            
+            updatePart <- currentValue[fixedIndices]
+            updatePartProposal <- updatePart
+            
+            # three possible moves:
+            moveType <- ceiling(runif(1, 0, 3))
+            
+            if (moveType == 1) {
+                # add a removal time
+                addIdx <- runif(1, 1, nTimePoints + 1)
+                updatePart[addIdx] <- updatePart[addIdx] + 1
+                
+                # g(old|new) - g(new|old)
+                # subtract from new - add to old
+                possibleSubtract <- which(updatePart > 0)
+                g <- -log(length(possibleSubtract)) + log(nTimePoints)
+                
+                
+            } else if (moveType == 2) {
+                # move a removal time
+                possibleSubtract <- which(updatePart > 0)
+                subtractIdx <- possibleSubtract[runif(1, 1, length(possibleSubtract) + 1)]
+                addIdx <- runif(1, 1, nTimePoints + 1)
+                
+                updatePartProposal[subtractIdx] <- updatePartProposal[subtractIdx] - 1
+                updatePartProposal[addIdx] <- updatePartProposal[addIdx] + 1
+                
+                # g(old|new) - g(new|old)
+                # possibly have different number of values to subtract from 
+                newPossibleSubtract <- which(updatePartProposal > 0)
+                g <- -log(length(newPossibleSubtract)) +log(length(possibleSubtract))
+                
+            } else if (moveType == 3) {
+                # subtract a removal time
+                possibleSubtract <- which(updatePart > 0)
+                subtractIdx <- possibleSubtract[runif(1, 1, length(possibleSubtract) + 1)]
+                updatePartProposal[subtractIdx] <- updatePartProposal[subtractIdx] - 1
+                
+                # g(old|new) - g(new|old)
+                # add to new - subtract from old
+                g <- -log(nTimePoints) + log(length(possibleSubtract)) 
+                
+            }
+            
+            # put proposal value in model
+            proposalValue <- currentValue
+            proposalValue[fixedIndices] <- updatePartProposal
+            
+            model[[target]] <<- proposalValue                               
+            proposalLogProb <- model$calculate(calcNodes)                     
+            logAcceptanceRatio <- proposalLogProb - currentLogProb + g      
+            
+            
+            accept <- decide(logAcceptanceRatio)                              
+            
+            if (accept) {
+                # no changes to model object needed
+                currentLogProb <- proposalLogProb
+                currentValue <- proposalValue
+                
+            } else {
+                # reject proposal and revert model to current state
+                model[[target]] <<- currentValue
+                
+                # current full conditional (calculate overwrites the stored value)
+                currentLogProb <- model$calculate(calcNodes) 
+            }
+            
+        } # end loop
+        
+        # synchronize model -> mvSaved after nUpdates
+        copy(from = model, to = mvSaved, row = 1, nodes = calcNodes, logProb = TRUE)
+        
+    },
+    methods = list(                              # required method for sampler_BASE base class
+        reset = function() {}
+    )
+)
+
+assign('HstarUpdate', HstarUpdate, envir = .GlobalEnv)
 

@@ -25,7 +25,7 @@ layoutMatrix <- matrix(c(1,2,3,4,4,4), byrow = T, nrow = 2)
 layout(layoutMatrix, heights = c(0.8, 0.2))
 
 par(mar = c(5.1, 4.1, 4.1, 2.1))
-for (dataType in c('inc', 'death', 'equal')) {
+for (dataType in c('inc', 'equal', 'death')) {
     simData <- readRDS(paste0('./data/sim_', dataType, '.rds'))
     
     # gather incidence, hospitalizations, and deaths
@@ -69,7 +69,7 @@ grAll <- readRDS('./results/grAll.rds')
 grAll <- grAll[-grep('comp_init', grAll$param),]
 
 # which didn't converge
-notConverge <- grAll[which(round(grAll$gr, 1) > 2),  ]
+notConverge <- grAll[which(round(grAll$gr, 1) > 1.1),  ]
 notConvergeModels <-  notConverge[
     !duplicated(notConverge[,-which(colnames(notConverge) 
                                     %in% c('gr', 'grUpper', 'param'))]),
@@ -103,10 +103,10 @@ R0PostAll <- merge(R0PostAll, notConvergeModels,
 R0PostAll <- subset(R0PostAll, is.na(noConverge))
 
 R0PostAll$dataType <- factor(R0PostAll$dataType,
-                             levels = c('inc', 'death', 'equal'),
+                             levels = c('inc',  'equal', 'death'),
                              labels = c('High case importance',
-                                        'High deaths importance',
-                                        'Equal importance'))
+                                        'Equal importance',
+                                        'High deaths importance'))
 
 R0PostAll$compartmentType <- ifelse(grepl('SIR', R0PostAll$modelType),
                                         'SIR', 'SIHRD')
@@ -194,10 +194,10 @@ postPredFitSimFinal <- merge(postPredFitAll, trueEpidemic,
 
 
 postPredFitSimFinal$dataType <- factor(postPredFitSimFinal$dataType,
-                                       levels = c('inc', 'death', 'equal'),
+                                       levels = c('inc', 'equal', 'death'),
                                        labels = c('Cases importance',
-                                                  'Deaths importance',
-                                                  'Equal importance'))
+                                                  'Equal importance',
+                                                  'Deaths importance'))
 
 postPredFitSimFinal$marg <- factor(postPredFitSimFinal$marg, 
                                    levels = c('inc', 'cases', 'hosp', 'death'),
@@ -220,7 +220,7 @@ postPredFitSimFinal <- postPredFitSimFinal[postPredFitSimFinal$marg != 'True Inc
 
 
 pdf('./figures/fig4_postPred.pdf', height = 5, width = 8.5)
-ggplot(subset(postPredFitSimFinal, simNumber == sim_idx &  assumeType == 'casesOnly'), 
+ggplot(subset(postPredFitSimFinal, simNumber == sim_idx &  assumeType == 'undetected'), 
        aes(x = time, ymin = lower, ymax = upper, fill = marg)) + 
     geom_line(linewidth = 0.5, aes(y = truth, col = marg)) +
     geom_line(aes(y = mean, col = marg), linetype = 2, linewidth = 0.5) + 
@@ -284,10 +284,10 @@ paramsPostAll <- paramsPostAll[order(paramsPostAll$dataType,
                                      paramsPostAll$param),]
 
 paramsPostAll$dataType <- factor(paramsPostAll$dataType,
-                                 levels = c('inc', 'death', 'equal'),
+                                 levels = c('inc', 'equal', 'death'),
                                  labels = c('High case importance',
-                                            'High deaths importance',
-                                            'Equal importance'))
+                                            'Equal importance',
+                                            'High deaths importance'))
 
 paramsPostAll$param <- factor(paramsPostAll$param,
                               levels = c('alpha', 'k',
@@ -306,7 +306,7 @@ paramsPostAll$modelType <- factor(paramsPostAll$modelType,
 
 pdf('./figures/fig5_alphaPost.pdf', height = 5, width = 9)
 ggplot(data = subset(paramsPostAll, 
-                     param %in% 'alpha' & assumeType == 'casesOnly'),  
+                     param %in% 'alpha' & assumeType == 'undetected'),  
        aes(x = simNumber, y = mean, ymin=lower, ymax=upper)) +
     geom_point(size = 0.8, position = position_dodge(width = 0.9), alpha = 0.8) + 
     geom_errorbar(width=0, position = position_dodge(width = 0.9), alpha = 0.8,
@@ -356,13 +356,13 @@ alarmPostAll <- merge(alarmPostAll, notConvergeModels,
                    by = c('dataType', 'modelType', 'assumeType', 'simNumber'),
                    all.x = T)
 
-# alarmPostAll <- subset(alarmPostAll, is.na(noConverge))
+alarmPostAll <- subset(alarmPostAll, is.na(noConverge))
 
 alarmPostAll$dataType <- factor(alarmPostAll$dataType,
-                             levels = c('inc', 'death', 'equal'),
+                             levels = c('inc', 'equal', 'death'),
                              labels = c('High case importance',
-                                        'High deaths importance',
-                                        'Equal importance'))
+                                        'Equal importance',
+                                        'High deaths importance'))
 
 alarmPostAll$compartmentType <- ifelse(grepl('SIR', alarmPostAll$modelType),
                                     'SIR', 'SIHRD')

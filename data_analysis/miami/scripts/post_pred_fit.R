@@ -4,13 +4,13 @@
 
 # can only run if modelType %in% 'SIHRD_full', 'SIHRD_inc', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')
 
-postPredFit <- function(incData, modelType, peak,
+postPredFit <- function(incData, modelType, peak, probDetectMean,
                         smoothC, smoothD, hospData, deathData, 
                         paramsSamples, N, S0, I0, H0, D0, R0,
                         Istar0, Dstar0) {
     
     # model-specific constants, data, and inits
-    modelInputs <- getModelInput(incData, modelType, peak,
+    modelInputs <- getModelInput(incData, modelType, peak, probDetectMean,
                                  smoothC, smoothD,
                                  hospData, deathData,
                                  N, S0, I0, H0, D0, R0)
@@ -46,9 +46,9 @@ postPredFit <- function(incData, modelType, peak,
     tau <- modelInputs$constantsList$tau
     
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
-        dataNodes <- c('Istar', 'Hstar', 'Dstar', 'RstarH', 'RstarI')
+        dataNodes <- c('detectIstar', 'Istar', 'Hstar', 'Dstar', 'RstarH', 'RstarI')
     } else {
-        dataNodes <- 'Istar'
+        dataNodes <- c('detectIstar', 'Istar')
     }
     
     dataNodes <- myModelPred$expandNodeNames(dataNodes)

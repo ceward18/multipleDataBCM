@@ -36,6 +36,14 @@ allModels <- allModels[order(allModels$city,
                              allModels$timePeriod),]
 rownames(allModels) <- NULL
 
+# prior for probDetect depends on wave 
+#   (https://www.healthdata.org/sites/default/files/covid_briefs/101_briefing_Canada.pdf)
+#   (Figure 8.1)
+# wave 1: Feb 25 - 11 July 2020          25% detection
+# wave 2: Aug 23, 2020 - March 20, 2021  40% detection
+
+allModels$probDetectMean <- ifelse(allModels$peak == 1, 0.25, 0.40)
+
 tmp <- allModels[seq(1,nrow(allModels), 3),]
 
 batchSize <- 3
@@ -48,6 +56,7 @@ for (i in batchIdx) {
     modelType_i <- allModels$modelType[i]
     peak_i <- allModels$peak[i]
     timePeriod_i <- allModels$timePeriod[i]
+    probDetectMean_i <- allModels$probDetectMean[i]
     
     print(paste0('Running: ', city_i, 
                  ', model: ', modelType_i, 
@@ -99,12 +108,14 @@ for (i in batchIdx) {
     
     # currently infectious if infected in the past 7 days
     I0 <- sum(dat$dailyCases[inWindowI])
+    #  inflate based on reporting
+    I0 <- round(I0 / probDetectMean_i)
+    
     
     if (peak_i == 1) {
         # need to add a few more to I0 so it makes sense with observed hospitalization data
-        I0 <- I0 + H0 + 10
+        I0 <- I0 + 10
         
-        if(city_i == 'nyc') I0 <- I0 + 30
         # peak 1 = no previous infectious
         R0 <- D0
     } else {
@@ -128,7 +139,8 @@ for (i in batchIdx) {
     
     # run three chains in parallel
     cl <- makeCluster(3)
-    clusterExport(cl, list('incData', 'city_i', 'modelType_i', 'peak_i',
+    clusterExport(cl, list('incData', 'city_i', 'modelType_i', 
+                           'peak_i', 'probDetectMean_i',
                            'smoothC', 'smoothD', 
                            'deathData', 'hospData',
                            'N', 'S0', 'I0', 'H0', 'D0', 'R0'))
@@ -143,6 +155,7 @@ for (i in batchIdx) {
         # debugonce(fitAlarmModel)
         fitAlarmModel(incData = incData, city = city_i,
                       modelType = modelType_i, peak = peak_i, 
+                      probDetectMean = probDetectMean_i,
                       smoothC = smoothC, smoothD = smoothD, 
                       deathData = deathData, hospData = hospData,
                       N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0,
@@ -156,6 +169,7 @@ for (i in batchIdx) {
     # debugonce(postPredForecast)
     postSummaries <- summarizePost(resThree = resThree, incData = incData,
                                    modelType = modelType_i, peak = peak_i, 
+                                   probDetectMean = probDetectMean_i,
                                    smoothC = smoothC, smoothD = smoothD,
                                    hospData = hospData, deathData = deathData,
                                    N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0,
@@ -187,6 +201,7 @@ for (i in batchIdx) {
         paramsPost <- cbind.data.frame(postSummaries$postParams, modelInfo)
         alarmTimePost <- cbind.data.frame(postSummaries$postAlarmTime, modelInfo)
         R0Post <- cbind.data.frame(postSummaries$postR0, modelInfo)
+        IstarPost <- cbind.data.frame(postSummaries$postIstar, modelInfo)
         waicPost <- cbind.data.frame(postSummaries$waic, modelInfo)
         predFitPost <- cbind.data.frame(postSummaries$postPredictFit, modelInfo)
         predForecastPost <- cbind.data.frame(postSummaries$postPredictForecast, modelInfo)
@@ -200,6 +215,8 @@ for (i in batchIdx) {
                                           cbind.data.frame(postSummaries$postAlarmTime, modelInfo))
         R0Post <- rbind.data.frame(R0Post, 
                                    cbind.data.frame(postSummaries$postR0, modelInfo))
+        IstarPost <- rbind.data.frame(IstarPost, 
+                                      cbind.data.frame(postSummaries$postIstar, modelInfo))
         waicPost <- rbind.data.frame(waicPost, 
                                      cbind.data.frame(postSummaries$waic, modelInfo))
         predFitPost <- rbind.data.frame(predFitPost, 
@@ -217,6 +234,7 @@ saveRDS(gr, paste0('./output/gr_Batch', idxPrint, '.rds'))
 saveRDS(paramsPost, paste0('./output/paramsPost_Batch', idxPrint, '.rds'))
 saveRDS(alarmTimePost, paste0('./output/alarmTimePost_Batch', idxPrint, '.rds'))
 saveRDS(R0Post, paste0('./output/R0Post_Batch', idxPrint, '.rds'))
+saveRDS(IstarPost, paste0('./output/IstarPost_Batch', idxPrint, '.rds'))
 saveRDS(waicPost, paste0('./output/waicPost_Batch', idxPrint, '.rds'))
 saveRDS(predFitPost, paste0('./output/predFitPostBatch', idxPrint, '.rds'))
 saveRDS(predForecastPost, paste0('./output/predForecastPostBatch', idxPrint, '.rds'))
