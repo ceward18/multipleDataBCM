@@ -11,10 +11,8 @@ simulation_study/err/*
 simulation_study/err/submitLonger.sh
 data_analysis/montreal/out/*
 data_analysis/montreal/err/*
-data_analysis/montreal/submitFull.sh
 data_analysis/miami/out/*
 data_analysis/miami/err/*
-data_analysis/miami/submitFull.sh
 Ward_Caitlin_IS.08.02.pdf
 Multiple*
 BCM_Biostatistics.pdf
