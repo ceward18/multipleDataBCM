@@ -204,7 +204,6 @@ for (i in batchIdx) {
         IstarPost <- cbind.data.frame(postSummaries$postIstar, modelInfo)
         waicPost <- cbind.data.frame(postSummaries$waic, modelInfo)
         predFitPost <- cbind.data.frame(postSummaries$postPredictFit, modelInfo)
-        predForecastPost <- cbind.data.frame(postSummaries$postPredictForecast, modelInfo)
         
     } else {
         gr <- rbind.data.frame(gr, 
@@ -221,8 +220,6 @@ for (i in batchIdx) {
                                      cbind.data.frame(postSummaries$waic, modelInfo))
         predFitPost <- rbind.data.frame(predFitPost, 
                                         cbind.data.frame(postSummaries$postPredictFit, modelInfo))
-        predForecastPost <- rbind.data.frame(predForecastPost, 
-                                        cbind.data.frame(postSummaries$postPredictForecast, modelInfo))
     }
     
 } # end loop
@@ -237,4 +234,3 @@ saveRDS(R0Post, paste0('./output/R0Post_Batch', idxPrint, '.rds'))
 saveRDS(IstarPost, paste0('./output/IstarPost_Batch', idxPrint, '.rds'))
 saveRDS(waicPost, paste0('./output/waicPost_Batch', idxPrint, '.rds'))
 saveRDS(predFitPost, paste0('./output/predFitPostBatch', idxPrint, '.rds'))
-saveRDS(predForecastPost, paste0('./output/predForecastPostBatch', idxPrint, '.rds'))

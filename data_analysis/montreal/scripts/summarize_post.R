@@ -185,54 +185,6 @@ summarizePost <- function(resThree, incData, modelType, peak, probDetectMean,
     }
     
     
-    ##############################################################################
-    ### Posterior predictive forecasting for models where it makes sense
-    print('Posterior predictive forecasting...')
-
-    if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')) {
-        postPred <- postPredForecast(incData = incData, 
-                                     modelType = modelType, peak = peak,
-                                     probDetectMean = probDetectMean,
-                                     smoothC = smoothC, smoothD = smoothD, 
-                                     hospData = hospData, deathData = deathData, 
-                                     paramsSamples = samples,
-                                     N = N, S0 = S0, I0 = I0, H0 = H0, D0 = D0, R0 = R0,
-                                     Istar0 = Istar0, Dstar0 = Dstar0)
-        
-        # remove NA rows (inc model only)
-        postPred <- postPred[!is.na(postPred[,1]),]
-        
-        postMeans <- rowMeans(postPred)
-        postCI <- apply(postPred, 1, quantile, probs = c(0.025, 0.975))
-        
-        nDaysSim <- 50
-        timeRange <- tau + 1:nDaysSim
-        
-        if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
-            
-            postPredictForecast <- data.frame(time = rep(timeRange, 3),
-                                              marg = rep(c('inc', 'hosp', 'death'), each = nDaysSim),
-                                              mean = postMeans,
-                                              lower = postCI[1,],
-                                              upper = postCI[2,])
-            
-        } else {
-            
-            postPredictForecast <- data.frame(time = rep(timeRange, 1),
-                                              marg = rep(c('inc'), each = nDaysSim),
-                                              mean = postMeans,
-                                              lower = postCI[1,],
-                                              upper = postCI[2,])
-        }
-        
-        
-    } else {
-        postPredictForecast <- data.frame(time = NA, 
-                                     marg = NA,
-                                     mean = NA,
-                                     lower = NA,
-                                     upper = NA)
-    }
     
     ##############################################################################
     ### output
@@ -242,8 +194,7 @@ summarizePost <- function(resThree, incData, modelType, peak, probDetectMean,
          postR0 = postR0,
          postIstar = postIstar,
          waic = waic,
-         postPredictFit = postPredictFit,
-         postPredictForecast = postPredictForecast)
+         postPredictFit = postPredictFit)
     
 }
 
