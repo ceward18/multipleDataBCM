@@ -118,7 +118,6 @@ summarizePost <- function(resThree, incData, modelType, peak, probDetectMean,
     postCI <- apply(IstarSamples, 2, quantile, probs = c(0.025, 0.975))
     
     postIstar <- data.frame(time = 1:tau,
-                            truth = trueInc,
                             mean = postMeans,
                             lower = postCI[1,],
                             upper = postCI[2,])
