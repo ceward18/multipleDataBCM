@@ -145,6 +145,7 @@ summarizePost <- function(resThree, incData, modelType, peak, probDetectMean,
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_inc', 'SIHRD_noAlarm', 'SIR_noAlarm')) {
         postPred <- postPredFit(incData = incData, 
                                 modelType = modelType, peak = peak,
+                                probDetectMean = probDetectMean,
                                 smoothC = smoothC, smoothD = smoothD, 
                                 hospData = hospData, deathData = deathData, 
                                 paramsSamples = samples,

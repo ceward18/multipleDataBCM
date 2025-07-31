@@ -49,9 +49,9 @@ rownames(allModels) <- NULL
 allModels$probDetectMean <- ifelse(allModels$peak == 1, 0.12, 0.26)
 
 
-tmp <- allModels[seq(1,nrow(allModels), 3),]
+tmp <- allModels[seq(1,nrow(allModels), 2),]
 
-batchSize <- 3
+batchSize <- 2
 batchIdx <- batchSize * (idx - 1) + 1:batchSize
 
 
