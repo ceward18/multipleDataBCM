@@ -228,7 +228,13 @@ getModelInput <- function(incData, modelType, peak, probDetectMean,
     niter <- 8e5
     nburn <- 3e5
     nthin <- 10
-    
+
+    niter <- 200
+    nburn <- 1
+    nthin <- 1
+
+
+
     list(constantsList = constantsList,
          dataList = dataList,
          initsList = initsList,
