@@ -20,7 +20,7 @@ source('./scripts/model_code.R')
 ################################################################################
 # Figure 2 - example epidemics
 
-pdf('./figures/fig2_simCurves.pdf', height = 5, width = 10)
+pdf('./figures/fig2_simCurves_ppt.pdf', height = 4, width = 10)
 layoutMatrix <- matrix(c(1,2,3,4,4,4), byrow = T, nrow = 2)
 layout(layoutMatrix, heights = c(0.8, 0.2))
 
@@ -42,8 +42,8 @@ for (dataType in c('inc', 'equal', 'death')) {
                         'equal' = bquote(atop(bold('Equal importance'), 
                                               alpha ==  0.5)))
     
-    plot(incData[1,], type = 'l', col = 'grey', ylim = c(0, 3500),
-         main = plotTitle, cex.lab = 1.2, cex.main = 1.5, lty = 2,
+    plot(incData[1,], type = 'l', col = 'grey', ylim = c(0, 1000),
+         main = plotTitle, cex.lab = 1.3, cex.main = 1.7, lty = 2,
          ylab = 'Count', xlab = 'Epidemic Time')
     for (i in 1:nrow(incData)) {
         lines(incData[i,], col = adjustcolor('grey70', alpha = 0.4), lty = 2)
@@ -57,7 +57,7 @@ plot.new()
 legend('top', c('Infections', 'Cases', 'Hospitalizations', 'Deaths'), lwd = 3,
        col = c('grey70', 'grey30', 'goldenrod2', 'royalblue'), 
        lty = c(2, 1, 1, 1),
-       cex = 1.5, bty = 'n', xpd = T, horiz = T)
+       cex = 1.6, bty = 'n', xpd = T, horiz = T)
 dev.off()
 
 ################################################################################
@@ -220,7 +220,8 @@ postPredFitSimFinal <- postPredFitSimFinal[postPredFitSimFinal$marg != 'True Inc
 
 
 pdf('./figures/fig4_postPred.pdf', height = 5, width = 8.5)
-ggplot(subset(postPredFitSimFinal, simNumber == sim_idx &  assumeType == 'undetected'), 
+ggplot(subset(postPredFitSimFinal, simNumber == sim_idx &  
+                  assumeType == 'undetected'), 
        aes(x = time, ymin = lower, ymax = upper, fill = marg)) + 
     geom_line(linewidth = 0.5, aes(y = truth, col = marg)) +
     geom_line(aes(y = mean, col = marg), linetype = 2, linewidth = 0.5) + 
@@ -375,29 +376,30 @@ alarmPostAll$alarmType <- ifelse(grepl('full', alarmPostAll$modelType),
                               'Cases + deaths', alarmPostAll$alarmType)
 
 
-
-ggplot(subset(alarmPostAll, assumeType == 'undetected'), 
-       aes(x = time,  y = mean, group = simNumber, col = alarmType)) +
+pdf('./figures/fig5b_alarmPost.pdf', height = 5, width = 9)
+ggplot(subset(alarmPostAll, assumeType == 'undetected' ), 
+       aes(x = time,  y = mean, group = simNumber, 
+           col = compartmentType)) +
     geom_line() + 
     geom_line(aes(y = truth), col = 'black') +
-    facet_nested(compartmentType ~  dataType + alarmType) +
+    facet_nested(compartmentType ~  dataType + alarmType ) +
     theme_bw() + 
     theme(strip.placement = "outside",
           strip.background = element_blank(),
-          strip.text = element_text(size = 11),
-          axis.title = element_text(size = 10),
-          axis.text = element_text(size = 9, color = 'black'),
-          legend.title = element_text(size = 10),
-          legend.text = element_text(size = 9),
-          plot.title = element_text(size = 12, h = 0.5),
+          strip.text = element_text(size = 14),
+          axis.title = element_text(size = 14),
+          axis.text = element_text(size = 12, color = 'black'),
+          plot.title = element_text(size = 15, h = 0.5),
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank()) +
     labs(x = 'Time', y = 'Alarm', col = '',
          title = 'Posterior mean alarm') +
-    scale_color_manual(values = c('steelblue1', 'tomato'))
+    scale_color_manual(values = c('orchid', 'orange')) + 
+    guides(color = 'none')
+dev.off()
 
-
-ggplot(subset(alarmPostAll, simNumber == 2), 
+ggplot(subset(alarmPostAll, simNumber == 2 &
+                  assumeType == 'undetected' & alarmType == 'Cases + deaths'), 
        aes(x = time,  y = mean, ymin = lower, ymax = upper, 
            col = assumeType,  fill = assumeType, group = assumeType)) +
     geom_line() + 

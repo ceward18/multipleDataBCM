@@ -63,6 +63,8 @@ for (i in batchIdx) {
                  ', peak: ', peak_i,
                  ', weeks: 1-', timePeriod_i))
     
+    print(Sys.time())
+    
     ### read data
     dat <- read.csv(paste0('./data/', city_i, 'Clean.csv'))
     dat$dailyCases <- round(dat$dailyCases)

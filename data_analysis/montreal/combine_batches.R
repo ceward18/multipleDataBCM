@@ -88,6 +88,23 @@ rownames(R0PostAll) <- NULL
 saveRDS(R0PostAll,  paste0('./', resultsFolder, '/R0PostAll.rds'))
 
 
+
+################################################################################
+# posterior Istar 
+
+IstarPostFiles <- outputFiles[grep('IstarPost', outputFiles)]
+
+IstarPostAll <- readRDS(paste0('./', outputFolder, '/', IstarPostFiles[1]))
+
+for (i in 2:length(IstarPostFiles)) {
+    IstarPost_i <- readRDS(paste0('./', outputFolder, '/', IstarPostFiles[i]))
+    IstarPostAll <-rbind.data.frame(IstarPostAll, IstarPost_i)
+}
+
+saveRDS(IstarPostAll,  paste0('./', resultsFolder, '/IstarPostAll.rds'))
+
+
+
 ################################################################################
 # WAIC
 
@@ -129,27 +146,4 @@ rownames(postPredFitAll) <- NULL
 
 
 saveRDS(postPredFitAll,  paste0('./', resultsFolder, '/postPredFitAll.rds'))
-
-
-################################################################################
-# posterior predictive forecasting
-
-postPredFiles <- outputFiles[grep('predForecastPost', outputFiles)]
-
-postPredAll <- readRDS(paste0('./', outputFolder, '/', postPredFiles[1]))
-
-
-for (i in 2:length(postPredFitFiles)) {
-    postPred_i <- readRDS(paste0('./', outputFolder, '/', postPredFiles[i]))
-    
-    postPredAll <-rbind.data.frame(postPredAll, postPred_i)
-}
-
-# remove NA (simple model)
-postPredAll <- postPredAll[!is.na(postPredAll$time),]
-
-rownames(postPredAll) <- NULL
-
-
-saveRDS(postPredAll,  paste0('./', resultsFolder, '/postPredForecastAll.rds'))
 
