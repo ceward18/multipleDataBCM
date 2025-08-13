@@ -819,11 +819,10 @@ RstarUpdate <- nimbleFunction(
     name = 'Rstar',                              
     contains = sampler_BASE,                     
     setup = function(model, mvSaved, target, control) {                 # REQUIRED setup arguments
-        calcNodes <- model$getDependencies(target) 
-        # percent <- if(!is.null(control$percent)) control$percent else 0.05   
+        calcNodes <- model$getDependencies(target)   
         
         # number of update attempts
-        nUpdates <- if(!is.null(control$nUpdates)) control$percent else 300
+        nUpdates <- if(!is.null(control$nUpdates)) control$nUpdates else 300
     },                                                                  # setup can't return anything
     run = function() {
         currentValue <- model[[target]]                                   
