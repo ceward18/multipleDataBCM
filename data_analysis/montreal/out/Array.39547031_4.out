@@ -1,0 +1,12 @@
+[1] "Running: montreal, model: SIHRD_inc, peak: 1, weeks: 1-6"
+[1] "Calculating GR diagnostic..."
+[1] "Summarizing posterior distributions..."
+[1] "Calculating WAIC..."
+[1] "Calculating posterior predictive fit..."
+Stochastic parents of data are:  probDetect beta gamma1 gamma2 lambda phi k comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
+[1] "Running: montreal, model: SIHRD_inc, peak: 1, weeks: 1-8"
+[1] "Calculating GR diagnostic..."
+[1] "Summarizing posterior distributions..."
+[1] "Calculating WAIC..."
+[1] "Calculating posterior predictive fit..."
+Stochastic parents of data are:  probDetect beta gamma1 gamma2 lambda phi k comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .

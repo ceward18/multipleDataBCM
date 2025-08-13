@@ -1,0 +1,12 @@
+[1] "Running: montreal, model: SIR_inc, peak: 1, weeks: 1-10"
+[1] "Calculating GR diagnostic..."
+[1] "Summarizing posterior distributions..."
+[1] "Calculating WAIC..."
+[1] "Calculating posterior predictive fit..."
+Stochastic parents of data are:  probDetect beta k w0 nu comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] comp_init[6] comp_init[7] comp_init[8] comp_init[9] comp_init[10] comp_init[11] comp_init[12] comp_init[13] comp_init[14] comp_init[15] comp_init[16] .
+[1] "Running: montreal, model: SIR_inc, peak: 2, weeks: 1-6"
+[1] "Calculating GR diagnostic..."
+[1] "Summarizing posterior distributions..."
+[1] "Calculating WAIC..."
+[1] "Calculating posterior predictive fit..."
+Stochastic parents of data are:  probDetect beta k w0 nu comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] comp_init[6] comp_init[7] comp_init[8] comp_init[9] comp_init[10] comp_init[11] comp_init[12] comp_init[13] comp_init[14] comp_init[15] comp_init[16] .
