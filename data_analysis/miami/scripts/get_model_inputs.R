@@ -94,8 +94,8 @@ getModelInput <- function(incData, modelType, peak, probDetectMean,
                               beta = runif(1, 0.01, 0.5),
                               gamma1 = rgamma(1, 1429, 10000),  # IR
                               gamma2 = rgamma(1, 6700, 100000), # HR
-                              lambda = rgamma(1, 2000, 100000), # IH
-                              phi = rgamma(1, 6700, 100000),    # HD
+                              lambda = rgamma(1, 1000, 100000), # IH
+                              phi = rgamma(1, 500, 10000),    # HD
                               k = runif(1, 0.00001, 0.001),
                               alpha = rbeta(1, 1, 1),
                               RstarI = RstarI,
@@ -132,8 +132,8 @@ getModelInput <- function(incData, modelType, peak, probDetectMean,
                               beta = runif(1, 0.01, 0.5),
                               gamma1 = rgamma(1, 1429, 10000),  # IR
                               gamma2 = rgamma(1, 6700, 100000), # HR
-                              lambda = rgamma(1, 2000, 100000), # IH
-                              phi = rgamma(1, 6700, 100000),    # HD
+                              lambda = rgamma(1, 1000, 100000), # IH
+                              phi = rgamma(1, 500, 10000),    # HD
                               k = runif(1, 0.00001, 0.001),
                               RstarI = RstarI,
                               RstarH = RstarH,
@@ -202,8 +202,8 @@ getModelInput <- function(incData, modelType, peak, probDetectMean,
                               beta = runif(1, 0.01, 0.5),
                               gamma1 = rgamma(1, 1429, 10000),  # IR
                               gamma2 = rgamma(1, 6700, 100000), # HR
-                              lambda = rgamma(1, 2000, 100000), # IH
-                              phi = rgamma(1, 6700, 100000),    # HD
+                              lambda = rgamma(1, 1000, 100000), # IH
+                              phi = rgamma(1, 500, 10000),    # HD
                               RstarI = RstarI,
                               RstarH = RstarH,
                               Hstar = hospData,
