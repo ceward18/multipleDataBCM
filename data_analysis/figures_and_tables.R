@@ -13,6 +13,7 @@ library(dplyr)
 library(knitr)
 library(kableExtra)
 library(ggh4x)
+library(tidyverse)
 
 ################################################################################
 # Fig 6 - Montreal and Miami cases and deaths data
@@ -152,7 +153,7 @@ ggplot(dat_long, aes(x = date, y = count/Population* 1e5)) +
 dev.off()
 
 ################################################################################
-# Table 1 - posterior alpha parameters by wave/city
+# Table 1 - posterior alpha parameters by wave/city with WAIC
 
 
 paramsPostAll_miami <- readRDS('miami/results/paramsPostAll.rds')
@@ -177,11 +178,6 @@ alphaPost_montreal <- alphaPost_montreal[which(alphaPost_montreal$peak == 1 & al
 
 alphaPost <- rbind.data.frame(alphaPost_miami, alphaPost_montreal)
 
-alphaPost$compartmentModel <- ifelse(alphaPost$modelType == 'SIHRD_full', 
-                                     'SIHRD', 'SIR')
-
-alphaPost$city <- factor(alphaPost$city,
-                         labels = c("Miami", "Montreal"))
 
 
 # table
@@ -193,23 +189,91 @@ alphaPost$val <- paste0(sprintf("%.3f", round(alphaPost$mean, 3)),
                         ')')
 
 
-alphaPostTab <- alphaPost[,c('city', 'compartmentModel', 'peak', 'val')]
 
-alphaPostTab <- reshape(alphaPostTab, 
-                        timevar = "peak",
-                        idvar = c("city", "compartmentModel"),
-                        direction = "wide")
+### WAIC 
+
+# WAIC is not comparable between SIR and SIHRD, but comparable between alarms within each
+waicAll_miami <- readRDS('miami/results/waicAll.rds')
+
+# 6 weeks for wave 1 and 10 weeks for wave 2
+waicAll_miami <- waicAll_miami[waicAll_miami$peak %in% 1:2 & 
+                                   waicAll_miami$timePeriod %in% c(6, 10),]
+
+waicAll_miami <- waicAll_miami[which(waicAll_miami$peak == 1 & 
+                                         waicAll_miami$timePeriod == 6 | 
+                                         waicAll_miami$peak == 2 & 
+                                         waicAll_miami$timePeriod == 10  ),]
 
 
-kable(alphaPostTab, row.names = F, format = 'latex', align = 'llcc', 
+waicAll_montreal <- readRDS('montreal/results/waicAll.rds')
+
+# 8 weeks for wave 1 and 10 weeks for wave 2
+waicAll_montreal <- waicAll_montreal[waicAll_montreal$peak %in% 1:2 & 
+                                         waicAll_montreal$timePeriod %in% c(8, 10),]
+
+waicAll_montreal <- waicAll_montreal[which(waicAll_montreal$peak == 1 & 
+                                               waicAll_montreal$timePeriod == 8 | 
+                                               waicAll_montreal$peak == 2 & 
+                                               waicAll_montreal$timePeriod == 10  ),]
+
+
+waicAll <- rbind.data.frame(waicAll_miami, waicAll_montreal)
+
+
+waicAllTab <- waicAll[,c('city', 'modelType', 'peak', 'waic')]
+
+alphaPost <- merge(alphaPost, waicAllTab,  by = c('city', 'modelType', 'peak'), all.y = T)
+
+combTab <- alphaPost[,c('city', 'modelType', 'peak', 'waic', 'val')]
+
+
+combTab$compartmentModel <- ifelse(grepl('SIHRD', combTab$modelType), 
+                                     'SIHRD', 'SIR')
+
+
+combTab$alarmType <- 'No alarm'
+combTab$alarmType <- ifelse(grepl('inc', combTab$modelType),
+                              'Cases only', combTab$alarmType)
+
+combTab$alarmType <- ifelse(grepl('full', combTab$modelType),
+                              'Cases + deaths', combTab$alarmType)
+
+combTab$city <- factor(combTab$city,
+                         labels = c("Miami", "Montreal"))
+
+# reorder new columns
+combTab <- combTab[,c('city', 'peak',  'compartmentModel', 'alarmType', 'waic', 'val')]
+
+# reorder rows
+combTab <- combTab[order(combTab$city, combTab$peak, combTab$compartmentModel, combTab$alarmType),]
+combTab$waic <- sprintf("%.1f", round(combTab$waic, 1))
+
+
+table1 <- pivot_wider(combTab,
+            names_from = 'compartmentModel', 
+            values_from = c('waic', 'val'),
+            names_vary = "slowest")
+
+table1$peak <- factor(table1$peak,
+                       labels = paste0('Wave ', c(1,2)))
+
+
+
+options(knitr.kable.NA = '-')
+kable(table1, row.names = F, format = 'latex', align = 'lllcccc', 
       booktabs = T, escape = F, 
       col.names = linebreak(c('\\textbf{City}',
+                              '\\textbf{Wave}', 
                               '\\textbf{Model fitted}', 
-                              '\\textbf{Wave 1}',
-                              '\\textbf{Wave2}'), align = 'c')) %>% 
-    collapse_rows(columns = 1, latex_hline = 'major') 
-
-
+                              '\\textbf{WAIC}',
+                              '\\hat-alpha', 
+                              '\\textbf{WAIC}',
+                              '\\hat-alpha'), align = 'c')) %>% 
+    add_header_above(c(" " = 3,
+                       "SIHRD" = 2, 
+                       "SIR" = 2), bold = T) %>%
+    collapse_rows(columns = 1:2, latex_hline = 'custom',
+                  custom_latex_hline = 1:2) 
 
 
 
@@ -573,81 +637,3 @@ ggplot(subset(postPredFitAll, marg %in% c('Cases', 'Deaths')),
     scale_fill_manual(values = c('grey30', 'dodgerblue'))
 dev.off()
 
-################################################################################
-# Table 2 - WAIC values
-
-# not comparable between SIR and SIHRD, but comparable between alarms within each
-
-waicAll_miami <- readRDS('miami/results/waicAll.rds')
-
-# 6 weeks for wave 1 and 10 weeks for wave 2
-waicAll_miami <- waicAll_miami[waicAll_miami$peak %in% 1:2 & 
-                                   waicAll_miami$timePeriod %in% c(6, 10),]
-
-waicAll_miami <- waicAll_miami[which(waicAll_miami$peak == 1 & 
-                                         waicAll_miami$timePeriod == 6 | 
-                                         waicAll_miami$peak == 2 & 
-                                         waicAll_miami$timePeriod == 10  ),]
-
-
-waicAll_montreal <- readRDS('montreal/results/waicAll.rds')
-
-# 8 weeks for wave 1 and 10 weeks for wave 2
-waicAll_montreal <- waicAll_montreal[waicAll_montreal$peak %in% 1:2 & 
-                                         waicAll_montreal$timePeriod %in% c(8, 10),]
-
-waicAll_montreal <- waicAll_montreal[which(waicAll_montreal$peak == 1 & 
-                                               waicAll_montreal$timePeriod == 8 | 
-                                               waicAll_montreal$peak == 2 & 
-                                               waicAll_montreal$timePeriod == 10  ),]
-
-
-waicAll <- rbind.data.frame(waicAll_miami, waicAll_montreal)
-
-
-waicAll$compartmentType <- ifelse(grepl('SIR', waicAll$modelType),
-                                  'SIR', 'SIHRD')
-waicAll$alarmType <- 'No alarm'
-waicAll$alarmType <- ifelse(grepl('inc', waicAll$modelType),
-                            'Cases only', waicAll$alarmType)
-
-waicAll$alarmType <- ifelse(grepl('full', waicAll$modelType),
-                            'Cases + deaths', waicAll$alarmType)
-
-waicAll$wave <- factor(waicAll$peak,
-                       labels = paste0('Wave ', c(1,2)))
-
-
-waicAll <- waicAll[,c('city','wave',  'compartmentType', 'alarmType', 'waic')]
-
-
-waicTab <- reshape(waicAll, 
-                   timevar = "alarmType",
-                   idvar = c("city", "wave", 'compartmentType'),
-                   direction = "wide")
-
-waicTab <- reshape(waicTab, 
-                   timevar = "compartmentType",
-                   idvar = c("city", "wave"),
-                   direction = "wide")
-
-
-
-waicTab <- waicTab[order(waicTab$city, 
-                         waicTab$wave),]
-waicTab$city <- factor(waicTab$city,
-                       labels = c('Miami', 'Montreal'))
-
-
-kable(waicTab, row.names = F, format = 'latex', align = 'llcccccc', 
-      booktabs = T, escape = F,   digits = 1,
-      col.names = linebreak(c('\\textbf{City}',
-                              '\\textbf{Wave}', 
-                              '\\textbf{Cases + deaths}',
-                              '\\textbf{Cases only}',
-                              '\\textbf{No alarm}', 
-                              '\\textbf{Cases + deaths}',
-                              '\\textbf{Cases only}',
-                              '\\textbf{No alarm}'), align = 'c')) %>% 
-    collapse_rows(columns = 1, latex_hline = 'major') %>%
-    add_header_above(c(" " = 2, "SIHRD" = 3, "SIR" = 3))

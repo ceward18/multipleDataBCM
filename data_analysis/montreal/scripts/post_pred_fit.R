@@ -74,7 +74,7 @@ postPredFit <- function(incData, modelType, peak, probDetectMean,
         
         postPredAll <- sim_C$run(trueVals, 1)
         
-        postPredInc[,j] <- postPredAll[grep('^Istar', dataNodes)]
+        postPredInc[,j] <- postPredAll[grep('detectIstar', dataNodes)]
         
         if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
             postPredHosp[,j] <- postPredAll[grep('Hstar', dataNodes)]

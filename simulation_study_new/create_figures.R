@@ -20,7 +20,7 @@ source('./scripts/model_code.R')
 ################################################################################
 # Figure 2 - example epidemics
 
-pdf('./figures/fig2_simCurves_ppt.pdf', height = 4, width = 10)
+pdf('./figures/fig1_simCurves.pdf', height = 4, width = 10)
 layoutMatrix <- matrix(c(1,2,3,4,4,4), byrow = T, nrow = 2)
 layout(layoutMatrix, heights = c(0.8, 0.2))
 
@@ -42,7 +42,7 @@ for (dataType in c('inc', 'equal', 'death')) {
                         'equal' = bquote(atop(bold('Equal importance'), 
                                               alpha ==  0.5)))
     
-    plot(incData[1,], type = 'l', col = 'grey', ylim = c(0, 1000),
+    plot(incData[1,], type = 'l', col = 'grey', ylim = c(0, 4000),
          main = plotTitle, cex.lab = 1.3, cex.main = 1.7, lty = 2,
          ylab = 'Count', xlab = 'Epidemic Time')
     for (i in 1:nrow(incData)) {
@@ -130,28 +130,37 @@ R0postMSE$assumeType <- factor(R0postMSE$assumeType,
                                labels = c('Yes', 'No'))
 
 # use only time 1 and do barplots
-R0postMSE_1 <- R0postMSE[R0postMSE$time == 1,]
+R0postMSE_1 <- R0postMSE[R0postMSE$time %in% c(1, 24),]
 
-pdf('./figures/fig3_R0Post_RMSE.pdf', height = 5, width = 10)
-ggplot(R0postMSE_1, 
-       aes(x = alarmType,  y = rmse, fill = assumeType)) +
+
+R0postMSE_1$time <- factor(R0postMSE_1$time, 
+                           labels = c('Start', 'End'))
+
+
+
+
+pdf('./figures/fig2_R0Post_RMSE.pdf', height = 5, width = 10)
+ggplot(subset(R0postMSE_1, alarmType != 'No alarm'), 
+       aes(x = time,  y = rmse, fill = assumeType)) +
     geom_bar(stat = "identity", position=position_dodge(),
              col = 'black') +
-    facet_nested(compartmentType ~  dataType ) +
+    facet_nested(compartmentType ~  dataType + alarmType) +
     theme_bw() + 
+    coord_cartesian(ylim =c(0, 1.5)) +
     theme(strip.placement = "outside",
           strip.background = element_blank(),
-          strip.text = element_text(size = 11),
+          strip.text = element_text(size = 12),
           axis.title = element_text(size = 10),
           axis.text = element_text(size = 9, color = 'black'),
-          legend.title = element_text(size = 10),
-          legend.text = element_text(size = 9),
-          plot.title = element_text(size = 12, h = 0.5),
+          legend.title = element_text(size = 12),
+          legend.text = element_text(size = 11),
+          plot.title = element_text(size = 14, h = 0.5),
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank()) +
     labs(x = '', y = 'RMSE', fill = 'Undetected\ninfections\nmodeled',
          title =expression('RMSE of'~R[0])) +
     scale_fill_manual(values = c('steelblue1', 'tomato'))
+
 dev.off()
 
 

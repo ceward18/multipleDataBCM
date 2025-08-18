@@ -18,56 +18,12 @@ library(dplyr)
 
 source('./scripts/model_code.R')
 
-################################################################################
-# Fig S1 compare true infections to the estimate using conditional inference 
-
-
-pdf('./figures/S1_undetectInfEst.pdf', height = 5, width = 10)
-layoutMatrix <- matrix(c(1,2,3,4,4,4), byrow = T, nrow = 2)
-layout(layoutMatrix, heights = c(0.8, 0.2))
-
-par(mar = c(5.1, 4.1, 4.1, 2.1))
-for (dataType in c('inc', 'death', 'equal')) {
-    simData <- readRDS(paste0('./data/sim_', dataType, '.rds'))
-    
-    # gather incidence, hospitalizations, and deaths
-    incData <- simData[, grep('^Istar', colnames(simData))]
-    incDataObs <- simData[, grep('detectIstar', colnames(simData))]
-    incDataEst <- round(incDataObs/0.25)
-    
-    plotTitle <- switch(dataType,
-                        'inc' = bquote(atop(bold('High case importance'), 
-                                            bold(alpha == 0.85))),
-                        'death' = bquote(atop(bold('High deaths importance'), 
-                                              alpha == 0.15)),
-                        'equal' = bquote(atop(bold('Equal importance'), 
-                                              alpha ==  0.5)))
-    
-    plot(incData[1,], type = 'l', col = 'black', ylim = c(0, 20000),
-         main = plotTitle, cex.lab = 1.2, cex.main = 1.5, lty = 2,
-         ylab = 'Count', xlab = 'Epidemic Time')
-    for (i in 1:nrow(incData)) {
-        lines(incData[i,], col = adjustcolor('black', alpha = 0.4), lty = 2)
-        lines(incDataEst[i,], col =  adjustcolor('tomato', alpha = 0.4))
-    }
-}
-par(mar = c(0, 0, 0, 0))
-plot.new()
-legend('top', c('True infections', 'Estimate including undetected'), lwd = 3,
-       col = c('black', 'tomato'), 
-       lty = c(2, 1, 1, 1),
-       cex = 1.5, bty = 'n', xpd = T, horiz = T)
-dev.off()
-
-
-################################################################################
-# Fig S3 R0 RMSE across time
 
 # read in GR so the few models that didn't converge are excluded
 grAll <- readRDS('./results/grAll.rds')
 grAll <- grAll[-grep('comp_init', grAll$param),]
 
-# which didn't converge
+# which didn't converge (5/1800)
 notConverge <- grAll[which(round(grAll$gr, 1) > 1.1),  ]
 notConvergeModels <-  notConverge[
     !duplicated(notConverge[,-which(colnames(notConverge) 
@@ -76,6 +32,8 @@ notConvergeModels <-  notConverge[
 notConvergeModels$noConverge <- 1
 
 
+################################################################################
+# Fig S1 and S2 R0 RMSE and simulation envelopes across time
 
 R0PostAll <- readRDS('./results/R0PostAll.rds')
 R0PostAll <- R0PostAll[-which(R0PostAll$time == 25),]
@@ -101,10 +59,10 @@ R0PostAll <- merge(R0PostAll, notConvergeModels,
 R0PostAll <- subset(R0PostAll, is.na(noConverge))
 
 R0PostAll$dataType <- factor(R0PostAll$dataType,
-                             levels = c('inc', 'death', 'equal'),
+                             levels = c('inc', 'equal', 'death'),
                              labels = c('Cases important',
-                                        'Deaths important',
-                                        'Equal importance'))
+                                        'Equal importance',
+                                        'Deaths important'))
 
 R0PostAll$compartmentType <- ifelse(grepl('SIR', R0PostAll$modelType),
                                     'SIR', 'SIHRD')
@@ -120,38 +78,6 @@ R0PostAll$assumeType <- factor(R0PostAll$assumeType,
                                levels = c('undetected', 'casesOnly'),
                                labels = c('w/ undetected', 'w/o undetected'))
 
-ggplot(subset(R0PostAll, modelType == 'SIHRD_full' & 
-                  assumeType == 'casesOnly' & dataType == 'High case importance'), 
-       aes(x = time, y = mean, group = simNumber)) + 
-    geom_line() +
-    ylim(0, 8)
-
-ggplot(subset(R0PostAll), aes(x = time, y = mean, group = simNumber)) + 
-    geom_line() + 
-    geom_line(aes(y = truth), col = 'red') +
-    facet_nested(dataType + assumeType~ compartmentType + alarmType) +
-    theme_bw() + 
-    theme(strip.placement = "outside",
-          strip.background = element_blank(),
-          strip.text = element_text(size = 9),
-          axis.title = element_text(size = 10),
-          axis.text = element_text(size = 8),
-          legend.title = element_text(size = 10),
-          legend.text = element_text(size = 9),
-          plot.title = element_text(size = 12, h = 0.5),
-          panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank()) +
-    labs(x = 'Epidemic Time', y = 'RMSE', color = 'Undetected\ninfections\nmodeled',
-         title =expression('RMSE of'~R[0](t))) +
-    scale_color_manual(values = c('steelblue1', 'tomato'))+
-    ylim(0, 6)
-
-
-
-
-
-
-
 
 R0postMSE <- R0PostAll %>%
     group_by(dataType, assumeType, compartmentType, alarmType, time) %>%
@@ -162,22 +88,48 @@ R0postMSE <- R0PostAll %>%
 R0postMSE$assumeType <- factor(R0postMSE$assumeType,
                                labels = c('Yes', 'No'))
 
+# use only time 1 and do barplots
+R0postMSE_1 <- R0postMSE[R0postMSE$time == 1,]
+
+pdf('./figures/S2_R0Post_RMSE.pdf', height = 5, width = 10)
+ggplot(R0postMSE_1, 
+       aes(x = alarmType,  y = rmse, fill = assumeType)) +
+    geom_bar(stat = "identity", position=position_dodge(),
+             col = 'black') +
+    facet_nested(compartmentType ~  dataType ) +
+    theme_bw() + 
+    theme(strip.placement = "outside",
+          strip.background = element_blank(),
+          strip.text = element_text(size = 12),
+          axis.title = element_text(size = 10),
+          axis.text = element_text(size = 9, color = 'black'),
+          legend.title = element_text(size = 12),
+          legend.text = element_text(size = 11),
+          plot.title = element_text(size = 14, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    labs(x = '', y = 'RMSE', fill = 'Undetected\ninfections\nmodeled',
+         title =expression('RMSE of'~R[0])) +
+    scale_fill_manual(values = c('steelblue1', 'tomato'))
+dev.off()
+
+
 strip_design <- strip_nested(
     text_x = elem_list_text(size = c(14, 12)),
     by_layer_x = TRUE
 )
 
 
-pdf('./figures/S2_R0Post_RMSE_time.pdf', height = 5, width = 10)
+pdf('./figures/S3_R0Post_RMSE_time.pdf', height = 5, width = 10)
 ggplot(subset(R0postMSE), 
        aes(x = time, y = rmse, col = assumeType)) +
-    geom_line(linewidth = 0.8, alpha = 0.8) +
+    geom_line(linewidth = 0.8, alpha = 0.6) +
     facet_nested(dataType ~ compartmentType + alarmType,
                  strip = strip_design ) +
     theme_bw() + 
     theme(strip.placement = "outside",
           strip.background = element_blank(),
-          strip.text = element_text(size = 9),
+          strip.text = element_text(size = 10),
           axis.title = element_text(size = 10),
           axis.text = element_text(size = 8),
           legend.title = element_text(size = 10),
@@ -187,8 +139,58 @@ ggplot(subset(R0postMSE),
           panel.grid.minor = element_blank()) +
     labs(x = 'Epidemic Time', y = 'RMSE', color = 'Undetected\ninfections\nmodeled',
          title =expression('RMSE of'~R[0](t))) +
-    scale_color_manual(values = c('steelblue1', 'tomato'))
+    scale_color_manual(values = c('royalblue4', 'tomato2'))
 dev.off()
+
+
+
+# 95% simulation envelope
+R0PostAll_summary <- R0PostAll %>%
+    group_by(dataType, compartmentType, alarmType, assumeType, time) %>%
+    summarize(sim_env_low = quantile(mean, probs = 0.025),
+              sim_env_up = quantile(mean, probs = 0.975),
+              truth = mean(truth)) %>%
+    data.frame()
+
+strip_design <- strip_nested(
+    text_x = elem_list_text(size = c(14, 12)),
+    by_layer_x = TRUE,
+    
+    text_y = elem_list_text(size = c(12, 10)),
+    by_layer_y = TRUE
+)
+
+set.seed(123)
+eligibleSims <- c(1:50)[!1:50 %in% unique(notConvergeModels$simNumber)]
+randomSim <- sample(eligibleSims, 1)
+
+pdf('./figures/S4_R0Post_time.pdf', height = 8, width = 12)
+ggplot(subset(R0PostAll, simNumber == randomSim), 
+       aes(x = time, y = mean, ymin = lower, ymax = upper,
+           group = assumeType, fill = assumeType)) + 
+    geom_line() +
+    geom_ribbon(alpha = 0.5) + 
+    geom_line(aes(y = truth), color = 'black', linewidth = 0.8) +
+    facet_nested(dataType + assumeType ~ compartmentType + alarmType,
+                 strip = strip_design ) +
+    ylim(0, 8) + 
+    theme_bw() + 
+    geom_hline(yintercept = 1, linetype = 2) +
+    theme(strip.placement = "outside",
+          strip.background = element_blank(),
+          axis.title = element_text(size = 10),
+          axis.text = element_text(size = 9),
+          plot.title = element_text(size = 14, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    scale_fill_manual(values = c('steelblue1', 'tomato')) + 
+    guides(fill = 'none') +
+    labs(x = 'Epidemic Time', y = 'R0(t)',
+         title = expression('Posterior mean and 95% CI for '~R[0](t)))
+dev.off()
+
+
+
 
 ################################################################################
 # Figure S3 - posterior parameter distributions for SIHRD models
@@ -226,10 +228,10 @@ paramsPostAll <- paramsPostAll[order(paramsPostAll$dataType,
                                      paramsPostAll$param),]
 
 paramsPostAll$dataType <- factor(paramsPostAll$dataType,
-                                 levels = c('inc', 'death', 'equal'),
+                                 levels = c('inc', 'equal', 'death'),
                                  labels = c('High cases importance',
-                                            'High deaths importance',
-                                            'Equal importance'))
+                                            'Equal importance',
+                                            'High deaths importance'))
 
 paramsPostAll$param <- factor(paramsPostAll$param,
                               levels = c('alpha', 'k',
@@ -243,7 +245,7 @@ paramsPostAll$assumeType <- factor(paramsPostAll$assumeType,
                                    labels = c('w/o undetected', 'w/ undetected'))
 
 
-pdf('./figures/S3_paramEsts_SIHRD_full.pdf', height = 9, width = 10)
+pdf('./figures/S5_paramEsts_SIHRD_full.pdf', height = 9, width = 10)
 ggplot(data = subset(paramsPostAll,
                      modelType == 'SIHRD_full' &
                          !is.na(param) ),  
@@ -264,70 +266,7 @@ ggplot(data = subset(paramsPostAll,
 dev.off()
 
 
-
-pdf('./figures/S4_paramEsts_SIR_full.pdf', height = 7, width = 10)
-ggplot(data = subset(paramsPostAll,
-                     modelType == 'SIR_full' &
-                         !is.na(param) ),  
-       aes(x = simNumber, y = mean, ymin=lower, ymax=upper)) +
-    geom_hline(aes(yintercept = truth), col = 'red', linetype = 2, linewidth = 0.8) +
-    geom_point(size = 0.5) + 
-    geom_errorbar(width=0, position = position_dodge(width = 0.9)) +
-    facet_nested(param ~ dataType + assumeType, scales = 'free') +
-    labs(x = 'Simulation Number', y = '', title = 'Posterior mean and 95% CI') +
-    theme_bw() + 
-    theme(strip.background = element_rect(fill = 'white'),
-          strip.text = element_text(size = 12),
-          axis.title = element_text(size = 12),
-          axis.text = element_text(size = 10),
-          plot.title = element_text(size = 13, h = 0.5),
-          panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank()) 
-dev.off()
-
-
-# prob IR undetected vs cases only
-
-tmp_undetected <- subset(paramsPostAll,
-              modelType == 'SIR_full' & param %in% c( 'w0', 'nu') & 
-                  assumeType == 'w/ undetected' & 
-                  dataType == 'Equal importance') 
-tmp_casesOnly <- subset(paramsPostAll,
-                         modelType == 'SIR_full' & param %in% c( 'w0', 'nu')& 
-                            assumeType == 'w/o undetected' & 
-                            dataType == 'Equal importance') 
-
-idd_curves <- expand.grid(simNumber = 1:50,
-                          assumeType = c('w/ undetected', 'w/o undetected'),
-                          day_inf = 1:15, 
-                          idd_curve = NA)
-
-for (i in 1:50) {
-    
-    params <- tmp_undetected[tmp_undetected$simNumber == i, ]
-    
-    
-    idd_curves[idd_curves$simNumber == i & idd_curves$assumeType == 'w/ undetected', 
-               'idd_curve'] <- logitDecay(1:15, 
-                                         w0=params[params$param == 'w0', 'mean'], 
-                                         nu=params[params$param == 'nu', 'mean'])
-    
-    params <- tmp_casesOnly[tmp_casesOnly$simNumber == i, ]
-    
-    
-    idd_curves[idd_curves$simNumber == i & idd_curves$assumeType == 'w/o undetected', 
-               'idd_curve'] <- logitDecay(1:15, 
-                                          w0=params[params$param == 'w0', 'mean'], 
-                                          nu=params[params$param == 'nu', 'mean'])
-}
-
-
-ggplot(subset(idd_curves, simNumber == 1), 
-       aes(x = day_inf, y = idd_curve, group = assumeType, col = assumeType)) + 
-    geom_line()
-
-
-pdf('./figures/S5_paramEsts_SIHRD_inc.pdf', height = 8, width = 10)
+pdf('./figures/S6_paramEsts_SIHRD_inc.pdf', height = 8, width = 10)
 ggplot(data = subset(paramsPostAll,
                      modelType == 'SIHRD_inc' &
                          !is.na(param) ),  
@@ -348,7 +287,52 @@ ggplot(data = subset(paramsPostAll,
 dev.off()
 
 
-pdf('./figures/S6_paramEsts_SIR_inc.pdf', height = 6, width = 10)
+pdf('./figures/S7_paramEsts_SIHRD_noAlarm.pdf', height = 8, width = 10)
+ggplot(data = subset(paramsPostAll,
+                     modelType == 'SIHRD_noAlarm' &
+                         !is.na(param) ),  
+       aes(x = simNumber, y = mean, ymin=lower, ymax=upper)) +
+    geom_hline(aes(yintercept = truth), col = 'red', linetype = 2, linewidth = 0.8) +
+    geom_point(size = 0.5) + 
+    geom_errorbar(width=0, position = position_dodge(width = 0.9)) +
+    facet_nested(param ~ dataType + assumeType, scales = 'free') +
+    labs(x = 'Simulation Number', y = '', title = 'Posterior mean and 95% CI') +
+    theme_bw() + 
+    theme(strip.background = element_rect(fill = 'white'),
+          strip.text = element_text(size = 12),
+          axis.title = element_text(size = 12),
+          axis.text = element_text(size = 10),
+          plot.title = element_text(size = 13, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) 
+dev.off()
+
+
+
+
+pdf('./figures/S8_paramEsts_SIR_full.pdf', height = 7, width = 10)
+ggplot(data = subset(paramsPostAll,
+                     modelType == 'SIR_full' &
+                         !is.na(param) ),  
+       aes(x = simNumber, y = mean, ymin=lower, ymax=upper)) +
+    geom_hline(aes(yintercept = truth), col = 'red', linetype = 2, linewidth = 0.8) +
+    geom_point(size = 0.5) + 
+    geom_errorbar(width=0, position = position_dodge(width = 0.9)) +
+    facet_nested(param ~ dataType + assumeType, scales = 'free') +
+    labs(x = 'Simulation Number', y = '', title = 'Posterior mean and 95% CI') +
+    theme_bw() + 
+    theme(strip.background = element_rect(fill = 'white'),
+          strip.text = element_text(size = 12),
+          axis.title = element_text(size = 12),
+          axis.text = element_text(size = 10),
+          plot.title = element_text(size = 13, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) 
+dev.off()
+
+
+
+pdf('./figures/S9_paramEsts_SIR_inc.pdf', height = 7, width = 10)
 ggplot(data = subset(paramsPostAll,
                      modelType == 'SIR_inc' &
                          !is.na(param) ),  
@@ -368,8 +352,9 @@ ggplot(data = subset(paramsPostAll,
           panel.grid.minor = element_blank()) 
 dev.off()
 
-11
-pdf('./figures/S8_paramEsts_SIR_noAlarm.pdf', height = 6, width = 10)
+
+
+pdf('./figures/S10_paramEsts_SIR_noAlarm.pdf', height = 6, width = 10)
 ggplot(data = subset(paramsPostAll,
                      modelType == 'SIR_noAlarm' &
                          !is.na(param) ),  
