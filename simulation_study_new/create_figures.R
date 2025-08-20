@@ -146,7 +146,7 @@ ggplot(subset(R0postMSE_1, alarmType != 'No alarm'),
              col = 'black') +
     facet_nested(compartmentType ~  dataType + alarmType) +
     theme_bw() + 
-    coord_cartesian(ylim =c(0, 1.5)) +
+    # coord_cartesian(ylim =c(0, 0.5)) +
     theme(strip.placement = "outside",
           strip.background = element_blank(),
           strip.text = element_text(size = 12),
@@ -165,94 +165,7 @@ dev.off()
 
 
 ################################################################################
-# Fig 4 - Posterior predictive fit
-
-postPredFitAll <- readRDS('./results/postPredFitAll.rds')
-
-# one randomly selected simulation of those where all models converged
-notConvergeSims <- unique(notConvergeModels$simNumber)
-
-convergeSims <- which(!1:50 %in% notConvergeSims)
-
-set.seed(123)
-sim_idx <- sample(convergeSims, 1)
-
-for (dataType in c('inc', 'death', 'equal')) {
-    simData <- readRDS(paste0('./data/sim_', dataType, '.rds'))
-    
-    incData <- simData[sim_idx, grep('^Istar', colnames(simData))]
-    caseData <- simData[sim_idx, grep('detect', colnames(simData))]
-    hospData <- simData[sim_idx, grep('fromI.*1\\]', colnames(simData))]
-    deathData <- simData[sim_idx, grep('fromH.*2\\]', colnames(simData))]
-    
-    tau <- length(incData)
-    
-    
-    trueEpi <- data.frame(time = 1:tau,
-                          truth = c(incData, caseData, hospData, deathData),
-                          marg = rep(c('inc', 'cases', 'hosp', 'death'), each = tau),
-                          dataType = dataType)
-    
-    assign(paste0('trueEpidemic', tools::toTitleCase(dataType)), trueEpi)
-}
-
-trueEpidemic <- rbind.data.frame(trueEpidemicInc, trueEpidemicDeath, trueEpidemicEqual)
-
-postPredFitSimFinal <- merge(postPredFitAll, trueEpidemic, 
-                             by = c('time', 'marg', 'dataType'))
-
-
-postPredFitSimFinal$dataType <- factor(postPredFitSimFinal$dataType,
-                                       levels = c('inc', 'equal', 'death'),
-                                       labels = c('Cases importance',
-                                                  'Equal importance',
-                                                  'Deaths importance'))
-
-postPredFitSimFinal$marg <- factor(postPredFitSimFinal$marg, 
-                                   levels = c('inc', 'cases', 'hosp', 'death'),
-                                   labels = c('True Incidence', 'Observed Cases',
-                                              'Hospitalizations',
-                                              'Deaths'))
-
-postPredFitSimFinal$compartmentType <- ifelse(grepl('SIR', postPredFitSimFinal$modelType),
-                                              'SIR', 'SIHRD')
-
-postPredFitSimFinal$alarmType <- 'No alarm'
-postPredFitSimFinal$alarmType <- ifelse(grepl('inc', postPredFitSimFinal$modelType),
-                                        'Cases only', postPredFitSimFinal$alarmType)
-
-postPredFitSimFinal$alarmType <- ifelse(grepl('full', postPredFitSimFinal$modelType),
-                                        'Cases + deaths', postPredFitSimFinal$alarmType)
-
-
-postPredFitSimFinal <- postPredFitSimFinal[postPredFitSimFinal$marg != 'True Incidence',]
-
-
-pdf('./figures/fig4_postPred.pdf', height = 5, width = 8.5)
-ggplot(subset(postPredFitSimFinal, simNumber == sim_idx &  
-                  assumeType == 'undetected'), 
-       aes(x = time, ymin = lower, ymax = upper, fill = marg)) + 
-    geom_line(linewidth = 0.5, aes(y = truth, col = marg)) +
-    geom_line(aes(y = mean, col = marg), linetype = 2, linewidth = 0.5) + 
-    geom_ribbon(alpha = 0.3) +
-    facet_nested(dataType~compartmentType + alarmType,  scales = 'free_y') +
-    scale_color_manual(values = c('black', 'goldenrod3', 'royalblue')) + 
-    scale_fill_manual(values = c('black', 'goldenrod2', 'royalblue')) +
-    theme_bw() + 
-    theme(strip.placement = "outside",
-          strip.background = element_blank(),
-          strip.text = element_text(size = 11),
-          axis.title = element_text(size = 10),
-          axis.text = element_text(size = 8),
-          plot.title = element_text(size = 12, h = 0.5),
-          panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank()) +
-    labs(y = 'Epidemic Time', x = 'Count') + 
-    guides(fill = 'none', col = 'none')
-dev.off()
-
-################################################################################
-# Figure 5 - alpha parameters measuring relative importance
+# Figure 3 - alpha parameters measuring relative importance
 
 paramsPostAll <- readRDS('./results/paramsPostAll.rds')
 paramsTruth <- read.xlsx('simParamsSummary.xlsx')
@@ -314,7 +227,7 @@ paramsPostAll$modelType <- factor(paramsPostAll$modelType,
 
 
 
-pdf('./figures/fig5_alphaPost.pdf', height = 5, width = 9)
+pdf('./figures/fig3_alphaPost.pdf', height = 5, width = 9)
 ggplot(data = subset(paramsPostAll, 
                      param %in% 'alpha' & assumeType == 'undetected'),  
        aes(x = simNumber, y = mean, ymin=lower, ymax=upper)) +

@@ -15,7 +15,6 @@ source('./scripts/model_code.R')
 source('./scripts/get_model_inputs.R')
 source('./scripts/get_WAIC.R')
 source('./scripts/post_pred_fit.R')
-source('./scripts/post_pred_forecast.R')
 
 summarizePost <- function(resThree, incData, modelType, peak, probDetectMean,
                           smoothC, smoothD, hospData, deathData,

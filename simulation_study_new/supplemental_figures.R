@@ -88,31 +88,6 @@ R0postMSE <- R0PostAll %>%
 R0postMSE$assumeType <- factor(R0postMSE$assumeType,
                                labels = c('Yes', 'No'))
 
-# use only time 1 and do barplots
-R0postMSE_1 <- R0postMSE[R0postMSE$time == 1,]
-
-pdf('./figures/S2_R0Post_RMSE.pdf', height = 5, width = 10)
-ggplot(R0postMSE_1, 
-       aes(x = alarmType,  y = rmse, fill = assumeType)) +
-    geom_bar(stat = "identity", position=position_dodge(),
-             col = 'black') +
-    facet_nested(compartmentType ~  dataType ) +
-    theme_bw() + 
-    theme(strip.placement = "outside",
-          strip.background = element_blank(),
-          strip.text = element_text(size = 12),
-          axis.title = element_text(size = 10),
-          axis.text = element_text(size = 9, color = 'black'),
-          legend.title = element_text(size = 12),
-          legend.text = element_text(size = 11),
-          plot.title = element_text(size = 14, h = 0.5),
-          panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank()) +
-    labs(x = '', y = 'RMSE', fill = 'Undetected\ninfections\nmodeled',
-         title =expression('RMSE of'~R[0])) +
-    scale_fill_manual(values = c('steelblue1', 'tomato'))
-dev.off()
-
 
 strip_design <- strip_nested(
     text_x = elem_list_text(size = c(14, 12)),
@@ -120,8 +95,8 @@ strip_design <- strip_nested(
 )
 
 
-pdf('./figures/S3_R0Post_RMSE_time.pdf', height = 5, width = 10)
-ggplot(subset(R0postMSE), 
+pdf('./figures/S2_R0Post_RMSE_time.pdf', height = 5, width = 10)
+ggplot(R0postMSE, 
        aes(x = time, y = rmse, col = assumeType)) +
     geom_line(linewidth = 0.8, alpha = 0.6) +
     facet_nested(dataType ~ compartmentType + alarmType,
@@ -144,27 +119,21 @@ dev.off()
 
 
 
-# 95% simulation envelope
-R0PostAll_summary <- R0PostAll %>%
-    group_by(dataType, compartmentType, alarmType, assumeType, time) %>%
-    summarize(sim_env_low = quantile(mean, probs = 0.025),
-              sim_env_up = quantile(mean, probs = 0.975),
-              truth = mean(truth)) %>%
-    data.frame()
-
-strip_design <- strip_nested(
-    text_x = elem_list_text(size = c(14, 12)),
-    by_layer_x = TRUE,
-    
-    text_y = elem_list_text(size = c(12, 10)),
-    by_layer_y = TRUE
-)
-
+## posterior distribution for one simulation
 set.seed(123)
 eligibleSims <- c(1:50)[!1:50 %in% unique(notConvergeModels$simNumber)]
 randomSim <- sample(eligibleSims, 1)
 
-pdf('./figures/S4_R0Post_time.pdf', height = 8, width = 12)
+
+strip_design <- strip_nested(
+    text_x = elem_list_text(size = c(14, 13)),
+    by_layer_x = TRUE,
+    text_y = elem_list_text(size = c(14, 11)),
+    by_layer_y = TRUE
+)
+
+
+pdf('./figures/S3_R0Post_time.pdf', height = 8, width = 12)
 ggplot(subset(R0PostAll, simNumber == randomSim), 
        aes(x = time, y = mean, ymin = lower, ymax = upper,
            group = assumeType, fill = assumeType)) + 
@@ -193,7 +162,7 @@ dev.off()
 
 
 ################################################################################
-# Figure S3 - posterior parameter distributions for SIHRD models
+# Figures S4-S9 - posterior parameter distributions for SIHRD models
 
 paramsPostAll <- readRDS('./results/paramsPostAll.rds')
 
@@ -245,7 +214,7 @@ paramsPostAll$assumeType <- factor(paramsPostAll$assumeType,
                                    labels = c('w/o undetected', 'w/ undetected'))
 
 
-pdf('./figures/S5_paramEsts_SIHRD_full.pdf', height = 9, width = 10)
+pdf('./figures/S4_paramEsts_SIHRD_full.pdf', height = 9, width = 10)
 ggplot(data = subset(paramsPostAll,
                      modelType == 'SIHRD_full' &
                          !is.na(param) ),  
@@ -266,7 +235,7 @@ ggplot(data = subset(paramsPostAll,
 dev.off()
 
 
-pdf('./figures/S6_paramEsts_SIHRD_inc.pdf', height = 8, width = 10)
+pdf('./figures/S5_paramEsts_SIHRD_inc.pdf', height = 8, width = 10)
 ggplot(data = subset(paramsPostAll,
                      modelType == 'SIHRD_inc' &
                          !is.na(param) ),  
@@ -287,7 +256,7 @@ ggplot(data = subset(paramsPostAll,
 dev.off()
 
 
-pdf('./figures/S7_paramEsts_SIHRD_noAlarm.pdf', height = 8, width = 10)
+pdf('./figures/S6_paramEsts_SIHRD_noAlarm.pdf', height = 8, width = 10)
 ggplot(data = subset(paramsPostAll,
                      modelType == 'SIHRD_noAlarm' &
                          !is.na(param) ),  
@@ -310,7 +279,7 @@ dev.off()
 
 
 
-pdf('./figures/S8_paramEsts_SIR_full.pdf', height = 7, width = 10)
+pdf('./figures/S7_paramEsts_SIR_full.pdf', height = 7, width = 10)
 ggplot(data = subset(paramsPostAll,
                      modelType == 'SIR_full' &
                          !is.na(param) ),  
@@ -332,7 +301,7 @@ dev.off()
 
 
 
-pdf('./figures/S9_paramEsts_SIR_inc.pdf', height = 7, width = 10)
+pdf('./figures/S8_paramEsts_SIR_inc.pdf', height = 7, width = 10)
 ggplot(data = subset(paramsPostAll,
                      modelType == 'SIR_inc' &
                          !is.na(param) ),  
@@ -354,7 +323,7 @@ dev.off()
 
 
 
-pdf('./figures/S10_paramEsts_SIR_noAlarm.pdf', height = 6, width = 10)
+pdf('./figures/S9_paramEsts_SIR_noAlarm.pdf', height = 6, width = 10)
 ggplot(data = subset(paramsPostAll,
                      modelType == 'SIR_noAlarm' &
                          !is.na(param) ),  
