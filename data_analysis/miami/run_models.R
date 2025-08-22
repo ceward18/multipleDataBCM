@@ -22,7 +22,7 @@ smoothWindow <- 30
 modelType <- c('SIHRD_full', 'SIHRD_inc',
                'SIR_full', 'SIR_inc', 
                'SIHRD_noAlarm', 'SIR_noAlarm')
-timePeriod <- c(4, 6, 8, 10)
+timePeriod <- c(4, 6, 8, 10, 12)
 
 allModels <- expand.grid(city = city,
                          modelType = modelType,
@@ -30,7 +30,9 @@ allModels <- expand.grid(city = city,
                          timePeriod = timePeriod,
                          stringsAsFactors = FALSE)
 allModels <- allModels[-which(allModels$peak == 2 & allModels$timePeriod == 4),]
+allModels <- allModels[-which(allModels$peak == 2 & allModels$timePeriod == 6),]
 allModels <- allModels[-which(allModels$peak == 1 & allModels$timePeriod == 10),]
+allModels <- allModels[-which(allModels$peak == 1 & allModels$timePeriod == 12),]
 
 # 36 total - 18 for each of 2 peaks 
 allModels <- allModels[order(allModels$city,
@@ -44,10 +46,11 @@ rownames(allModels) <- NULL
 #   (https://covid19.healthdata.org/united-states-of-america/florida?view=cumulative-deaths&tab=trend)
 # wave 1: March - April 2020          12% detection (on 3/15  estimate 3192, reported 35)
 #                                                   (on 4/1  estimate 4600, reported 1090)
-# wave 2: June - July 2020  26% detection  (on 6/1  estimate 5180, reported 938)
-#                                          (on 7/1  estimate 23406, reported 8141)
+# wave 2: June - July 2020  34% detection  (on 6/1  estimate 5180, reported 938 - 18%)
+#                                          (on 7/1  estimate 23406, reported 8141 - 35%)
+#                                          (on 8/1  estimate 16371, reported 8238 - 50%)
 
-allModels$probDetectMean <- ifelse(allModels$peak == 1, 0.12, 0.26)
+allModels$probDetectMean <- ifelse(allModels$peak == 1, 0.12, 0.34)
 
 
 

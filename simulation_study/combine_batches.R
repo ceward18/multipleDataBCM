@@ -14,6 +14,11 @@ outputFiles <- list.files(paste0('./', outputFolder))
 
 grFiles <- outputFiles[grep('gr', outputFiles)]
 
+# check if there are results for everything
+all_gr <- paste0('gr_Batch', sprintf("%03d",1:360), '.rds')
+all_gr[which(!all_gr %in% grFiles)] 
+
+
 grAll <- readRDS(paste0('./', outputFolder, '/', grFiles[1]))
 
 for (i in 2:length(grFiles)) {
@@ -34,6 +39,10 @@ for (i in 2:length(alarmFiles)) {
     alarm_i <- readRDS(paste0('./', outputFolder, '/', alarmFiles[i]))
     alarmAll <-rbind.data.frame(alarmAll, alarm_i)
 }
+
+
+# remove NA (noAlarm models)
+alarmAll <- alarmAll[!is.na(alarmAll$time),]
 
 rownames(alarmAll) <- NULL
 
@@ -67,6 +76,23 @@ for (i in 2:length(R0PostFiles)) {
 }
 
 saveRDS(R0PostAll,  paste0('./', resultsFolder, '/R0PostAll.rds'))
+
+
+
+################################################################################
+# posterior Istar 
+
+IstarPostFiles <- outputFiles[grep('IstarPost', outputFiles)]
+
+IstarPostAll <- readRDS(paste0('./', outputFolder, '/', IstarPostFiles[1]))
+
+for (i in 2:length(IstarPostFiles)) {
+    IstarPost_i <- readRDS(paste0('./', outputFolder, '/', IstarPostFiles[i]))
+    IstarPostAll <-rbind.data.frame(IstarPostAll, IstarPost_i)
+}
+
+saveRDS(IstarPostAll,  paste0('./', resultsFolder, '/IstarPostAll.rds'))
+
 
 ################################################################################
 # WAIC

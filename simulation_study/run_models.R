@@ -38,11 +38,13 @@ rownames(tmp) <- NULL
 
 ################################################################################
 
-# fit models in batches of 5 (90 batches total)
-batchSize <- 10
+# fit models in batches of 5 (360 batches total)
+batchSize <- 5
 batchIdx <- batchSize * (idx - 1) + 1:batchSize
 
 for (i in batchIdx) {
+    
+    print(Sys.time())
     
     dataType_i <- allFits$dataType[i]
     modelType_i <- allFits$modelType[i]
@@ -129,6 +131,7 @@ for (i in batchIdx) {
         paramsPost <- cbind.data.frame(postSummaries$postParams, modelInfo)
         alarmTimePost <- cbind.data.frame(postSummaries$postAlarmTime, modelInfo)
         R0Post <- cbind.data.frame(postSummaries$postR0, modelInfo)
+        IstarPost <- cbind.data.frame(postSummaries$postIstar, modelInfo)
         waicPost <- cbind.data.frame(postSummaries$waic, modelInfo)
         predFitPost <- cbind.data.frame(postSummaries$postPredictFit, modelInfo)
         
@@ -141,6 +144,8 @@ for (i in batchIdx) {
                                           cbind.data.frame(postSummaries$postAlarmTime, modelInfo))
         R0Post <- rbind.data.frame(R0Post, 
                                    cbind.data.frame(postSummaries$postR0, modelInfo))
+        IstarPost <- rbind.data.frame(IstarPost, 
+                                   cbind.data.frame(postSummaries$postIstar, modelInfo))
         waicPost <- rbind.data.frame(waicPost, 
                                      cbind.data.frame(postSummaries$waic, modelInfo))
         predFitPost <- rbind.data.frame(predFitPost, 
@@ -157,6 +162,7 @@ saveRDS(gr, paste0('./output/gr_Batch', idxPrint, '.rds'))
 saveRDS(paramsPost, paste0('./output/paramsPost_Batch', idxPrint, '.rds'))
 saveRDS(alarmTimePost, paste0('./output/alarmTimePost_Batch', idxPrint, '.rds'))
 saveRDS(R0Post, paste0('./output/R0Post_Batch', idxPrint, '.rds'))
+saveRDS(IstarPost, paste0('./output/IstarPost_Batch', idxPrint, '.rds'))
 saveRDS(waicPost, paste0('./output/waicPost_Batch', idxPrint, '.rds'))
 saveRDS(predFitPost, paste0('./output/predFitPostBatch', idxPrint, '.rds'))
 

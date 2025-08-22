@@ -18,6 +18,7 @@ I0 <- 5
 S0 <- N - I0
 tau <- 40
 bw <- 30
+maxInf <- 15
 
 ### parameter values for all models 
 
@@ -30,7 +31,7 @@ phi <- 0.1     # H to D
 probDetect <- 0.25
 
 # overall alarm parameter
-k <- 0.00015
+k <- 0.00003
 
 # beta
 beta <- 1.5
@@ -42,13 +43,14 @@ constantsList <- list(N = N,
                       tau = tau,
                       S0 = S0,
                       I0 = I0,
-                      bw = bw)
+                      bw = bw,
+                      maxInf = maxInf)
 
 SIR_sim_model <- nimbleModel(code = SIHRD_sim,
                              constants = constantsList)
 SIR_sim_model_C <- compileNimble(SIR_sim_model)
 
-dataNodes <- c('Istar', 'detectIstar', 'fromI', 'fromH', 'R0')
+dataNodes <- c('Istar', 'detectIstar', 'fromI', 'fromH', 'R0', 'alarm')
 dataNodes <- SIR_sim_model$expandNodeNames(dataNodes)
 sim_R <- simulator(SIR_sim_model, dataNodes)
 sim_C <- compileNimble(sim_R, project = SIR_sim_model)
@@ -75,7 +77,7 @@ nInf <- rowSums(epiSims[,grep('Istar', colnames(epiSims))])
 toSave <- epiSims[nInf > 100,][1:nSim,]
 
 plot(toSave[1,grep('^Istar', colnames(toSave))], type = 'l', col = 'black', 
-     ylim = c(0, 5000), main = 'inc')
+     ylim = c(0, 2000), main = 'inc')
 for (i in 2:nrow(toSave)) {
     lines(toSave[i,grep('^Istar', colnames(toSave))], col = 'black')
     lines(toSave[i,grep('detectIstar', colnames(toSave))], col = 'grey')
@@ -115,7 +117,7 @@ nInf <- rowSums(epiSims[,grep('Istar', colnames(epiSims))])
 toSave <- epiSims[nInf > 100,][1:nSim,]
 
 plot(toSave[1,grep('^Istar', colnames(toSave))], type = 'l', col = 'black', 
-     ylim = c(0, 5000), main = 'deaths')
+     ylim = c(0, 4000), main = 'deaths')
 for (i in 2:nrow(toSave)) {
     lines(toSave[i,grep('^Istar', colnames(toSave))], col = 'black')
     lines(toSave[i,grep('detectIstar', colnames(toSave))], col = 'grey')
@@ -155,7 +157,7 @@ nInf <- rowSums(epiSims[,grep('Istar', colnames(epiSims))])
 toSave <- epiSims[nInf > 100,][1:nSim,]
 
 plot(toSave[1,grep('^Istar', colnames(toSave))], type = 'l', col = 'black', 
-     ylim = c(0, 5000), main = 'equal')
+     ylim = c(0, 2000), main = 'equal')
 for (i in 2:nrow(toSave)) {
     lines(toSave[i,grep('^Istar', colnames(toSave))], col = 'black')
     lines(toSave[i,grep('detectIstar', colnames(toSave))], col = 'grey')

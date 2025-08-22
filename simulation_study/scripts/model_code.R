@@ -228,23 +228,23 @@ SIHRD_sim <-  nimbleCode({
     }
     
     # estimated effective R0
-    R0[1:(tau-11)] <- get_R0_full(betat = beta * (1 - alarm[1:tau]), 
+    R0[1:(tau-maxInf-1)] <- get_R0_full(betat = beta * (1 - alarm[1:tau]), 
                                   N = N, gamma1 = gamma1, lambda = lambda,
-                                  S = S[1:tau], maxInf = 15)
+                                  S = S[1:tau], maxInf = maxInf)
     
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
-    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
-    lambda ~ dgamma(3, 100) # IH (mean 0.03)
-    phi ~ dgamma(10, 100)    # HD (mean 0.1)
+    gamma1 ~ dgamma(2000, 10000) # IR (mean 0.2)
+    gamma2 ~ dgamma(2000, 10000) # HR (mean 0.2)
+    lambda ~ dgamma(300, 10000) # IH (mean 0.03)
+    phi ~ dgamma(100, 1000)    # HD (mean 0.1)
     
     # alarm functions - priors don't matter as this is used for simulation only
     k ~ dgamma(0.1, 0.1)
@@ -323,16 +323,16 @@ SIHRD_full_undetected <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
-    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
-    lambda ~ dgamma(3, 100) # IH (mean 0.03)
-    phi ~ dgamma(10, 100)    # HD (mean 0.1)
+    gamma1 ~ dgamma(2000, 10000) # IR (mean 0.2)
+    gamma2 ~ dgamma(2000, 10000) # HR (mean 0.2)
+    lambda ~ dgamma(300, 10000) # IH (mean 0.03)
+    phi ~ dgamma(100, 1000)    # HD (mean 0.1)
     
     # alarm functions
     k ~ dgamma(0.1, 0.1)
@@ -421,16 +421,16 @@ SIHRD_full_undetected_sim <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
-    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
-    lambda ~ dgamma(3, 100) # IH (mean 0.03)
-    phi ~ dgamma(10, 100)    # HD (mean 0.1)
+    gamma1 ~ dgamma(2000, 10000) # IR (mean 0.2)
+    gamma2 ~ dgamma(2000, 10000) # HR (mean 0.2)
+    lambda ~ dgamma(300, 10000) # IH (mean 0.03)
+    phi ~ dgamma(100, 1000)    # HD (mean 0.1)
     
     # alarm functions
     k ~ dgamma(0.1, 0.1)
@@ -497,10 +497,10 @@ SIHRD_full_casesOnly <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
-    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
-    lambda ~ dgamma(3, 100) # IH (mean 0.03)
-    phi ~ dgamma(10, 100)    # HD (mean 0.1)
+    gamma1 ~ dgamma(2000, 10000) # IR (mean 0.2)
+    gamma2 ~ dgamma(2000, 10000) # HR (mean 0.2)
+    lambda ~ dgamma(300, 10000) # IH (mean 0.03)
+    phi ~ dgamma(100, 1000)    # HD (mean 0.1)
     
     # alarm functions
     k ~ dgamma(0.1, 0.1)
@@ -588,10 +588,10 @@ SIHRD_full_casesOnly_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
-    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
-    lambda ~ dgamma(3, 100) # IH (mean 0.03)
-    phi ~ dgamma(10, 100)    # HD (mean 0.1)
+    gamma1 ~ dgamma(2000, 10000) # IR (mean 0.2)
+    gamma2 ~ dgamma(2000, 10000) # HR (mean 0.2)
+    lambda ~ dgamma(300, 10000) # IH (mean 0.03)
+    phi ~ dgamma(100, 1000)    # HD (mean 0.1)
     
     # alarm functions
     k ~ dgamma(0.1, 0.1)
@@ -655,16 +655,16 @@ SIHRD_inc_undetected <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
-    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
-    lambda ~ dgamma(3, 100) # IH (mean 0.03)
-    phi ~ dgamma(10, 100)    # HD (mean 0.1)
+    gamma1 ~ dgamma(2000, 10000) # IR (mean 0.2)
+    gamma2 ~ dgamma(2000, 10000) # HR (mean 0.2)
+    lambda ~ dgamma(300, 10000) # IH (mean 0.03)
+    phi ~ dgamma(100, 1000)    # HD (mean 0.1)
     
     # alarm functions
     k ~ dgamma(0.1, 0.1)
@@ -750,16 +750,16 @@ SIHRD_inc_undetected_sim <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
-    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
-    lambda ~ dgamma(3, 100) # IH (mean 0.03)
-    phi ~ dgamma(10, 100)    # HD (mean 0.1)
+    gamma1 ~ dgamma(2000, 10000) # IR (mean 0.2)
+    gamma2 ~ dgamma(2000, 10000) # HR (mean 0.2)
+    lambda ~ dgamma(300, 10000) # IH (mean 0.03)
+    phi ~ dgamma(100, 1000)    # HD (mean 0.1)
     
     # alarm functions
     k ~ dgamma(0.1, 0.1)
@@ -824,10 +824,10 @@ SIHRD_inc_casesOnly <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
-    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
-    lambda ~ dgamma(3, 100) # IH (mean 0.03)
-    phi ~ dgamma(10, 100)    # HD (mean 0.1)
+    gamma1 ~ dgamma(2000, 10000) # IR (mean 0.2)
+    gamma2 ~ dgamma(2000, 10000) # HR (mean 0.2)
+    lambda ~ dgamma(300, 10000) # IH (mean 0.03)
+    phi ~ dgamma(100, 1000)    # HD (mean 0.1)
     
     # alarm functions
     k ~ dgamma(0.1, 0.1)
@@ -912,10 +912,10 @@ SIHRD_inc_casesOnly_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
-    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
-    lambda ~ dgamma(3, 100) # IH (mean 0.03)
-    phi ~ dgamma(10, 100)    # HD (mean 0.1)
+    gamma1 ~ dgamma(2000, 10000) # IR (mean 0.2)
+    gamma2 ~ dgamma(2000, 10000) # HR (mean 0.2)
+    lambda ~ dgamma(300, 10000) # IH (mean 0.03)
+    phi ~ dgamma(100, 1000)    # HD (mean 0.1)
     
     # alarm functions
     k ~ dgamma(0.1, 0.1)
@@ -977,16 +977,16 @@ SIHRD_noAlarm_undetected <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
-    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
-    lambda ~ dgamma(3, 100) # IH (mean 0.03)
-    phi ~ dgamma(10, 100)    # HD (mean 0.1)
+    gamma1 ~ dgamma(2000, 10000) # IR (mean 0.2)
+    gamma2 ~ dgamma(2000, 10000) # HR (mean 0.2)
+    lambda ~ dgamma(300, 10000) # IH (mean 0.03)
+    phi ~ dgamma(100, 1000)    # HD (mean 0.1)
     
 })
 
@@ -1046,10 +1046,10 @@ SIHRD_noAlarm_casesOnly <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(20, 100) # IR (mean 0.2)
-    gamma2 ~ dgamma(20, 100) # HR (mean 0.2)
-    lambda ~ dgamma(3, 100) # IH (mean 0.03)
-    phi ~ dgamma(10, 100)    # HD (mean 0.1)
+    gamma1 ~ dgamma(2000, 10000) # IR (mean 0.2)
+    gamma2 ~ dgamma(2000, 10000) # HR (mean 0.2)
+    lambda ~ dgamma(300, 10000) # IH (mean 0.03)
+    phi ~ dgamma(100, 1000)    # HD (mean 0.1)
     
 })
 
@@ -1060,7 +1060,7 @@ SIR_full_undetected <-  nimbleCode({
     
     # compartment initial values
     # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    comp_init[1:(maxInf + 2)] ~ dmulti(prob = initProb[1:(maxInf + 2)], size = N)
     S[1] <- comp_init[1] - 1
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
@@ -1098,7 +1098,7 @@ SIR_full_undetected <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -1108,8 +1108,8 @@ SIR_full_undetected <-  nimbleCode({
     alpha ~ dbeta(1, 1)
     
     # IDD Curve
-    w0 ~ dnorm(5, sd = 0.25)
-    nu ~ dgamma(100, 100)
+    w0 ~ dnorm(5, sd = 0.1)
+    nu ~ dgamma(1000, 1000)
     
 })
 
@@ -1120,7 +1120,7 @@ SIR_full_casesOnly <-  nimbleCode({
     
     # compartment initial values
     # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    comp_init[1:(maxInf + 2)] ~ dmulti(prob = initProb[1:(maxInf + 2)], size = N)
     S[1] <- comp_init[1] - 1
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
@@ -1162,8 +1162,8 @@ SIR_full_casesOnly <-  nimbleCode({
     alpha ~ dbeta(1, 1)
     
     # IDD Curve
-    w0 ~ dnorm(5, sd = 0.25)
-    nu ~ dgamma(100, 100)
+    w0 ~ dnorm(5, sd = 0.1)
+    nu ~ dgamma(1000, 1000)
     
 })
 
@@ -1174,7 +1174,7 @@ SIR_noAlarm_undetected <-  nimbleCode({
     
     # compartment initial values
     # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    comp_init[1:(maxInf + 2)] ~ dmulti(prob = initProb[1:(maxInf + 2)], size = N)
     S[1] <- comp_init[1] - 1
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
@@ -1209,14 +1209,14 @@ SIR_noAlarm_undetected <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
     
     # IDD Curve
-    w0 ~ dnorm(5, sd = 0.25)
-    nu ~ dgamma(100, 100)
+    w0 ~ dnorm(5, sd = 0.1)
+    nu ~ dgamma(1000, 1000)
     
     
 })
@@ -1228,7 +1228,7 @@ SIR_noAlarm_casesOnly <-  nimbleCode({
     
     # compartment initial values
     # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    comp_init[1:(maxInf + 2)] ~ dmulti(prob = initProb[1:(maxInf + 2)], size = N)
     S[1] <- comp_init[1] - 1
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
@@ -1263,8 +1263,8 @@ SIR_noAlarm_casesOnly <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # IDD Curve
-    w0 ~ dnorm(5, sd = 0.25)
-    nu ~ dgamma(100, 100)
+    w0 ~ dnorm(5, sd = 0.1)
+    nu ~ dgamma(1000, 1000)
     
     
 })
@@ -1276,7 +1276,7 @@ SIR_inc_undetected <-  nimbleCode({
     
     # compartment initial values
     # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    comp_init[1:(maxInf + 2)] ~ dmulti(prob = initProb[1:(maxInf + 2)], size = N)
     S[1] <- comp_init[1] - 1
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
@@ -1312,7 +1312,7 @@ SIR_inc_undetected <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -1321,8 +1321,8 @@ SIR_inc_undetected <-  nimbleCode({
     k ~ dgamma(0.1, 0.1)
     
     # IDD Curve
-    w0 ~ dnorm(5, sd = 0.25)
-    nu ~ dgamma(100, 100)
+    w0 ~ dnorm(5, sd = 0.1)
+    nu ~ dgamma(1000, 1000)
     
 })
 
@@ -1333,7 +1333,7 @@ SIR_inc_undetected_sim <-  nimbleCode({
     
     # compartment initial values
     # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    comp_init[1:(maxInf + 2)] ~ dmulti(prob = initProb[1:(maxInf + 2)], size = N)
     S[1] <- comp_init[1] - 1
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
@@ -1383,7 +1383,7 @@ SIR_inc_undetected_sim <-  nimbleCode({
     ### Priors
     
     # detection probability (1/4 reported)
-    probDetect ~ dbeta(250, 750)
+    probDetect ~ dbeta(2500, 7500)
     
     # transmission
     beta ~ dgamma(0.1, 0.1)
@@ -1392,8 +1392,8 @@ SIR_inc_undetected_sim <-  nimbleCode({
     k ~ dgamma(0.1, 0.1)
     
     # IDD Curve
-    w0 ~ dnorm(5, sd = 0.25)
-    nu ~ dgamma(100, 100)
+    w0 ~ dnorm(5, sd = 0.1)
+    nu ~ dgamma(1000, 1000)
     
 })
 
@@ -1404,7 +1404,7 @@ SIR_inc_casesOnly <-  nimbleCode({
     
     # compartment initial values
     # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    comp_init[1:(maxInf + 2)] ~ dmulti(prob = initProb[1:(maxInf + 2)], size = N)
     S[1] <- comp_init[1] - 1
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
@@ -1444,8 +1444,8 @@ SIR_inc_casesOnly <-  nimbleCode({
     k ~ dgamma(0.1, 0.1)
     
     # IDD Curve
-    w0 ~ dnorm(5, sd = 0.25)
-    nu ~ dgamma(100, 100)
+    w0 ~ dnorm(5, sd = 0.1)
+    nu ~ dgamma(1000, 1000)
     
 })
 
@@ -1456,7 +1456,7 @@ SIR_inc_casesOnly_sim <-  nimbleCode({
     
     # compartment initial values
     # 1 = S0, 2 - 11 = I0, 12 = R0
-    comp_init[1:12] ~ dmulti(prob = initProb[1:12], size = N)
+    comp_init[1:(maxInf + 2)] ~ dmulti(prob = initProb[1:(maxInf + 2)], size = N)
     S[1] <- comp_init[1] - 1
     I[1, 1] <- comp_init[2] + 1
     I[1, 2:maxInf] <- comp_init[3:(maxInf + 1)]
@@ -1508,13 +1508,13 @@ SIR_inc_casesOnly_sim <-  nimbleCode({
     k ~ dgamma(0.1, 0.1)
     
     # IDD Curve
-    w0 ~ dnorm(5, sd = 0.25)
-    nu ~ dgamma(100, 100)
+    w0 ~ dnorm(5, sd = 0.1)
+    nu ~ dgamma(1000, 1000)
     
 })
 
 ################################################################################
-### Special proposal function for removal times in exponential model
+### Special proposal function for unobserved compartments
 
 RstarUpdate <- nimbleFunction(
     name = 'Rstar',                              

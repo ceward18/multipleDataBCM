@@ -58,14 +58,7 @@ fitAlarmModel <- function(incData, modelType, assumeType,
             myConfig$addSampler(target = paramsForSlice[j], type = "slice")
         }
         
-    } else if (modelType == 'SIR_full') {
-        
-        # use slice sampling for transmission parameters
-        paramsForSlice <- c('beta', 'k', 'w0')
-        myConfig$removeSampler(paramsForSlice)
-        myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
-        
-    } else if (modelType == 'SIR_inc') { 
+    } else if (modelType %in% c('SIR_full', 'SIR_inc')) {
         
         # use slice sampling for transmission parameters
         paramsForSlice <- c('beta', 'k', 'w0')
@@ -99,6 +92,25 @@ fitAlarmModel <- function(incData, modelType, assumeType,
         myConfig$addSampler(target = c('beta', 'w0'), type = "AF_slice")
         
     } 
+    
+    # if unobserved model add sampler for Istar
+    if (assumeType == 'undetected') {
+        
+        myConfig$removeSamplers('Istar') # Nodes will be expanded
+        myConfig$addSampler(target = c('Istar'),
+                            type = "RstarUpdate",
+                            control = list(nUpdates = 1500))
+        
+        myConfig$addMonitors('Istar')
+        
+        if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
+            # joint sampler for probDetect and lambda in SIHRD models
+            myConfig$removeSampler(c('probDetect', 'lambda'))
+            myConfig$addSampler(target = c('probDetect', 'lambda'), type = "AF_slice")
+        }
+        
+    }
+    
     
     # monitor alarm functions when present
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIR_full', 'SIR_inc')) {

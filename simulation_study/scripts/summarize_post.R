@@ -20,16 +20,16 @@ summarizePost <- function(resThree, incData, modelType, assumeType,
                           smoothC, smoothD, hospData, deathData, trueInc) {
     
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
-        paramSamples1 <- resThree[[1]][,-grep('alarm|R0|Rstar|
+        paramSamples1 <- resThree[[1]][,-grep('alarm|R0|Rstar|Istar|
                                               |comp_init\\[3\\]|comp_init\\[4\\]|comp_init\\[5\\]', colnames(resThree[[1]]))]
-        paramSamples2 <- resThree[[2]][,-grep('alarm|R0|Rstar|
+        paramSamples2 <- resThree[[2]][,-grep('alarm|R0|Rstar|Istar|
                                               |comp_init\\[3\\]|comp_init\\[4\\]|comp_init\\[5\\]', colnames(resThree[[2]]))]
-        paramSamples3 <- resThree[[3]][,-grep('alarm|R0|Rstar|
+        paramSamples3 <- resThree[[3]][,-grep('alarm|R0|Rstar|Istar|
                                               |comp_init\\[3\\]|comp_init\\[4\\]|comp_init\\[5\\]', colnames(resThree[[3]]))]
     } else if (modelType %in% c('SIR_full', 'SIR_inc', 'SIR_noAlarm')) {
-        paramSamples1 <- resThree[[1]][,-grep('alarm|R0|Rstar|comp_init\\[12\\]', colnames(resThree[[1]]))]
-        paramSamples2 <- resThree[[2]][,-grep('alarm|R0|Rstar|comp_init\\[12\\]', colnames(resThree[[2]]))]
-        paramSamples3 <- resThree[[3]][,-grep('alarm|R0|Rstar|comp_init\\[12\\]', colnames(resThree[[3]]))]
+        paramSamples1 <- resThree[[1]][,-grep('alarm|R0|Rstar|Istar|comp_init\\[17\\]', colnames(resThree[[1]]))]
+        paramSamples2 <- resThree[[2]][,-grep('alarm|R0|Rstar|Istar|comp_init\\[17\\]', colnames(resThree[[2]]))]
+        paramSamples3 <- resThree[[3]][,-grep('alarm|R0|Rstar|Istar|comp_init\\[17\\]', colnames(resThree[[3]]))]
     }
     
     ##############################################################################
@@ -104,6 +104,38 @@ summarizePost <- function(resThree, incData, modelType, assumeType,
                          upper = postCI[2,])
     
     ##############################################################################
+    ### posterior distribution of Istar for undetectedd
+    
+    
+    if (assumeType == 'undetected') {
+        
+        IstarSamples1 <- resThree[[1]][,grep('Istar', colnames(resThree[[1]]))]
+        IstarSamples2 <- resThree[[2]][,grep('Istar', colnames(resThree[[2]]))]
+        IstarSamples3 <- resThree[[3]][,grep('Istar', colnames(resThree[[3]]))]
+        IstarSamples <- rbind(IstarSamples1, IstarSamples2, IstarSamples3)
+        
+        postMeans <- colMeans(IstarSamples)
+        postCI <- apply(IstarSamples, 2, quantile, probs = c(0.025, 0.975))
+        
+        postIstar <- data.frame(time = 1:tau,
+                                truth = trueInc,
+                                mean = postMeans,
+                                lower = postCI[1,],
+                                upper = postCI[2,])
+        
+        rownames(postIstar) <- NULL
+        
+    } else {
+        
+        postIstar <- data.frame(time = NA,
+                                truth = NA,
+                                mean = NA,
+                                lower = NA,
+                                upper = NA)
+    }
+    
+    
+    ##############################################################################
     ### WAIC values
     
     # samples to use for WAIC calculation differ by model
@@ -150,7 +182,7 @@ summarizePost <- function(resThree, incData, modelType, assumeType,
                                              lower = postCI[1,],
                                              upper = postCI[2,])
             }
-           
+            
         } else {
             
             if (assumeType == 'undetected') {
@@ -183,6 +215,7 @@ summarizePost <- function(resThree, incData, modelType, assumeType,
          postParams = postParams,
          postAlarmTime = postAlarmTime,
          postR0 = postR0,
+         postIstar = postIstar,
          waic = waic,
          postPredictFit = postPredictFit)
     

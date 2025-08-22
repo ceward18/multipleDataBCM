@@ -105,9 +105,16 @@ fitAlarmModel <- function(incData, city, modelType, peak, probDetectMean,
     
     # data augmentation for undetected infections
     myConfig$removeSamplers('Istar') # Nodes will be expanded
-    myConfig$addSampler(target = c('Istar'),
-                        type = "RstarUpdate",
-                        control = list(nUpdates = 3000))
+    if (peak == 1) {
+        myConfig$addSampler(target = c('Istar'),
+                            type = "RstarUpdate",
+                            control = list(nUpdates = 3000))
+    } else if (peak == 2) {
+        myConfig$addSampler(target = c('Istar'),
+                            type = "RstarUpdate",
+                            control = list(nUpdates = 10000))
+    }
+    
     myConfig$addMonitors('Istar')
     
     print(myConfig)

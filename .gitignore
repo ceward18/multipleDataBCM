@@ -2,6 +2,7 @@
 *.Rhistory
 *.qmd
 *.docx
+simulation_study_old/*
 simulation_study/chains/*
 simulation_study/convergence/*
 simulation_study_new/convergence/*

@@ -38,13 +38,12 @@ getModelInput <- function(incData, modelType, assumeType,
                           initProb = initProb,
                           maxInf = maxInf)
     
-    # conditional inference - fix unobserved Istar at 4 times what was observed
+    # initial value but this will be estimated
     # (for models that allow undetected infections)
     Istar <- round(incData / 0.25)
     
     ### data
     dataList <- list(detectIstar = incData,
-                     Istar = Istar,
                      smoothC = smoothC,
                      smoothD = smoothD)
 
@@ -56,21 +55,22 @@ getModelInput <- function(incData, modelType, assumeType,
         if (assumeType == 'casesOnly') {
             RstarI <- round(0.3 * c(rep(0, 3), I0, dataList$detectIstar[1:(tau-4)]))
         } else {
-            RstarI <- round(0.3 * c(rep(0, 3), I0, dataList$Istar[1:(tau-4)]))
+            RstarI <- round(0.3 * c(rep(0, 3), I0, Istar[1:(tau-4)]))
         }
         
         repeat {
             
             ### inits 
             initsList <- list(comp_init = comp_init,
-                              probDetect = rbeta(1, 250, 750),
+                              probDetect = rbeta(1, 2500, 7500),
                               beta = runif(1, 1/7, 1),
-                              gamma1 = rgamma(1, 20, 100), # IR
-                              gamma2 = rgamma(1, 20, 100), # HR
-                              lambda = rgamma(1, 3, 100), # IH
-                              phi = rgamma(1, 10, 100) ,   # HD
+                              gamma1 = rgamma(1, 2000, 10000), # IR
+                              gamma2 = rgamma(1, 2000, 10000), # HR
+                              lambda = rgamma(1, 3000, 100000), # IH
+                              phi = rgamma(1, 100, 1000) ,   # HD
                               k = runif(1, 0, 0.02),
                               alpha = rbeta(1, 1, 1),
+                              Istar = Istar,
                               RstarI = RstarI,
                               RstarH = round(0.3 * c(rep(0, 4), dataList$Hstar[1:(tau-4)])))
             
@@ -84,6 +84,7 @@ getModelInput <- function(incData, modelType, assumeType,
             
         } 
         
+        names(initsList$Istar) <- paste0('Istar[', 1:tau, ']')
         names(initsList$RstarI) <- paste0('RstarI[', 1:tau, ']')
         names(initsList$RstarH) <- paste0('RstarH[', 1:tau, ']')
         
@@ -98,12 +99,15 @@ getModelInput <- function(incData, modelType, assumeType,
         
         ### inits 
         initsList <- list(comp_init = comp_init,
-                          probDetect = rbeta(1, 250, 750),
+                          probDetect = rbeta(1, 2500, 7500),
                           beta = runif(1, 1/7, 1),
                           k = runif(1, 0, 0.02),
                           alpha = rbeta(1, 1, 1),
-                          w0 = rnorm(1, 5, 0.25),
-                          nu = rgamma(1, 100, 100))
+                          w0 = rnorm(1, 5, 0.1),
+                          nu = rgamma(1, 1000, 1000),
+                          Istar = Istar)
+        
+        names(initsList$Istar) <- paste0('Istar[', 1:tau, ']')
         
         # end modelType %in% c('SIR_full', 'SIR_inc', 'SIR_noAlarm')
         

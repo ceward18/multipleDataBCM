@@ -31,14 +31,8 @@ getWAIC <- function(samples, modelType, assumeType,
         colnames(incDataSamples) <- paste0('Istar[', 1:ncol(incDataSamples), ']')
         samples <- cbind(samples, incDataSamples)
         
-    } else if (assumeType == 'undetected') {
-        
-        Istar <- round(incData / 0.25)
-        incDataSamples <- matrix(rep(Istar), NROW(samples),
-                                 ncol = length(Istar), byrow = T)
-        colnames(incDataSamples) <- paste0('Istar[', 1:ncol(incDataSamples), ']')
-        samples <- cbind(samples, incDataSamples)
     }
+    # if undetected, Istar already in samples
     
     
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
