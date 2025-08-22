@@ -467,7 +467,7 @@ p_r0 <- ggplot(R0PostAll,
     theme_bw() + 
     theme(strip.background = element_rect(fill = 'white')) + 
     myTheme + 
-    scale_y_continuous(limits = c(0.5, 2.5)) +
+    scale_y_continuous(limits = c(0.5, 3)) +
     labs(x = 'Time since wave start', y = expression(R[0](t)),
          col = '', fill = '', 
          title = expression('Posterior distribution of'~R[0](t)))
@@ -636,4 +636,34 @@ ggplot(subset(postPredFitAll, marg %in% c('Cases', 'Deaths')),
     scale_color_manual(values = c('black',  'dodgerblue3'))+ 
     scale_fill_manual(values = c('grey30', 'dodgerblue'))
 dev.off()
+
+################################################################################
+# Supplemental Table 4 - alpha values for various weeks of data for modeling
+
+
+
+paramsPostAll_miami <- readRDS('miami/results/paramsPostAll.rds')
+
+alphaPost_miami <- paramsPostAll_miami[paramsPostAll_miami$param == 'alpha',]
+
+paramsPostAll_montreal <- readRDS('montreal/results/paramsPostAll.rds')
+
+alphaPost_montreal <- paramsPostAll_montreal[paramsPostAll_montreal$param == 'alpha',]
+
+
+alphaPost <- rbind.data.frame(alphaPost_miami, alphaPost_montreal)
+
+
+
+# table
+alphaPost$val <- paste0(sprintf("%.3f", round(alphaPost$mean, 3)), 
+                        ' (',
+                        sprintf("%.3f", round(alphaPost$lower, 3)),
+                        ', ',
+                        sprintf("%.3f", round(alphaPost$upper, 3)),
+                        ')')
+
+alphaPost[,c('city', 'modelType', 'peak', 'timePeriod', 'val')] %>%
+    pivot_wider(names_from = peak,
+                values_from = val)
 
