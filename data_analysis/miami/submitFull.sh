@@ -4,9 +4,9 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=6
-#SBATCH --time=72:00:00
+#SBATCH --time=96:00:00
 #SBATCH --mem=32G
-#SBATCH --array=4-6,10-12,16-18,22-24,28-30,34-36
+#SBATCH --array=6,12,18,24,29,30,35,36
 #SBATCH --output=./out/Array.%A_%a.out
 #SBATCH --error=./err/Array.%A_%a.error
 
