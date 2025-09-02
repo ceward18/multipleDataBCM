@@ -22,13 +22,15 @@ smoothWindow <- 30
 modelType <- c('SIHRD_full', 'SIHRD_inc',
                'SIR_full', 'SIR_inc', 
                'SIHRD_noAlarm', 'SIR_noAlarm')
-timePeriod <- c(6, 8, 10)
+timePeriod <- c(6, 8, 10, 12)
 
 allModels <- expand.grid(city = city,
                          modelType = modelType,
                          peak = peak,
                          timePeriod = timePeriod,
                          stringsAsFactors = FALSE)
+allModels <- allModels[-which(allModels$peak == 1 & allModels$timePeriod == 12),] # peak 1: 6, 8, 10
+allModels <- allModels[-which(allModels$peak == 2 & allModels$timePeriod == 6),] # peak 2: 8, 10, 12
 
 # 36 total - 18 for each of 2 peaks
 allModels <- allModels[order(allModels$city,

@@ -6,7 +6,7 @@
 #SBATCH --cpus-per-task=6
 #SBATCH --time=96:00:00
 #SBATCH --mem=32G
-#SBATCH --array=6,12,18,24,29,30,35,36
+#SBATCH --array=1-36
 #SBATCH --output=./out/Array.%A_%a.out
 #SBATCH --error=./err/Array.%A_%a.error
 

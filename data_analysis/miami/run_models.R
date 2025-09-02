@@ -29,10 +29,10 @@ allModels <- expand.grid(city = city,
                          peak = peak,
                          timePeriod = timePeriod,
                          stringsAsFactors = FALSE)
-allModels <- allModels[-which(allModels$peak == 2 & allModels$timePeriod == 4),]
-allModels <- allModels[-which(allModels$peak == 2 & allModels$timePeriod == 6),]
 allModels <- allModels[-which(allModels$peak == 1 & allModels$timePeriod == 10),]
 allModels <- allModels[-which(allModels$peak == 1 & allModels$timePeriod == 12),]
+allModels <- allModels[-which(allModels$peak == 2 & allModels$timePeriod == 4),]
+allModels <- allModels[-which(allModels$peak == 2 & allModels$timePeriod == 6),]
 
 # 36 total - 18 for each of 2 peaks 
 allModels <- allModels[order(allModels$city,
