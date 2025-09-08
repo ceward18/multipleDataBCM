@@ -29,8 +29,14 @@ getModelInput <- function(incData, modelType, peak, probDetectMean,
         
     }
     
-    a <- probDetectMean * 1e4
-    b <- (1 - probDetectMean) * 1e4
+    if (peak == 1) {
+        a <- probDetectMean * 1e4
+        b <- (1 - probDetectMean) * 1e4
+    } else {
+        a <- probDetectMean * 1e5
+        b <- (1 - probDetectMean) * 1e5
+    }
+    
     # initial value but this will be estimated
     Istar <- round(incData / probDetectMean)
   

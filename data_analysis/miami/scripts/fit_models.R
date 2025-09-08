@@ -108,11 +108,11 @@ fitAlarmModel <- function(incData, city, modelType, peak, probDetectMean,
     if (peak == 1) {
         myConfig$addSampler(target = c('Istar'),
                             type = "RstarUpdate",
-                            control = list(nUpdates = 3000))
+                            control = list(nUpdates = 4000))
     } else if (peak == 2) {
         myConfig$addSampler(target = c('Istar'),
                             type = "RstarUpdate",
-                            control = list(nUpdates = 10000))
+                            control = list(nUpdates = 11000))
     }
     
     myConfig$addMonitors('Istar')
