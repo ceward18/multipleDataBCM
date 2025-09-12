@@ -1,5 +1,6 @@
 #!/bin/bash
 ####### Reserve computing resources #############
+#SBATCH -p msilong
 #SBATCH --job-name=BCM_miami
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
