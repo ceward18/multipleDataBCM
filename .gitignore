@@ -2,6 +2,7 @@
 *.Rhistory
 *.qmd
 *.docx
+*.sh
 simulation_study_old/*
 simulation_study_new/*
 simulation_study/chains/*
