@@ -16,7 +16,7 @@ library(ggh4x)
 library(tidyverse)
 
 ################################################################################
-# Fig 6 - Montreal and Miami cases and deaths data
+# Fig 4 - Montreal and Miami cases and deaths data
 
 ### set up Montreal data
 montreal <- read.csv('montreal/data/montrealClean.csv')
@@ -120,7 +120,7 @@ ann_text2 <- data.frame(city = rep(c('Montreal', 'Miami'), 2),
                         lab = c(rep('Wave 2', 2), '', ''))
 
 
-pdf('figures/fig6_montreal_miami_data.pdf', height = 5.5, width = 9)
+pdf('figures/fig4_montreal_miami_data.pdf', height = 5.5, width = 9)
 ggplot(dat_long, aes(x = date, y = count/Population* 1e5)) + 
     geom_rect(aes(xmin = peak1_min, 
                   xmax = peak1_max, ymin = -Inf, ymax = Inf), 
@@ -278,7 +278,7 @@ kable(table1, row.names = F, format = 'latex', align = 'lllcccc',
 
 
 ################################################################################
-# Fig 7 - alarm functions and R0 over time
+# Fig 5 - alarm functions and R0 over time
 
 
 # get epidemic time matched with dates
@@ -472,7 +472,7 @@ p_r0 <- ggplot(R0PostAll,
          col = '', fill = '', 
          title = expression('Posterior distribution of'~R[0](t)))
 
-pdf('figures/fig7_data_alarmR0Post2.pdf', height = 8, width = 10)
+pdf('figures/fig5_data_alarmR0Post2.pdf', height = 8, width = 10)
 grid.arrange(p_alarm, p_r0, nrow = 2)
 dev.off()
 
@@ -504,7 +504,21 @@ alphaPost$val <- paste0(sprintf("%.3f", round(alphaPost$mean, 3)),
                         sprintf("%.3f", round(alphaPost$upper, 3)),
                         ')')
 
-alphaPost[,c('city', 'modelType', 'peak', 'timePeriod', 'val')] %>%
+tabOut <- alphaPost[,c('city', 'modelType', 'peak', 'timePeriod', 'val')] %>%
     pivot_wider(names_from = peak,
                 values_from = val)
+
+tabOut$modelType <- factor(tabOut$modelType, labels = c('SIHRD', 'SIR'))
+
+options(knitr.kable.NA = '-')
+kable(tabOut, row.names = F, format = 'latex', align = 'lcccc', 
+      booktabs = T, escape = F, 
+      col.names = linebreak(c('\\textbf{City}',
+                              '\\textbf{Model fitted}', 
+                              '\\textbf{Weeks used}',
+                              '\\textbf{Wave 1}',
+                              '\\textbf{Wave 2}'), align = 'c')) %>% 
+    collapse_rows(columns = 1:2, latex_hline = 'custom',
+                  custom_latex_hline = 1:2) 
+
 
