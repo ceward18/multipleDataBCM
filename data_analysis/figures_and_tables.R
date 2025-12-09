@@ -16,7 +16,7 @@ library(ggh4x)
 library(tidyverse)
 
 ################################################################################
-# Fig 4 - Montreal and Miami cases and deaths data
+# Fig 5 - Montreal and Miami cases and deaths data
 
 ### set up Montreal data
 montreal <- read.csv('montreal/data/montrealClean.csv')
@@ -120,7 +120,7 @@ ann_text2 <- data.frame(city = rep(c('Montreal', 'Miami'), 2),
                         lab = c(rep('Wave 2', 2), '', ''))
 
 
-pdf('figures/fig4_montreal_miami_data.pdf', height = 5.5, width = 9)
+pdf('figures/fig5_montreal_miami_data.pdf', height = 5.5, width = 9)
 ggplot(dat_long, aes(x = date, y = count/Population* 1e5)) + 
     geom_rect(aes(xmin = peak1_min, 
                   xmax = peak1_max, ymin = -Inf, ymax = Inf), 
@@ -278,7 +278,7 @@ kable(table1, row.names = F, format = 'latex', align = 'lllcccc',
 
 
 ################################################################################
-# Fig 5 - alarm functions and R0 over time
+# Figure 6 - Posterior predictive fit + alarms
 
 
 # get epidemic time matched with dates
@@ -313,6 +313,201 @@ montreal_dat <- data.frame(city = 'montreal',
                                     montreal$dailyHosp[which(montreal$peak == 2)]),
                            death = c(montreal$dailyDeaths[which(montreal$peak == 1)],
                                      montreal$dailyDeaths[which(montreal$peak == 2)]))
+
+
+postPredFitAll_miami <- readRDS('miami/results/postPredFitAll.rds')
+
+# 6 weeks for wave 1 and 8 weeks for wave 2
+postPredFitAll_miami <- postPredFitAll_miami[postPredFitAll_miami$peak %in% 1:2 & 
+                                                 postPredFitAll_miami$timePeriod %in% c(6, 10),]
+
+postPredFitAll_miami <- postPredFitAll_miami[which(postPredFitAll_miami$peak == 1 &
+                                                       postPredFitAll_miami$timePeriod == 6 | 
+                                                       postPredFitAll_miami$peak == 2 &
+                                                       postPredFitAll_miami$timePeriod == 10),]
+
+postPredFitAll_montreal <- readRDS('montreal/results/postPredFitAll.rds')
+
+# 8 weeks for wave 1 and 8 weeks for wave 2
+postPredFitAll_montreal <- postPredFitAll_montreal[postPredFitAll_montreal$peak %in% 1:2 & 
+                                                       postPredFitAll_montreal$timePeriod %in% c(8, 10),]
+
+
+postPredFitAll_montreal <- postPredFitAll_montreal[which(postPredFitAll_montreal$peak == 1 &
+                                                             postPredFitAll_montreal$timePeriod == 8 | 
+                                                             postPredFitAll_montreal$peak == 2 &
+                                                             postPredFitAll_montreal$timePeriod == 10),]
+
+
+
+# need in long format to merge with posterior predictions
+miami_dat_long <- reshape(miami_dat, 
+                          varying = c("inc", "hosp", "death"), 
+                          v.names = "truth",
+                          timevar = "marg", 
+                          times = c("inc", "hosp", "death"), 
+                          new.row.names = 1:10000,
+                          direction = "long")
+
+miami_dat_long <- miami_dat_long[,-which(colnames(miami_dat_long) == 'id')]
+
+postPredFitAll_miami <- merge(postPredFitAll_miami, miami_dat_long, 
+                              by = c('city', 'peak', 'time', 'marg'),
+                              all.x = T)
+
+
+
+# need in long format to merge with posterior predictions
+
+montreal_dat_long <- reshape(montreal_dat, 
+                             varying = c("inc", "hosp", "death"), 
+                             v.names = "truth",
+                             timevar = "marg", 
+                             times = c("inc", "hosp", "death"), 
+                             new.row.names = 1:10000,
+                             direction = "long")
+
+montreal_dat_long <- montreal_dat_long[,-which(colnames(montreal_dat_long) == 'id')]
+
+postPredFitAll_montreal <- merge(postPredFitAll_montreal, montreal_dat_long, 
+                                 by = c('city', 'peak', 'time', 'marg'),
+                                 all.x = T)
+
+postPredFitAll <- rbind.data.frame(postPredFitAll_miami, postPredFitAll_montreal)
+
+postPredFitAll <- postPredFitAll[order(postPredFitAll$city,
+                                       postPredFitAll$peak,
+                                       postPredFitAll$time,
+                                       postPredFitAll$marg, 
+                                       postPredFitAll$timePeriod),]
+
+
+# convert outcome to rate scale
+postPredFitAll$population <- ifelse(postPredFitAll$city == 'miami', 
+                                    miami$Population[1],
+                                    montreal$Population[1])
+postPredFitAll$truth <- postPredFitAll$truth/postPredFitAll$population * 1e5
+postPredFitAll$mean <- postPredFitAll$mean/postPredFitAll$population * 1e5
+postPredFitAll$lower <- postPredFitAll$lower/postPredFitAll$population * 1e5
+postPredFitAll$upper <- postPredFitAll$upper/postPredFitAll$population * 1e5
+
+
+postPredFitAll$marg <- factor(postPredFitAll$marg,
+                              levels = c('inc', 'hosp', 'death'),
+                              labels = c('Cases', 'Hospitalizations' , 'Deaths'))
+
+postPredFitAll$compartmentType <- ifelse(grepl('SIR', postPredFitAll$modelType),
+                                         'SIR', 'SIHRD')
+postPredFitAll$alarmType <- 'No alarm'
+postPredFitAll$alarmType <- ifelse(grepl('inc', postPredFitAll$modelType),
+                                   'Cases only', postPredFitAll$alarmType)
+
+postPredFitAll$alarmType <- ifelse(grepl('full', postPredFitAll$modelType),
+                                   'Cases + deaths', postPredFitAll$alarmType)
+
+postPredFitAll$wave <- factor(postPredFitAll$peak,
+                              labels = paste0('Wave ', c(1,2)))
+
+postPredFitAll$date <- as.Date(postPredFitAll$date, format = '%m/%d/%Y')
+
+postPredFitAll$city <- factor(postPredFitAll$city,
+                              labels = c("Miami", "Montreal"))
+
+scales_set<- list(
+    scale_x_date(date_labels = "%b %d ",date_breaks = '2 weeks'),
+    scale_x_date(date_labels = "%b %d ",date_breaks = '2 weeks'),
+    scale_x_date(date_labels = "%b %d ",date_breaks = '2 weeks'),
+    scale_x_date(date_labels = "%b %d ",date_breaks = '2 weeks'),
+    scale_x_date(date_labels = "%b %d ",date_breaks = '2 weeks'),
+    
+    scale_x_date(date_labels = "%b %d ",  date_breaks = '4 weeks'),
+    scale_x_date(date_labels = "%b %d ",  date_breaks = '4 weeks'),
+    scale_x_date(date_labels = "%b %d ",  date_breaks = '4 weeks'),
+    scale_x_date(date_labels = "%b %d ",  date_breaks = '4 weeks'),
+    scale_x_date(date_labels = "%b %d ",  date_breaks = '4 weeks'),
+    
+    scale_x_date(date_labels = "%b %d ", date_breaks = '3 weeks'),
+    scale_x_date(date_labels = "%b %d ", date_breaks = '3 weeks'),
+    scale_x_date(date_labels = "%b %d ", date_breaks = '3 weeks'),
+    scale_x_date(date_labels = "%b %d ", date_breaks = '3 weeks'),
+    scale_x_date(date_labels = "%b %d ", date_breaks = '3 weeks'),
+    
+    scale_x_date(date_labels = "%b %d ", date_breaks = '3 weeks'),
+    scale_x_date(date_labels = "%b %d ", date_breaks = '3 weeks'),
+    scale_x_date(date_labels = "%b %d ", date_breaks = '3 weeks'),
+    scale_x_date(date_labels = "%b %d ", date_breaks = '3 weeks'),
+    scale_x_date(date_labels = "%b %d ", date_breaks = '3 weeks')
+)
+
+
+
+pdf('figures/fig6_data_postPred.pdf', height = 7, width = 12)
+ggplot(subset(postPredFitAll, marg %in% c('Cases', 'Deaths', 'Hospitalizations')),
+       aes(x = date, fill = marg, group = marg)) +
+    geom_line(aes(y = truth, col = marg), linewidth = 0.8) +
+    geom_line(aes(y = mean, col = marg), linetype = 2) + 
+    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.3) +
+    facet_nested( city + wave ~  compartmentType + alarmType, 
+                  scales = "free", independent = 'x') +
+    facetted_pos_scales(x = scales_set)+
+    theme_bw() +  
+    scale_x_date(date_labels = "%b %d ",
+                 date_breaks = '2 weeks') +
+    theme(strip.placement = "outside",
+          strip.background = element_blank(),
+          strip.text = element_text(size = 13),
+          axis.title = element_text(size = 13),
+          axis.text = element_text(size = 9),
+          plot.title = element_text(size = 14, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    labs(x = 'Date', y = 'Count per 100,000',
+         col = '', fill = '', 
+         title = 'Posterior predictive distributions') + 
+    scale_color_manual(values = c('black', 'goldenrod4',  'dodgerblue3'))+ 
+    scale_fill_manual(values = c('grey30', 'goldenrod2', 'dodgerblue'))
+dev.off()
+
+
+################################################################################
+# Supplemental figure 10 - posterior prediction of hospitalizations and deaths
+#   zoomed in
+
+
+
+
+pdf('figures/S10_data_postPred_zoom.pdf', height = 7, width = 9)
+ggplot(subset(postPredFitAll, marg %in% c('Deaths', 'Hospitalizations')),
+       aes(x = date, fill = marg, group = marg)) +
+    geom_line(aes(y = truth, col = marg),linewidth = 0.8) +
+    geom_line(aes(y = mean, col = marg), linetype = 2) + 
+    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.3) +
+    facet_nested( city + wave ~  compartmentType + alarmType, 
+                  scales = "free", independent = 'x') +
+    facetted_pos_scales(x = scales_set)+
+    theme_bw() +  
+    scale_x_date(date_labels = "%b %d ",
+                 date_breaks = '2 weeks') +
+    theme(strip.placement = "outside",
+          strip.background = element_blank(),
+          strip.text = element_text(size = 13),
+          axis.title = element_text(size = 13),
+          axis.text = element_text(size = 9),
+          plot.title = element_text(size = 14, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    labs(x = 'Date', y = 'Count per 100,000',
+         col = '', fill = '', 
+         title = 'Posterior predictive distributions') + 
+    scale_color_manual(values = c('goldenrod4',  'dodgerblue3'))+ 
+    scale_fill_manual(values = c('goldenrod2', 'dodgerblue'))
+dev.off()
+
+
+################################################################################
+# Fig 7 - alarm functions and R0 over time
+
+
 
 
 ### alarms
@@ -472,14 +667,14 @@ p_r0 <- ggplot(R0PostAll,
          col = '', fill = '', 
          title = expression('Posterior distribution of'~R[0](t)))
 
-pdf('figures/fig5_data_alarmR0Post2.pdf', height = 8, width = 10)
+pdf('figures/fig7_data_alarmR0Post2.pdf', height = 8, width = 10)
 grid.arrange(p_alarm, p_r0, nrow = 2)
 dev.off()
 
 
 
 ################################################################################
-# Supplemental Table 4 - alpha values for various weeks of data for modeling
+# Supplemental Table 5 - alpha values for various weeks of data for modeling
 
 
 
