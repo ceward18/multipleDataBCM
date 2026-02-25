@@ -12,6 +12,7 @@ library(parallel)
 # source model codes for moving average function
 source('./scripts/model_code.R')
 
+
 # set up grid of models to fit
 nSim <- 50
 dataType <- c('inc', 'death', 'equal')
@@ -20,7 +21,7 @@ modelType <- c('SIHRD_full', 'SIHRD_inc',
 assumeType <- c('undetected')
 
 
-# 1800, 300 for each model (50 sims * 2 assumeTypes * 3 dataTypes)
+# 450, 150 for each model (50 sims * 1 assumeTypes * 3 dataTypes)
 allFits <- expand.grid(simNumber = 1:nSim,
                        dataType = dataType,
                        modelType = modelType,
@@ -29,7 +30,7 @@ allFits <- expand.grid(simNumber = 1:nSim,
 
 rownames(allFits) <- NULL
 
-# 360
+# 90
 tmp <- allFits[seq(1,nrow(allFits), 5),]
 rownames(tmp) <- NULL
 
@@ -59,7 +60,7 @@ for (i in batchIdx) {
     
     # gather cases, hospitalizations, and deaths
     incData <- simData[simNumber_i, grep('detectIstar', colnames(simData))]
-    hospData <- simData[simNumber_i, grep('fromI.*1\\]', colnames(simData))]
+    hospData <- simData[simNumber_i, grep('Hstar', colnames(simData))]
     deathData <- simData[simNumber_i, grep('fromH.*2\\]', colnames(simData))]
     
     # smoothed cases/hosp/deaths to inform alarm function 
