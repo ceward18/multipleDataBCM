@@ -23,8 +23,10 @@ getModelInput <- function(incData, modelType, peak, probDetectMean,
         
     } else if (grepl('SIR', modelType)) {
         
+        # Removed includes R0 and H0 and D0
+        
         # SIR models 
-        initProb <- c(S0, rep(I0/maxInf, maxInf), R0)/N
+        initProb <- c(S0, rep(I0/maxInf, maxInf), R0 + H0 + D0)/N
         comp_init <- rmulti(1, N, initProb)
         
     }

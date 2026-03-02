@@ -121,12 +121,17 @@ if (peak_i == 1) {
     R0 <- D0
 } else {
     
-    # account for waning immunity by initializing previous infections to have occurred only in the past 6 months
+    # potential to account for waning immunity by initializing previous 
+    # infections to have occurred only in the past 6 months
     lengthR <- 30*6
     inWindowR <- max(1, (idxStart - lengthI - lengthR)):(idxStart - lengthI - 1)
     
     prev_inf <- sum(dat$dailyCases[inWindowR])
+    #  inflate based on reporting
+    prev_inf <- round(prev_inf / probDetectMean_i)
+    
     R0 <- prev_inf - H0 - D0
+    
 }
 
 # currently susceptible
