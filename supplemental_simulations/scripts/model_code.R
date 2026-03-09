@@ -64,30 +64,11 @@ movingAverage <- nimbleFunction(
     })
 assign('movingAverage', movingAverage, envir = .GlobalEnv)
 
-# get effective reproductive number at time t using a forward sum
-get_R0 <- nimbleFunction(     
-    run = function(betat = double(1), N = double(0), S = double(1),
-                   maxInf = double(0), iddCurve = double(1)) {
-        returnType(double(1))
-        
-        nTime <- length(betat)
-        bw <- maxInf
-        sumSmooth <- rep(NA, nTime - bw)
-        for(k in 1:(nTime - bw)){
-            t1 <- k
-            t2 <- k + bw - 1
-            pi_SI <- 1 - exp(-betat[t1:t2] * iddCurve / N)
-            sumSmooth[k] <- sum(pi_SI * S[t1:t2])
-        }
-        
-        return(sumSmooth)
-    })
-assign('get_R0', get_R0, envir = .GlobalEnv)
-
 # get effective reproductive number for full model with transitions to H and R
 get_R0_full <- nimbleFunction(     
     run = function(betat = double(1), N = double(0), gamma1 = double(0), 
-                   lambda = double(0), S = double(1), maxInf = double(0)) {
+                   lambda = double(0), probDetect = double(0), 
+                   S = double(1), maxInf = double(0)) {
         returnType(double(1))
         
         # probability of transition given 1 infectious individual (vector length t)
@@ -95,7 +76,9 @@ get_R0_full <- nimbleFunction(
         
         # infectious probability of removal
         pi_IR <- 1 - exp(-gamma1)
-        pi_IH <- 1 - exp(-lambda)
+        # probability of hospitalization is conditional on case detection
+        # P(H) = P(H|C)P(C)
+        pi_IH <- (1 - exp(-lambda)) * probDetect
         
         # for exponential periods
         # probability of remaining infectious
@@ -323,6 +306,7 @@ SIHRD_full_undetected <-  nimbleCode({
     # estimated effective R0
     R0[1:(tau-maxInf-1)] <- get_R0_full(betat = beta * (1 - alarm[1:tau]), 
                                         N = N, gamma1 = gamma1, lambda = lambda,
+                                        probDetect = probDetect,
                                         S = S[1:tau], maxInf = maxInf)
     
     ### Priors
@@ -499,6 +483,7 @@ SIHRD_inc_undetected <-  nimbleCode({
     # estimated effective R0
     R0[1:(tau-maxInf-1)] <- get_R0_full(betat = beta * (1 - alarm[1:tau]), 
                                         N = N, gamma1 = gamma1, lambda = lambda,
+                                        probDetect = probDetect,
                                         S = S[1:tau], maxInf = maxInf)
     
     ### Priors
@@ -670,6 +655,7 @@ SIHRD_noAlarm_undetected <-  nimbleCode({
     # estimated effective R0
     R0[1:(tau-maxInf-1)] <- get_R0_full(betat = betat[1:tau], 
                                         N = N, gamma1 = gamma1, lambda = lambda,
+                                        probDetect = probDetect,
                                         S = S[1:tau], maxInf = maxInf)
     
     ### Priors

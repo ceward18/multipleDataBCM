@@ -463,7 +463,7 @@ ggplot(subset(postPredFitAll, marg %in% c('Cases', 'Deaths', 'Hospitalizations')
           panel.grid.minor = element_blank()) +
     labs(x = 'Date', y = 'Count per 100,000',
          col = '', fill = '', 
-         title = 'Posterior predictive distributions') + 
+         title = 'Posterior predictive model fit') + 
     scale_color_manual(values = c('black', 'goldenrod4',  'dodgerblue3'))+ 
     scale_fill_manual(values = c('grey30', 'goldenrod2', 'dodgerblue'))
 dev.off()
@@ -498,16 +498,48 @@ ggplot(subset(postPredFitAll, marg %in% c('Deaths', 'Hospitalizations')),
           panel.grid.minor = element_blank()) +
     labs(x = 'Date', y = 'Count per 100,000',
          col = '', fill = '', 
-         title = 'Posterior predictive distributions') + 
+         title = 'Posterior predictive model fit') + 
     scale_color_manual(values = c('goldenrod4',  'dodgerblue3'))+ 
     scale_fill_manual(values = c('goldenrod2', 'dodgerblue'))
 dev.off()
 
 
 ################################################################################
+# Supplemental figure 10 - posterior prediction of no alarm model
+#   zoomed in
+
+pdf('figures/S11_noalarm_postPred_zoom.pdf', height = 7, width = 7)
+ggplot(subset(postPredFitAll, 
+              marg %in% c('Cases', 'Deaths', 'Hospitalizations') & 
+                  alarmType == 'No alarm'),
+       aes(x = date, fill = marg, group = marg)) +
+    geom_line(aes(y = truth, col = marg), linewidth = 0.8) +
+    geom_line(aes(y = mean, col = marg), linetype = 2) + 
+    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.3) +
+    facet_nested( city + wave ~  compartmentType, 
+                  scales = "free", independent = 'x') +
+    facetted_pos_scales(x = scales_set)+
+    theme_bw() +  
+    scale_x_date(date_labels = "%b %d ",
+                 date_breaks = '2 weeks') +
+    theme(strip.placement = "outside",
+          strip.background = element_blank(),
+          strip.text = element_text(size = 13),
+          axis.title = element_text(size = 13),
+          axis.text = element_text(size = 9),
+          plot.title = element_text(size = 14, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    labs(x = 'Date', y = 'Count per 100,000',
+         col = '', fill = '', 
+         title = 'Posterior predictive model fit\nNo alarm models') + 
+    scale_color_manual(values = c('black', 'goldenrod4',  'dodgerblue3'))+ 
+    scale_fill_manual(values = c('grey30', 'goldenrod2', 'dodgerblue'))
+dev.off()
+
+
+################################################################################
 # Fig 7 - alarm functions and R0 over time
-
-
 
 
 ### alarms
