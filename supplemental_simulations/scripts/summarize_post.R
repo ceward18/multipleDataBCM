@@ -160,9 +160,6 @@ summarizePost <- function(resThree, incData, modelType, assumeType,
                                 paramsSamples = samples)
         
         
-        # remove NA rows (inc model only)
-        postPred <- postPred[!is.na(postPred[,1]),]
-        
         postMeans <- rowMeans(postPred, na.rm = T)
         postCI <- apply(postPred, 1, quantile, probs = c(0.025, 0.975), na.rm = T)
         
