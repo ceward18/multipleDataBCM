@@ -1,0 +1,7 @@
+[1] "Running: miami, model: SIR_full, peak: 1, weeks: 1-8"
+[1] "2026-03-13 17:25:55 CDT"
+[1] 2701750      17       0       0       0
+[1] "Calculating GR diagnostic..."
+[1] "Summarizing posterior distributions..."
+[1] "Calculating WAIC..."
+[1] "Calculating posterior predictive fit..."
