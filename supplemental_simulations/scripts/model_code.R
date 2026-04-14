@@ -78,14 +78,14 @@ get_R0_full <- nimbleFunction(
         pi_IR <- 1 - exp(-gamma1)
         # probability of hospitalization is conditional on case detection
         # P(H) = P(H|C)P(C)
-        pi_IH <- (1 - exp(-lambda)) * probDetect
+        pi_H <- (1 - exp(-lambda)) * probDetect
         
         # for exponential periods
         # probability of remaining infectious
         # detected
         multVec <- c(1, rep(NA, maxInf))
         for (i in 2:length(multVec)) {
-            multVec[i] <- multVec[i-1] * (1 - pi_IR) * (1 - pi_IH)
+            multVec[i] <- multVec[i-1] * (1 - pi_IR) * (1 - pi_H)
         }
         
         nTime <- length(pi_SI)
@@ -223,7 +223,7 @@ SIHRD_sim <-  nimbleCode({
                                         probDetect = probDetect,
                                         S = S[1:tau], maxInf = maxInf)
     
-    ### Priors
+    ### Priors- priors don't matter as this is used for simulation only
     
     # detection probability (1/4 reported)
     probDetect ~ dbeta(2500, 7500)
@@ -232,12 +232,12 @@ SIHRD_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(200, 10000) # IR (mean 0.2)
-    gamma2 ~ dgamma(200, 10000) # HR (mean 0.2)
+    gamma1 ~ dgamma(200, 1000) # IR (mean 0.2)
+    gamma2 ~ dgamma(200, 1000) # HR (mean 0.2)
     lambda ~ dgamma(3, 100)     # IH (mean 0.03)
     phi ~ dgamma(10, 100)       # HD (mean 0.1)
     
-    # alarm functions - priors don't matter as this is used for simulation only
+    # alarm functions 
     k ~ dgamma(0.1, 0.1)
     
     # relative importance of cases
@@ -320,8 +320,8 @@ SIHRD_full_undetected <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(200, 10000) # IR (mean 0.2)
-    gamma2 ~ dgamma(200, 10000) # HR (mean 0.2)
+    gamma1 ~ dgamma(200, 1000) # IR (mean 0.2)
+    gamma2 ~ dgamma(200, 1000) # HR (mean 0.2)
     lambda ~ dgamma(3, 100)     # IH (mean 0.03)
     phi ~ dgamma(10, 100)       # HD (mean 0.1)
     
@@ -421,8 +421,8 @@ SIHRD_full_undetected_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(200, 10000) # IR (mean 0.2)
-    gamma2 ~ dgamma(200, 10000) # HR (mean 0.2)
+    gamma1 ~ dgamma(200, 1000) # IR (mean 0.2)
+    gamma2 ~ dgamma(200, 1000) # HR (mean 0.2)
     lambda ~ dgamma(3, 100)     # IH (mean 0.03)
     phi ~ dgamma(10, 100)       # HD (mean 0.1)
     
@@ -497,8 +497,8 @@ SIHRD_inc_undetected <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(200, 10000) # IR (mean 0.2)
-    gamma2 ~ dgamma(200, 10000) # HR (mean 0.2)
+    gamma1 ~ dgamma(200, 1000) # IR (mean 0.2)
+    gamma2 ~ dgamma(200, 1000) # HR (mean 0.2)
     lambda ~ dgamma(3, 100)     # IH (mean 0.03)
     phi ~ dgamma(10, 100)       # HD (mean 0.1)
     
@@ -595,8 +595,8 @@ SIHRD_inc_undetected_sim <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(200, 10000) # IR (mean 0.2)
-    gamma2 ~ dgamma(200, 10000) # HR (mean 0.2)
+    gamma1 ~ dgamma(200, 1000) # IR (mean 0.2)
+    gamma2 ~ dgamma(200, 1000) # HR (mean 0.2)
     lambda ~ dgamma(3, 100)     # IH (mean 0.03)
     phi ~ dgamma(10, 100)       # HD (mean 0.1)
     
@@ -669,8 +669,8 @@ SIHRD_noAlarm_undetected <-  nimbleCode({
     beta ~ dgamma(0.1, 0.1)
     
     # transitions
-    gamma1 ~ dgamma(200, 10000) # IR (mean 0.2)
-    gamma2 ~ dgamma(200, 10000) # HR (mean 0.2)
+    gamma1 ~ dgamma(200, 1000) # IR (mean 0.2)
+    gamma2 ~ dgamma(200, 1000) # HR (mean 0.2)
     lambda ~ dgamma(3, 100)     # IH (mean 0.03)
     phi ~ dgamma(10, 100)       # HD (mean 0.1)
     
