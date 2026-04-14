@@ -20,7 +20,7 @@ source('./scripts/model_code.R')
 ################################################################################
 # Figure 1 - example epidemics
 
-pdf('./figures/fig1_simCurves.pdf', height = 4, width = 10)
+pdf('./figures/S10_supp_simCurves.pdf', height = 4, width = 10)
 layoutMatrix <- matrix(c(1,2,3,4,4,4), byrow = T, nrow = 2)
 layout(layoutMatrix, heights = c(0.8, 0.2))
 
@@ -31,7 +31,7 @@ for (dataType in c('inc', 'equal', 'death')) {
     # gather incidence, hospitalizations, and deaths
     incData <- simData[, grep('^Istar', colnames(simData))]
     incDataObs <- simData[, grep('detectIstar', colnames(simData))]
-    hospData <- simData[, grep('fromI.*1\\]', colnames(simData))]
+    hospData <- simData[, grep('Hstar', colnames(simData))]
     deathData <- simData[, grep('fromH.*2\\]', colnames(simData))]
     
     plotTitle <- switch(dataType,
@@ -145,7 +145,7 @@ ggplot(R0postMSE_1,
        aes(x = assumeType,  y = rmse, fill = alarmType)) +
     geom_bar(stat = "identity", position=position_dodge(),
              col = 'black', linewidth = 0) +
-    facet_nested( time  ~  dataType + compartmentType, 
+    facet_nested( time  ~  dataType , 
                   scales = 'free_y') +
     theme_bw() + 
     # coord_cartesian(ylim =c(0, 0.5)) +
@@ -277,7 +277,7 @@ for (dataType in c('inc', 'death', 'equal')) {
     
     incData <- simData[sim_idx, grep('^Istar', colnames(simData))]
     caseData <- simData[sim_idx, grep('detect', colnames(simData))]
-    hospData <- simData[sim_idx, grep('fromI.*1\\]', colnames(simData))]
+    hospData <- simData[sim_idx, grep('Hstar', colnames(simData))]
     deathData <- simData[sim_idx, grep('fromH.*2\\]', colnames(simData))]
     
     tau <- length(incData)

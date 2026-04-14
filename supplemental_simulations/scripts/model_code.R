@@ -82,9 +82,10 @@ get_R0_full <- nimbleFunction(
         
         # for exponential periods
         # probability of remaining infectious
+        # detected
         multVec <- c(1, rep(NA, maxInf))
         for (i in 2:length(multVec)) {
-            multVec[i] <- multVec[i-1] * (1 - pi_IR - pi_IH)
+            multVec[i] <- multVec[i-1] * (1 - pi_IR) * (1 - pi_IH)
         }
         
         nTime <- length(pi_SI)
@@ -219,6 +220,7 @@ SIHRD_sim <-  nimbleCode({
     # estimated effective R0
     R0[1:(tau-maxInf-1)] <- get_R0_full(betat = beta * (1 - alarm[1:tau]), 
                                         N = N, gamma1 = gamma1, lambda = lambda,
+                                        probDetect = probDetect,
                                         S = S[1:tau], maxInf = maxInf)
     
     ### Priors
