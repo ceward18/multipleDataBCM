@@ -6,6 +6,7 @@ simulation_study_old/*
 simulation_study_new/*
 simulation_study/chains/*
 simulation_study/convergence/*
+supplemental_simulations/convergence/*
 simulation_study/out/*
 simulation_study/err/*
 simulation_study/err/submitLonger.sh
