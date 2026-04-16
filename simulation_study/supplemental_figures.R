@@ -31,9 +31,40 @@ notConvergeModels <-  notConverge[
     c('dataType', 'modelType', 'assumeType', 'simNumber')]
 notConvergeModels$noConverge <- 1
 
+################################################################################
+# Fig S2 - Illustration of IDD transmissibility curve
+
+# logistic decay IDD curve
+logitDecay <- function(x, w0, nu) {
+    1 / (1 + exp(nu * (x - w0)))
+}
+
+time_inf <- seq(0, 20, by = 0.1)
+
+
+pdf('./figures/S2_IDD_Curve.pdf', height = 5, width = 10)
+par(mfrow = c(1,2))
+plot(time_inf, logitDecay(time_inf, w0=5, nu=1), col = 'grey',
+     type = 'l', lwd = 2,
+     xlab = 'Days infectious', ylab = 'IDD curve',
+     main = 'Gamma(100, 100)')
+for (i in 1:100) {
+    lines(time_inf, logitDecay(time_inf, w0=5, nu=rgamma(1, 100, 100)), col = 'grey', lwd = 2)
+}
+
+
+
+plot(time_inf, logitDecay(time_inf, w0=5, nu=1), col = 'grey',
+     type = 'l', lwd = 2,
+     xlab = 'Days infectious', ylab = 'IDD curve',
+     main = 'Gamma(10, 10)')
+for (i in 1:100) {
+    lines(time_inf, logitDecay(time_inf, w0=5, nu=rgamma(1, 10, 10)), col = 'grey', lwd = 2)
+}
+dev.off()
 
 ################################################################################
-# Fig S1 and S2 R0 RMSE and simulation envelopes across time
+# Fig S3 and S4 R0 RMSE and simulation envelopes across time
 
 R0PostAll <- readRDS('./results/R0PostAll.rds')
 R0PostAll <- R0PostAll[-which(R0PostAll$time == 25),]
@@ -95,7 +126,7 @@ strip_design <- strip_nested(
 )
 
 
-pdf('./figures/S2_R0Post_RMSE_time.pdf', height = 5, width = 10)
+pdf('./figures/S3_R0Post_RMSE_time.pdf', height = 5, width = 10)
 ggplot(R0postMSE, 
        aes(x = time, y = rmse, col = assumeType)) +
     geom_line(linewidth = 0.8, alpha = 0.6) +
@@ -133,7 +164,7 @@ strip_design <- strip_nested(
 )
 
 
-pdf('./figures/S3_R0Post_time.pdf', height = 8, width = 12)
+pdf('./figures/S4_R0Post_time.pdf', height = 8, width = 12)
 ggplot(subset(R0PostAll, simNumber == randomSim), 
        aes(x = time, y = mean, ymin = lower, ymax = upper,
            group = assumeType, fill = assumeType)) + 
@@ -162,7 +193,7 @@ dev.off()
 
 
 ################################################################################
-# Figures S4-S9 - posterior parameter distributions for SIHRD models
+# Figures S5-S10 - posterior parameter distributions for SIHRD models
 
 paramsPostAll <- readRDS('./results/paramsPostAll.rds')
 
@@ -214,7 +245,7 @@ paramsPostAll$assumeType <- factor(paramsPostAll$assumeType,
                                    labels = c('w/o undetected', 'w/ undetected'))
 
 
-pdf('./figures/S4_paramEsts_SIHRD_full.pdf', height = 9, width = 10)
+pdf('./figures/S5_paramEsts_SIHRD_full.pdf', height = 9, width = 10)
 ggplot(data = subset(paramsPostAll,
                      modelType == 'SIHRD_full' &
                          !is.na(param) ),  
@@ -235,7 +266,7 @@ ggplot(data = subset(paramsPostAll,
 dev.off()
 
 
-pdf('./figures/S5_paramEsts_SIHRD_inc.pdf', height = 8, width = 10)
+pdf('./figures/S6_paramEsts_SIHRD_inc.pdf', height = 8, width = 10)
 ggplot(data = subset(paramsPostAll,
                      modelType == 'SIHRD_inc' &
                          !is.na(param) ),  
@@ -256,7 +287,7 @@ ggplot(data = subset(paramsPostAll,
 dev.off()
 
 
-pdf('./figures/S6_paramEsts_SIHRD_noAlarm.pdf', height = 8, width = 10)
+pdf('./figures/S7_paramEsts_SIHRD_noAlarm.pdf', height = 8, width = 10)
 ggplot(data = subset(paramsPostAll,
                      modelType == 'SIHRD_noAlarm' &
                          !is.na(param) ),  
@@ -279,7 +310,7 @@ dev.off()
 
 
 
-pdf('./figures/S7_paramEsts_SIR_full.pdf', height = 7, width = 10)
+pdf('./figures/S8_paramEsts_SIR_full.pdf', height = 7, width = 10)
 ggplot(data = subset(paramsPostAll,
                      modelType == 'SIR_full' &
                          !is.na(param) ),  
@@ -301,7 +332,7 @@ dev.off()
 
 
 
-pdf('./figures/S8_paramEsts_SIR_inc.pdf', height = 7, width = 10)
+pdf('./figures/S9_paramEsts_SIR_inc.pdf', height = 7, width = 10)
 ggplot(data = subset(paramsPostAll,
                      modelType == 'SIR_inc' &
                          !is.na(param) ),  
@@ -323,7 +354,7 @@ dev.off()
 
 
 
-pdf('./figures/S9_paramEsts_SIR_noAlarm.pdf', height = 6, width = 10)
+pdf('./figures/S10_paramEsts_SIR_noAlarm.pdf', height = 6, width = 10)
 ggplot(data = subset(paramsPostAll,
                      modelType == 'SIR_noAlarm' &
                          !is.na(param) ),  

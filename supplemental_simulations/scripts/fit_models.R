@@ -36,7 +36,7 @@ fitAlarmModel <- function(incData, modelType, assumeType,
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc')) {
         
         # use slice sampling for transmission parameters
-        paramsForSlice <- c('beta', 'k')
+        paramsForSlice <- c('beta', 'k', 'alpha')
         myConfig$removeSampler(paramsForSlice)
         myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
         
@@ -52,11 +52,17 @@ fitAlarmModel <- function(incData, modelType, assumeType,
         myConfig$addMonitors(c('RstarI', 'RstarH'))
         
         # use slice sampling for rate parameters
-        paramsForSlice <- c('gamma1', 'gamma2', 'lambda', 'phi')
+        paramsForSlice <- c('gamma2', 'lambda', 'phi')
         myConfig$removeSampler(paramsForSlice)
         for (j in 1:length(paramsForSlice)) {
             myConfig$addSampler(target = paramsForSlice[j], type = "slice")
         }
+        
+        # joint slice for gamma1 and probDetect
+        paramsForSlice <- c('gamma1', 'probDetect')
+        myConfig$removeSampler(paramsForSlice)
+        myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
+        
         
     } else if (modelType %in% c('SIR_full', 'SIR_inc')) {
         
@@ -79,11 +85,16 @@ fitAlarmModel <- function(incData, modelType, assumeType,
         myConfig$addMonitors(c('RstarI', 'RstarH'))
         
         # use slice sampling for rate parameters
-        paramsForSlice <- c('beta', 'gamma1', 'gamma2', 'lambda', 'phi')
+        paramsForSlice <- c('beta', 'gamma2', 'lambda', 'phi')
         myConfig$removeSampler(paramsForSlice)
         for (j in 1:length(paramsForSlice)) {
             myConfig$addSampler(target = paramsForSlice[j], type = "slice")
         }
+        
+        # joint slice for gamma1 and probDetect
+        paramsForSlice <- c('gamma1', 'probDetect')
+        myConfig$removeSampler(paramsForSlice)
+        myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
         
     } else if (modelType == 'SIR_noAlarm') {
         

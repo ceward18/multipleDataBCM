@@ -233,9 +233,9 @@ SIHRD_sim <-  nimbleCode({
     
     # transitions
     gamma1 ~ dgamma(2000, 10000) # IR (mean 0.2)
-    gamma2 ~ dgamma(200, 1000) # HR (mean 0.2)
+    gamma2 ~ dgamma(2000, 10000) # HR (mean 0.2)
     lambda ~ dgamma(3, 100)     # IH (mean 0.03)
-    phi ~ dgamma(10, 100)       # HD (mean 0.1)
+    phi ~ dgamma(100, 1000)       # HD (mean 0.1)
     
     # alarm functions 
     k ~ dgamma(0.1, 0.1)
@@ -321,9 +321,9 @@ SIHRD_full_undetected <-  nimbleCode({
     
     # transitions
     gamma1 ~ dgamma(2000, 10000) # IR (mean 0.2)
-    gamma2 ~ dgamma(200, 1000) # HR (mean 0.2)
+    gamma2 ~ dgamma(2000, 10000) # HR (mean 0.2)
     lambda ~ dgamma(3, 100)     # IH (mean 0.03)
-    phi ~ dgamma(10, 100)       # HD (mean 0.1)
+    phi ~ dgamma(100, 1000)       # HD (mean 0.1)
     
     # alarm functions
     k ~ dgamma(0.1, 0.1)
@@ -422,9 +422,9 @@ SIHRD_full_undetected_sim <-  nimbleCode({
     
     # transitions
     gamma1 ~ dgamma(2000, 10000) # IR (mean 0.2)
-    gamma2 ~ dgamma(200, 1000) # HR (mean 0.2)
+    gamma2 ~ dgamma(2000, 10000) # HR (mean 0.2)
     lambda ~ dgamma(3, 100)     # IH (mean 0.03)
-    phi ~ dgamma(10, 100)       # HD (mean 0.1)
+    phi ~ dgamma(100, 1000)       # HD (mean 0.1)
     
     # alarm functions
     k ~ dgamma(0.1, 0.1)
@@ -498,9 +498,9 @@ SIHRD_inc_undetected <-  nimbleCode({
     
     # transitions
     gamma1 ~ dgamma(2000, 10000) # IR (mean 0.2)
-    gamma2 ~ dgamma(200, 1000) # HR (mean 0.2)
+    gamma2 ~ dgamma(2000, 10000) # HR (mean 0.2)
     lambda ~ dgamma(3, 100)     # IH (mean 0.03)
-    phi ~ dgamma(10, 100)       # HD (mean 0.1)
+    phi ~ dgamma(100, 1000)       # HD (mean 0.1)
     
     # alarm functions
     k ~ dgamma(0.1, 0.1)
@@ -596,9 +596,9 @@ SIHRD_inc_undetected_sim <-  nimbleCode({
     
     # transitions
     gamma1 ~ dgamma(2000, 10000) # IR (mean 0.2)
-    gamma2 ~ dgamma(200, 1000) # HR (mean 0.2)
+    gamma2 ~ dgamma(2000, 10000) # HR (mean 0.2)
     lambda ~ dgamma(3, 100)     # IH (mean 0.03)
-    phi ~ dgamma(10, 100)       # HD (mean 0.1)
+    phi ~ dgamma(100, 1000)       # HD (mean 0.1)
     
     # alarm functions
     k ~ dgamma(0.1, 0.1)
@@ -670,9 +670,9 @@ SIHRD_noAlarm_undetected <-  nimbleCode({
     
     # transitions
     gamma1 ~ dgamma(2000, 10000) # IR (mean 0.2)
-    gamma2 ~ dgamma(200, 1000) # HR (mean 0.2)
+    gamma2 ~ dgamma(2000, 10000) # HR (mean 0.2)
     lambda ~ dgamma(3, 100)     # IH (mean 0.03)
-    phi ~ dgamma(10, 100)       # HD (mean 0.1)
+    phi ~ dgamma(100, 1000)       # HD (mean 0.1)
     
 })
 
