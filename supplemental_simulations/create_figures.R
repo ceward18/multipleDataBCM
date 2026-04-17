@@ -18,9 +18,9 @@ library(dplyr)
 source('./scripts/model_code.R')
 
 ################################################################################
-# Figure 1 - example epidemics
+# Figure S11 - example epidemics
 
-pdf('./figures/S10_supp_simCurves.pdf', height = 4, width = 10)
+pdf('./figures/S11_supp_simCurves.pdf', height = 4, width = 10)
 layoutMatrix <- matrix(c(1,2,3,4,4,4), byrow = T, nrow = 2)
 layout(layoutMatrix, heights = c(0.8, 0.2))
 
@@ -77,7 +77,7 @@ notConvergeModels <-  notConverge[
 notConvergeModels$noConverge <- 1
 
 ################################################################################
-# Fig 2 - RMSE undetected vs detected in estimation of R0 
+# S12 - RMSE undetected vs detected in estimation of R0 
 
 R0PostAll <- readRDS('./results/R0PostAll.rds')
 
@@ -140,7 +140,7 @@ R0postMSE_1$time <- factor(R0postMSE_1$time,
 
 
 
-pdf('./figures/fig2_R0Post_RMSE.pdf', height = 5, width = 10)
+pdf('./figures/S12_R0Post_RMSE.pdf', height = 5, width = 8)
 ggplot(R0postMSE_1, 
        aes(x = assumeType,  y = rmse, fill = alarmType)) +
     geom_bar(stat = "identity", position=position_dodge(),
@@ -170,97 +170,7 @@ dev.off()
 
 
 ################################################################################
-# Figure 3 - alpha parameters measuring relative importance
-
-paramsPostAll <- readRDS('./results/paramsPostAll.rds')
-paramsTruth <- read.xlsx('simParamsSummary.xlsx')
-
-
-### wide to long
-paramsTruth <- reshape(paramsTruth, 
-                       varying = colnames(paramsTruth)[-1], 
-                       v.names = "truth",
-                       timevar = "param", 
-                       times = colnames(paramsTruth)[-1], 
-                       new.row.names = 1:1000,
-                       direction = "long")
-paramsTruth <- paramsTruth[-which(colnames(paramsTruth) %in% c('id'))]
-
-# ## remove those that did not converge
-# paramsPostAll <- merge(paramsPostAll, notConvergeModels,
-#                        by = c('dataType', 'modelType', 'assumeType', 'simNumber'),
-#                        all.x = T)
-# paramsPostAll$noConverge[is.na(paramsPostAll$noConverge)] <- 0
-# paramsPostAll <- paramsPostAll[paramsPostAll$noConverge == 0,]
-
-# merge with truth
-paramsPostAll <- merge(paramsPostAll, paramsTruth, 
-                       by = c('param', 'dataType'),
-                       all.x = T)
-
-
-paramsPostAll <- merge(paramsPostAll, notConvergeModels, 
-                       by = c('dataType', 'modelType', 'assumeType', 'simNumber'),
-                       all.x = T)
-
-paramsPostAll <- subset(paramsPostAll, is.na(noConverge))
-
-paramsPostAll <- paramsPostAll[order(paramsPostAll$dataType, 
-                                     paramsPostAll$modelType,
-                                     paramsPostAll$assumeType,
-                                     paramsPostAll$simNumber, 
-                                     paramsPostAll$param),]
-
-paramsPostAll$dataType <- factor(paramsPostAll$dataType,
-                                 levels = c('inc', 'equal', 'death'),
-                                 labels = c('High case importance',
-                                            'Equal importance',
-                                            'High deaths importance'))
-
-paramsPostAll$param <- factor(paramsPostAll$param,
-                              levels = c('alpha', 'k',
-                                         'beta', 'probDetect',
-                                         'nu', 'w0', 
-                                         'lambda', 'gamma1', 'gamma2', 'phi'))
-
-
-paramsPostAll <- paramsPostAll[which(paramsPostAll$modelType %in%
-                                         c('SIR_full', 'SIHRD_full')),]
-paramsPostAll$modelType <- factor(paramsPostAll$modelType,
-                                  levels = c('SIR_full', 'SIHRD_full'),
-                                  labels = c('SIR', 'SIHRD'))
-
-
-
-pdf('./figures/fig3_alphaPost.pdf', height = 5, width = 9)
-ggplot(data = subset(paramsPostAll, 
-                     param %in% 'alpha' & assumeType == 'undetected'),  
-       aes(x = simNumber, y = mean, ymin=lower, ymax=upper)) +
-    geom_point(size = 0.8, position = position_dodge(width = 0.9), alpha = 0.8) + 
-    geom_errorbar(width=0, position = position_dodge(width = 0.9), alpha = 0.8,
-                  linewidth = 0.2) +
-    geom_hline(aes(yintercept = truth), col = 'red',
-               linetype = 2, linewidth = 0.5) +
-    facet_nested(modelType ~  dataType ) +
-    labs(x = 'Simulation Number', y = expression(alpha), 
-         title = expression(paste('Posterior mean and 95% Credible Intervals for ',
-                                  alpha)),
-         col = '') +
-    theme_bw() + 
-    ylim(0, 1) + 
-    theme(strip.placement = "outside",
-          strip.background = element_blank(),
-          strip.text = element_text(size = 12),
-          axis.title = element_text(size = 12),
-          axis.text = element_text(size = 10),
-          legend.text = element_text(size = 12),
-          plot.title = element_text(size = 14, h = 0.5),
-          panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank())
-dev.off()
-
-################################################################################
-# Figure 4 - posterior predictive fit for one simulation
+# Figure S13 - posterior predictive fit for one simulation
 
 postPredFitAll <- readRDS('results/postPredFitAll.rds')
 
@@ -323,7 +233,7 @@ postPredFitSimFinal$alarmType <- ifelse(grepl('full', postPredFitSimFinal$modelT
 postPredFitSimFinal <- postPredFitSimFinal[postPredFitSimFinal$marg != 'True Incidence',]
 
 
-pdf('./figures/fig4_postPred.pdf', height = 5, width = 8.5)
+pdf('./figures/S13_postPred.pdf', height = 5, width = 8.5)
 ggplot(subset(postPredFitSimFinal, simNumber == sim_idx &  
                   assumeType == 'undetected'), 
        aes(x = time, ymin = lower, ymax = upper, fill = marg)) + 
@@ -349,6 +259,96 @@ dev.off()
 
 
 
+
+################################################################################
+# Figure S14 - alpha parameters measuring relative importance
+
+paramsPostAll <- readRDS('./results/paramsPostAll.rds')
+paramsTruth <- read.xlsx('simParamsSummary.xlsx')
+
+
+### wide to long
+paramsTruth <- reshape(paramsTruth, 
+                       varying = colnames(paramsTruth)[-1], 
+                       v.names = "truth",
+                       timevar = "param", 
+                       times = colnames(paramsTruth)[-1], 
+                       new.row.names = 1:1000,
+                       direction = "long")
+paramsTruth <- paramsTruth[-which(colnames(paramsTruth) %in% c('id'))]
+
+# ## remove those that did not converge
+# paramsPostAll <- merge(paramsPostAll, notConvergeModels,
+#                        by = c('dataType', 'modelType', 'assumeType', 'simNumber'),
+#                        all.x = T)
+# paramsPostAll$noConverge[is.na(paramsPostAll$noConverge)] <- 0
+# paramsPostAll <- paramsPostAll[paramsPostAll$noConverge == 0,]
+
+# merge with truth
+paramsPostAll <- merge(paramsPostAll, paramsTruth, 
+                       by = c('param', 'dataType'),
+                       all.x = T)
+
+
+paramsPostAll <- merge(paramsPostAll, notConvergeModels, 
+                       by = c('dataType', 'modelType', 'assumeType', 'simNumber'),
+                       all.x = T)
+
+paramsPostAll <- subset(paramsPostAll, is.na(noConverge))
+
+paramsPostAll <- paramsPostAll[order(paramsPostAll$dataType, 
+                                     paramsPostAll$modelType,
+                                     paramsPostAll$assumeType,
+                                     paramsPostAll$simNumber, 
+                                     paramsPostAll$param),]
+
+paramsPostAll$dataType <- factor(paramsPostAll$dataType,
+                                 levels = c('inc', 'equal', 'death'),
+                                 labels = c('High case importance',
+                                            'Equal importance',
+                                            'High deaths importance'))
+
+paramsPostAll$param <- factor(paramsPostAll$param,
+                              levels = c('alpha', 'k',
+                                         'beta', 'probDetect',
+                                         'nu', 'w0', 
+                                         'lambda', 'gamma1', 'gamma2', 'phi'))
+
+
+paramsPostAll <- paramsPostAll[which(paramsPostAll$modelType %in%
+                                         c('SIR_full', 'SIHRD_full')),]
+paramsPostAll$modelType <- factor(paramsPostAll$modelType,
+                                  levels = c('SIR_full', 'SIHRD_full'),
+                                  labels = c('SIR', 'SIHRD'))
+
+
+
+pdf('./figures/S14_alphaPost.pdf', height = 3, width = 6)
+ggplot(data = subset(paramsPostAll, 
+                     param %in% 'alpha' & assumeType == 'undetected'),  
+       aes(x = simNumber, y = mean, ymin=lower, ymax=upper)) +
+    geom_point(size = 0.8, position = position_dodge(width = 0.9), alpha = 0.8) + 
+    geom_errorbar(width=0, position = position_dodge(width = 0.9), alpha = 0.8,
+                  linewidth = 0.2) +
+    geom_hline(aes(yintercept = truth), col = 'red',
+               linetype = 2, linewidth = 0.5) +
+    facet_nested(modelType ~  dataType ) +
+    labs(x = 'Simulation Number', y = expression(alpha), 
+         title = expression(paste('Posterior mean and 95% Credible Intervals for ',
+                                  alpha)),
+         col = '') +
+    theme_bw() + 
+    ylim(0, 1) + 
+    theme(strip.placement = "outside",
+          strip.background = element_blank(),
+          strip.text = element_text(size = 12),
+          axis.title = element_text(size = 12),
+          axis.text = element_text(size = 10),
+          legend.text = element_text(size = 12),
+          plot.title = element_text(size = 14, h = 0.5),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank())
+dev.off()
 
 
 

@@ -61,7 +61,7 @@ fitAlarmModel <- function(incData, modelType, assumeType,
         # joint slice for gamma1 and probDetect
         paramsForSlice <- c('gamma1', 'probDetect')
         myConfig$removeSampler(paramsForSlice)
-        myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
+        myConfig$addSampler(target = paramsForSlice, type = "RW_block")
         
         
     } else if (modelType %in% c('SIR_full', 'SIR_inc')) {
@@ -91,10 +91,10 @@ fitAlarmModel <- function(incData, modelType, assumeType,
             myConfig$addSampler(target = paramsForSlice[j], type = "slice")
         }
         
-        # joint slice for gamma1 and probDetect
+        # joint RW for gamma1 and probDetect
         paramsForSlice <- c('gamma1', 'probDetect')
         myConfig$removeSampler(paramsForSlice)
-        myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
+        myConfig$addSampler(target = paramsForSlice, type = "RW_block")
         
     } else if (modelType == 'SIR_noAlarm') {
         

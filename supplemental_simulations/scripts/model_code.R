@@ -688,7 +688,7 @@ RstarUpdate <- nimbleFunction(
         # percent <- if(!is.null(control$percent)) control$percent else 0.05   
         
         # number of update attempts at each iteration
-        nUpdates <- if(!is.null(control$nUpdates)) control$nUpdates else 500
+        nUpdates <- if(!is.null(control$nUpdates)) control$nUpdates else 1000
         
     },                                                                  # setup can't return anything
     run = function() {
