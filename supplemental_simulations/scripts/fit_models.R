@@ -58,11 +58,6 @@ fitAlarmModel <- function(incData, modelType, assumeType,
             myConfig$addSampler(target = paramsForSlice[j], type = "slice")
         }
         
-        # joint slice for gamma1 and probDetect
-        paramsForSlice <- c('gamma1', 'probDetect')
-        myConfig$removeSampler(paramsForSlice)
-        myConfig$addSampler(target = paramsForSlice, type = "RW_block")
-        
         
     } else if (modelType %in% c('SIR_full', 'SIR_inc')) {
         
@@ -91,11 +86,6 @@ fitAlarmModel <- function(incData, modelType, assumeType,
             myConfig$addSampler(target = paramsForSlice[j], type = "slice")
         }
         
-        # joint RW for gamma1 and probDetect
-        paramsForSlice <- c('gamma1', 'probDetect')
-        myConfig$removeSampler(paramsForSlice)
-        myConfig$addSampler(target = paramsForSlice, type = "RW_block")
-        
     } else if (modelType == 'SIR_noAlarm') {
         
         # joint sampler for beta and w0
@@ -115,9 +105,9 @@ fitAlarmModel <- function(incData, modelType, assumeType,
         myConfig$addMonitors('Istar')
         
         if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
-            # joint sampler for probDetect and lambda in SIHRD models
-            myConfig$removeSampler(c('probDetect', 'lambda'))
-            myConfig$addSampler(target = c('probDetect', 'lambda'), type = "AF_slice")
+            # joint sampler for probDetect and gamma1 in SIHRD models
+            myConfig$removeSampler(c('probDetect', 'gamma1'))
+            myConfig$addSampler(target = c('probDetect', 'gamma1'), type = "AF_slice")
         }
         
     }
