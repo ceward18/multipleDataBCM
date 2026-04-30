@@ -36,7 +36,7 @@ fitAlarmModel <- function(incData, modelType, assumeType,
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc')) {
         
         # use slice sampling for transmission parameters
-        paramsForSlice <- c('beta', 'k', 'alpha')
+        paramsForSlice <- c('beta', 'k', 'alpha', 'gamma1', 'probDetect')
         myConfig$removeSampler(paramsForSlice)
         myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
         
@@ -86,6 +86,10 @@ fitAlarmModel <- function(incData, modelType, assumeType,
             myConfig$addSampler(target = paramsForSlice[j], type = "slice")
         }
         
+        # joint sampler for probDetect and gamma1 in SIHRD models
+        myConfig$removeSampler(c('probDetect', 'gamma1'))
+        myConfig$addSampler(target = c('probDetect', 'gamma1'), type = "AF_slice")
+        
     } else if (modelType == 'SIR_noAlarm') {
         
         # joint sampler for beta and w0
@@ -103,13 +107,7 @@ fitAlarmModel <- function(incData, modelType, assumeType,
                             control = list(nUpdates = 1500))
         
         myConfig$addMonitors('Istar')
-        
-        if (modelType %in% c('SIHRD_full', 'SIHRD_inc', 'SIHRD_noAlarm')) {
-            # joint sampler for probDetect and gamma1 in SIHRD models
-            myConfig$removeSampler(c('probDetect', 'gamma1'))
-            myConfig$addSampler(target = c('probDetect', 'gamma1'), type = "AF_slice")
-        }
-        
+       
     }
     
     
