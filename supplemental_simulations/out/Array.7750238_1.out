@@ -1,0 +1,15 @@
+[1] "2026-04-27 14:41:19 CDT"
+[1] "Data Gen: inc, model fit: SIHRD_full, assumption: undetected, simulation: 1"
+Stochastic parents of data are:  probDetect beta gamma1 gamma2 lambda phi k alpha comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
+[1] "2026-04-27 18:37:05 CDT"
+[1] "Data Gen: inc, model fit: SIHRD_full, assumption: undetected, simulation: 2"
+Stochastic parents of data are:  probDetect beta gamma1 gamma2 lambda phi k alpha comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
+[1] "2026-04-27 22:27:20 CDT"
+[1] "Data Gen: inc, model fit: SIHRD_full, assumption: undetected, simulation: 3"
+Stochastic parents of data are:  probDetect beta gamma1 gamma2 lambda phi k alpha comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
+[1] "2026-04-28 02:06:52 CDT"
+[1] "Data Gen: inc, model fit: SIHRD_full, assumption: undetected, simulation: 4"
+Stochastic parents of data are:  probDetect beta gamma1 gamma2 lambda phi k alpha comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
+[1] "2026-04-28 05:38:14 CDT"
+[1] "Data Gen: inc, model fit: SIHRD_full, assumption: undetected, simulation: 5"
+Stochastic parents of data are:  probDetect beta gamma1 gamma2 lambda phi k alpha comp_init[1] comp_init[2] comp_init[3] comp_init[4] comp_init[5] .
