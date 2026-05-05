@@ -35,8 +35,13 @@ fitAlarmModel <- function(incData, modelType, assumeType,
     
     if (modelType %in% c('SIHRD_full', 'SIHRD_inc')) {
         
-        # use slice sampling for transmission parameters
-        paramsForSlice <- c('beta', 'k', 'alpha', 'gamma1', 'probDetect')
+        if (modelType == 'SIHRD_full') {
+            # use slice sampling for transmission parameters
+            paramsForSlice <- c('beta', 'k', 'alpha', 'gamma1', 'probDetect')
+        } else {
+            # use slice sampling for transmission parameters
+            paramsForSlice <- c('beta', 'k', 'gamma1', 'probDetect')
+        }
         myConfig$removeSampler(paramsForSlice)
         myConfig$addSampler(target = paramsForSlice, type = "AF_slice")
         
@@ -47,7 +52,8 @@ fitAlarmModel <- function(incData, modelType, assumeType,
         
         myConfig$removeSamplers('RstarH') # Nodes will be expanded
         myConfig$addSampler(target = c('RstarH'),
-                            type = "RstarUpdate")
+                            type = "RstarUpdate",
+                            control = list(nUpdates = 1500))
         
         myConfig$addMonitors(c('RstarI', 'RstarH'))
         
@@ -75,7 +81,8 @@ fitAlarmModel <- function(incData, modelType, assumeType,
         
         myConfig$removeSamplers('RstarH') # Nodes will be expanded
         myConfig$addSampler(target = c('RstarH'),
-                            type = "RstarUpdate")
+                            type = "RstarUpdate",
+                            control = list(nUpdates = 1500))
         
         myConfig$addMonitors(c('RstarI', 'RstarH'))
         
