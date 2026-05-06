@@ -15,7 +15,7 @@ outputFiles <- list.files(paste0('./', outputFolder))
 grFiles <- outputFiles[grep('gr', outputFiles)]
 
 # check if there are results for everything
-all_gr <- paste0('gr_Batch', sprintf("%03d",1:90), '.rds')
+all_gr <- paste0('gr_Batch', sprintf("%03d",1:225), '.rds')
 all_gr[which(!all_gr %in% grFiles)] 
 
 

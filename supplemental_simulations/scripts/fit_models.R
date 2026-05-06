@@ -48,7 +48,8 @@ fitAlarmModel <- function(incData, modelType, assumeType,
         # samplers for RstarI and RstarH
         myConfig$removeSamplers('RstarI') # Nodes will be expanded
         myConfig$addSampler(target = c('RstarI'),
-                            type = "RstarUpdate")
+                            type = "RstarUpdate",
+                            control = list(nUpdates = 1500))
         
         myConfig$removeSamplers('RstarH') # Nodes will be expanded
         myConfig$addSampler(target = c('RstarH'),
@@ -77,7 +78,8 @@ fitAlarmModel <- function(incData, modelType, assumeType,
         # samplers for RstarI and RstarH
         myConfig$removeSamplers('RstarI') # Nodes will be expanded
         myConfig$addSampler(target = c('RstarI'),
-                            type = "RstarUpdate")
+                            type = "RstarUpdate",
+                            control = list(nUpdates = 1500))
         
         myConfig$removeSamplers('RstarH') # Nodes will be expanded
         myConfig$addSampler(target = c('RstarH'),
