@@ -9,6 +9,13 @@ This directory contains the code needed to run the simulation study presented in
 The create_figures.R script in this directory can be run to reproduce Figures 1 - 3.
 
 
+## supplemental_simulations
+
+This directory contains the code needed to run the supplemental simulation study presented in Supplementary Material Section 4.
+
+The create_figures.R script in this directory can be run to reproduce Supplementary Figures S11 - S14.
+
+
 ## data_analysis
 
 This directory contains code to reproduce the analysis of COVID-19 data from Miami-Dade county and Montreal presented in Section 4.
