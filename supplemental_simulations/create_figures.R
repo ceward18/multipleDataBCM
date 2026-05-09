@@ -69,7 +69,8 @@ grAll <- readRDS('./results/grAll.rds')
 grAll <- grAll[-grep('comp_init', grAll$param),]
 
 # which didn't converge
-notConverge <- grAll[which(round(grAll$gr, 1) > 1.1),  ]
+notConverge <- grAll[which(round(grAll$gr, 1) > 1.1 & 
+                               grAll$param != 'probDetect'),  ]
 notConvergeModels <-  notConverge[
     !duplicated(notConverge[,-which(colnames(notConverge) 
                                     %in% c('gr', 'grUpper', 'param'))]),
