@@ -1,6 +1,6 @@
 # multipleDataBCM
 
-This repository contains code associated with the simulation study and data analysis presented in "Multivariable Behavioral Change Modeling of Epidemics in the Presence of Undetected Infections" by Ward et al. (2025). 
+This repository contains code associated with the simulation study and data analysis presented in "Multivariable Behavioral Change Modeling of Epidemics in the Presence of Undetected Infections" by Ward et al. (2026). 
 
 ## simulation_study
 
